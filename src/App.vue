@@ -1,21 +1,28 @@
 <template>
-  <div id="app">App根组件</div>
+  <div id="app">
+    <div>index</div>
+    <Login></Login>
+  </div>
 </template>
 
 <script>
+import Login from './components/Login.vue'
 export default {
-  name: 'app'
-  // components: {},
+  name: 'app',
+  components: {
+    Login
+  }
 }
 </script>
 
-<style>
+<style lang="less" scoped>
 #app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
+  background-color: #eff2f4;
+  position: relative;
 }
 </style>
