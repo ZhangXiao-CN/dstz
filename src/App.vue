@@ -1,17 +1,12 @@
 <template>
   <div id="app">
-    <div>index</div>
-    <Login></Login>
+    <router-view />
   </div>
 </template>
 
 <script>
-import Login from './components/Login.vue'
 export default {
-  name: 'app',
-  components: {
-    Login
-  }
+  name: 'app'
 }
 </script>
 
@@ -21,8 +16,8 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  background-color: #eff2f4;
+  color: #304455;
+  background-color: #edf0f2;
   position: relative;
 }
 </style>

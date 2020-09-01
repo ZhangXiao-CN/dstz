@@ -8,72 +8,77 @@
       </div>
       <div class="title">登陆</div>
       <div class="form-box">
-        <div class="username-box" id="usernamebox">
-          <div :class="'form-tips ' + colorStyle.blueUsername">昵称</div>
-          <el-input
-            v-model="userLogin.username"
-            class="login-input username"
-            @focus="changeColorUsername"
-            @blur="changeColorUsername"
-          ></el-input>
-          <div class="tips-text">中文字母组合,最少两位</div>
-        </div>
+        <transition name="slide">
+          <div class="username-box" v-if="regShow">
+            <div class="form-tips" :class="{blueFont:colorStyle.blueStyle==='username'}">昵称</div>
+            <el-input
+              v-model="userLogin.username"
+              class="login-input username"
+              @focus="changeColor('username')"
+              @blur="changeColor"
+            ></el-input>
+            <div class="tips-text">中文字母组合,最少两位</div>
+          </div>
+        </transition>
         <div class="email-box">
-          <div :class="'form-tips ' + colorStyle.blueEmail">登陆邮箱</div>
+          <div class="form-tips" :class="{blueFont:colorStyle.blueStyle==='email'}">登陆邮箱</div>
           <el-input
             v-model="userLogin.email"
             class="login-input email"
-            @focus="changeColorEmail"
-            @blur="changeColorEmail"
+            @focus="changeColor('email')"
+            @blur="changeColor"
           ></el-input>
-          <div class="tips-text" v-show="colorStyle.regShow">使用邮箱注册登录</div>
+          <div class="tips-text" v-show="regShow">使用邮箱注册登录</div>
         </div>
         <div class="password-box">
-          <div :class="'form-tips ' + colorStyle.bluePassword">密码</div>
+          <div class="form-tips" :class="{blueFont:colorStyle.blueStyle==='password'}">密码</div>
           <el-input
             ref="passwordInput"
             :type="colorStyle.passwordShow"
             v-model="userLogin.password"
             class="login-input password"
-            @focus="changeColorPassword"
-            @blur="changeColorPassword"
+            @focus="changeColor('password')"
+            @blur="changeColor"
           >
             <i
               slot="suffix"
               class="iconfont see"
-              :class="[colorStyle.blueEye, colorStyle.iconEye]"
+              :class="colorStyle.iconEye"
               @click="changePasswordShow"
             ></i>
           </el-input>
-          <div class="tips-text" v-show="colorStyle.regShow">密码最少三位</div>
+          <div class="tips-text" v-show="regShow">密码最少三位</div>
         </div>
       </div>
-      <div class="tool-wrap" v-if="!colorStyle.regShow">
+      <div class="tool-wrap" v-if="!regShow">
         <div class="retrieve">
-          <a href="javascript:;" class="reg-btn">忘记密码</a>
+          <a href="javascript:;" class="reg-btn">忘记密码?</a>
         </div>
         <div class="reg">
-          <a href="javascript:;" class="reg-btn" @click="renderReg">立即注册</a>
+          <a href="javascript:;" class="reg-btn" @click="renderReg(true)">立即注册</a>
         </div>
       </div>
-      <div class="login-btn" v-if="!colorStyle.regShow">
-        <el-button type="primary">快速登录</el-button>
+      <div class="login-btn" v-if="!regShow">
+        <el-button type="primary" @click="login">快速登录</el-button>
       </div>
-      <div class="tool-wrap" v-if="colorStyle.regShow">
+      <div class="tool-wrap" v-if="regShow">
         <div class="retrieve">
           已有账号?
-          <a href="javascript:;" class="reg-btn" @click="renderReg">去登录</a>
+          <a href="javascript:;" class="reg-btn" @click="renderReg(false)">去登录</a>
         </div>
       </div>
-      <div class="login-btn" v-if="colorStyle.regShow">
-        <el-button type="primary">立即注册</el-button>
+      <div class="login-btn" v-if="regShow">
+        <el-button type="primary" @click="renderReg(true)">立即注册</el-button>
+      </div>
+      <div class="closebtn" @click="close">
+        <i class="iconfont icon-close"></i>
       </div>
     </el-card>
   </div>
 </template>
 
 <script>
-import $ from 'jquery'
+import { mapState } from 'vuex'
 export default {
   name: 'Login',
   data () {
@@ -84,63 +89,91 @@ export default {
         username: ''
       },
       colorStyle: {
-        blueUsername: '',
-        blueEmail: '',
-        bluePassword: '',
-        blueEye: '',
+        blueStyle: '',
         iconEye: 'icon-close-eye',
-        passwordShow: 'password',
-        regShow: false
+        passwordShow: 'password'
       }
     }
   },
   methods: {
-    changeColorUsername () {
-      this.colorStyle.blueUsername = this.colorStyle.blueUsername ? '' : 'blueFont'
+    changeColor (name) {
+      if (!name) return false
+      this.colorStyle.blueStyle = name
     },
-    changeColorEmail () {
-      this.colorStyle.blueEmail = this.colorStyle.blueEmail ? '' : 'blueFont'
-    },
-    changeColorPassword () {
-      this.colorStyle.bluePassword = this.colorStyle.bluePassword ? '' : 'blueFont'
-      this.colorStyle.blueEye = this.colorStyle.blueEye ? '' : 'blueFont'
-    },
+
     changePasswordShow () {
       this.colorStyle.passwordShow = this.colorStyle.passwordShow === 'password' ? 'text' : 'password'
       this.colorStyle.iconEye = this.colorStyle.iconEye === 'icon-close-eye' ? 'icon-browse' : 'icon-close-eye'
     },
-    renderReg () {
-      // this.colorStyle.regShow = !this.colorStyle.regShow
-      // const height = $('#loginbox')[0].offsetHeight
-      // $('#loginbox').animate({ height: height + 45 + 'px' }, 'fast', 'linear')
-      this.colorStyle.regShow = !this.colorStyle.regShow
-      $('#usernamebox').slideToggle('fast')
+    renderReg (bool) {
+      this.$store.commit('changeRegShow', bool)
+    },
+    close () {
+      this.$store.commit('changeLoginBox', false)
+    },
+    async login () {
+      // 设置了捕获错误的拦截器后,需使用 try catch 语句!
+      try {
+        const { data: res } = await this.axios.post('api/login', {
+          email: this.userLogin.email,
+          password: this.userLogin.password
+        })
+        this.$message.success('登陆成功')
+        this.$store.commit('changeuserInfo', res)
+        this.$store.commit('changeIsLogin', true)
+        this.$store.commit('changeLoginBox', false)
+      } catch (err) {
+        this.$message.error(err.message)
+      }
     }
+  },
+  computed: {
+    ...mapState(['regShow', 'userInfo'])
   }
 }
 </script>
 
 <style lang="less" scoped>
 #login {
+  position: fixed;
+  top: 0;
   width: 100%;
   height: 100%;
-  position: relative;
+  transition: all 0.5s;
 }
 
 .loginbox {
   // width: 300px;
-  // height: 400px;
+  // height: 370px;
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  text-align: center;
   transition: all 0.5s;
+  text-align: center;
+}
+
+.closebtn {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  color: #bbb;
+  cursor: pointer;
+  i {
+    font-size: 18px;
+    font-weight: 700;
+  }
+}
+
+.closebtn:hover {
+  color: #2c3e50;
 }
 
 .logo-con {
+  position: relative;
   width: 100%;
   text-align: center;
+  z-index: 2;
   .logobox {
     width: 100px;
     height: 50px;
@@ -152,8 +185,10 @@ export default {
 }
 
 .title {
+  position: relative;
   font-size: 14px;
   color: #bbb;
+  z-index: 2;
 }
 
 .form-box {
@@ -179,19 +214,8 @@ export default {
     position: absolute;
     color: #bbb;
     right: 12px;
-    bottom: 0;
+    bottom: 15px;
   }
-  .username-box {
-    display: none;
-  }
-
-  // .addtransition {
-  //   transition: all 0.5s;
-  // }
-
-  // .close-login {
-  //   height: 0;
-  // }
 
   .blueFont {
     color: #409eff;
@@ -203,6 +227,10 @@ export default {
     font-size: 24px;
     cursor: pointer;
   }
+}
+
+.username-box {
+  z-index: 1;
 }
 
 .email,
@@ -224,19 +252,21 @@ export default {
   margin: 20px 0 10px 0;
 }
 
-// .regfade-enter {
-//   opacity: 1;
-// }
-// .regfade-enter {
-//   opacity: 1;
-// }
-
-// .regfade-enter-active,
-// .regfade-leave-active {
-//   transition: all 0.5s;
-// }
-
-// .regfade-leave-to {
-//   opacity: 1;
-// }
+.slide-enter-active {
+  animation: slide-in 0.3s linear;
+}
+.slide-leave-active {
+  animation: slide-in 0.3s linear reverse;
+}
+@keyframes slide-in {
+  0% {
+    top: -70px;
+  }
+  // 50% {
+  //   top: 30px;
+  // }
+  100% {
+    top: 0;
+  }
+}
 </style>

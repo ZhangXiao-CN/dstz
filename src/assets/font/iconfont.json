@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "584065",
+      "name": "退出",
+      "font_class": "084tuichu",
+      "unicode": "e659",
+      "unicode_decimal": 58969
+    },
+    {
       "icon_id": "3032218",
       "name": "闭眼",
       "font_class": "close-eye",
@@ -174,6 +181,20 @@
       "unicode_decimal": 59156
     },
     {
+      "icon_id": "7008982",
+      "name": "play",
+      "font_class": "play",
+      "unicode": "e717",
+      "unicode_decimal": 59159
+    },
+    {
+      "icon_id": "7008983",
+      "name": "play_fill",
+      "font_class": "play_fill",
+      "unicode": "e718",
+      "unicode_decimal": 59160
+    },
+    {
       "icon_id": "7008986",
       "name": "praise_fill",
       "font_class": "praise_fill",
@@ -200,6 +221,13 @@
       "font_class": "prompt",
       "unicode": "e71d",
       "unicode_decimal": 59165
+    },
+    {
+      "icon_id": "7008994",
+      "name": "refresh",
+      "font_class": "refresh",
+      "unicode": "e71e",
+      "unicode_decimal": 59166
     },
     {
       "icon_id": "7008995",
