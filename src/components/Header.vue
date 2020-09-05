@@ -128,7 +128,7 @@ export default {
   computed: {
     ...mapState(['isLogin', 'userInfo'])
   },
-  created: async function () {
+  mounted: async function () {
     try {
       const { data: res } = await this.axios.get('api/login/status')
       if (res.isLogin) {

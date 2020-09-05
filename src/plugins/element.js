@@ -6,7 +6,8 @@ import {
   Card,
   Input,
   Avatar,
-  Message
+  Message,
+  Tag
 } from 'element-ui'
 
 Vue.use(Button)
@@ -15,4 +16,5 @@ Vue.use(Col)
 Vue.use(Card)
 Vue.use(Input)
 Vue.use(Avatar)
+Vue.use(Tag)
 Vue.prototype.$message = Message

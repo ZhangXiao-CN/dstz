@@ -1,21 +1,29 @@
 <template>
   <div id="write">
     <Header-View></Header-View>
-    <Wang-Editor></Wang-Editor>
+    <Write-form>
+      <Editor></Editor>
+    </Write-form>
   </div>
 </template>
 
 <script>
 import HeaderView from '../components/Header'
-import WangEditor from '../components/WangEditor'
+import Editor from '../components/Editor'
+import WriteForm from '../components/writeForm'
 export default {
   name: 'Write',
+  data () {
+    return {
+      thumb: ''
+    }
+  },
   components: {
     'Header-View': HeaderView,
-    'Wang-Editor': WangEditor
+    Editor,
+    'Write-form': WriteForm
   }
 }
 </script>>
-
 <style lang="less" scoped>
 </style>
