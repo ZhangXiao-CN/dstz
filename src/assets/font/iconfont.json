@@ -13,11 +13,39 @@
       "unicode_decimal": 58969
     },
     {
+      "icon_id": "720980",
+      "name": "图片",
+      "font_class": "xiazai40",
+      "unicode": "e615",
+      "unicode_decimal": 58901
+    },
+    {
+      "icon_id": "1063395",
+      "name": "标签",
+      "font_class": "icontag",
+      "unicode": "e61d",
+      "unicode_decimal": 58909
+    },
+    {
       "icon_id": "3032218",
       "name": "闭眼",
       "font_class": "close-eye",
       "unicode": "e79c",
       "unicode_decimal": 59292
+    },
+    {
+      "icon_id": "3216135",
+      "name": "垃圾桶",
+      "font_class": "icon--",
+      "unicode": "e73d",
+      "unicode_decimal": 59197
+    },
+    {
+      "icon_id": "3878687",
+      "name": "标签",
+      "font_class": "tag",
+      "unicode": "e61c",
+      "unicode_decimal": 58908
     },
     {
       "icon_id": "4766293",
@@ -310,15 +338,15 @@
       "icon_id": "7009038",
       "name": "warning_fill",
       "font_class": "warning_fill",
-      "unicode": "e73d",
-      "unicode_decimal": 59197
+      "unicode": "e73e",
+      "unicode_decimal": 59198
     },
     {
       "icon_id": "7009039",
       "name": "warning",
       "font_class": "warning",
-      "unicode": "e73e",
-      "unicode_decimal": 59198
+      "unicode": "e73f",
+      "unicode_decimal": 59199
     },
     {
       "icon_id": "7009042",
@@ -354,6 +382,13 @@
       "font_class": "yanjing",
       "unicode": "e611",
       "unicode_decimal": 58897
+    },
+    {
+      "icon_id": "8089710",
+      "name": "标签",
+      "font_class": "iconfront-",
+      "unicode": "e619",
+      "unicode_decimal": 58905
     },
     {
       "icon_id": "16367924",

@@ -113,10 +113,10 @@ export default {
       justify-content: flex-start;
       .category-item {
         position: relative;
+        border-bottom: 2px solid transparent;
         .category-link {
           display: inline-block;
           padding: 13px 20px;
-          border-bottom: 2px solid transparent;
           font-size: 14px;
           color: #304455;
         }

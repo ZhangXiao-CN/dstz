@@ -69,3 +69,35 @@ button:active {
 .login-btn .el-button {
     width: 100%;
 }
+
+.article-title .el-textarea .el-textarea__inner {
+    max-width: 1440px;
+    outline: none;
+    border: none;
+    resize: none;
+    font-size: 28px;
+    font-family: 'Microsoft YaHei';
+}
+
+.article-title .el-textarea .el-textarea__inner::-webkit-input-placeholder {
+    /* WebKit browsers 适配谷歌 */
+    color: #999;
+}
+
+.article-title .el-textarea .el-textarea__inner:-moz-placeholder {
+    /* Mozilla Firefox 4 to 18 适配火狐 */
+    color: #999;
+}
+
+.article-title .el-textarea .el-textarea__inner::-moz-placeholder {
+    /* Mozilla Firefox 19+ 适配火狐 */
+    color: #999;
+}
+
+.article-title .el-textarea .el-textarea__inner:-ms-input-placeholder {
+    color: #999;
+}
+
+.article-title .el-textarea .el-textarea__inner:focus {
+    color: #304455;
+}

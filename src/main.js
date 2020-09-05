@@ -7,6 +7,8 @@ import VueAxios from 'vue-axios'
 import './plugins/element.js'
 import './assets/css/global.css'
 import './assets/font/iconfont.css'
+import mavonEditor from 'mavon-editor'
+import 'mavon-editor/dist/css/index.css'
 
 Vue.config.productionTip = false
 // 定义axios默认地址
@@ -20,6 +22,7 @@ axios.interceptors.response.use(function (res) {
   return Promise.reject(err.response.data)
 })
 Vue.use(VueAxios, axios)
+Vue.use(mavonEditor)
 
 new Vue({
   router,
