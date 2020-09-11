@@ -16,6 +16,7 @@
               class="login-input username"
               @focus="changeColor('username')"
               @blur="changeColor"
+              @keyup.enter.native="loginOrReg"
             ></el-input>
             <div class="tips-text">中文字母组合,最少两位</div>
           </div>
@@ -27,6 +28,7 @@
             class="login-input email"
             @focus="changeColor('email')"
             @blur="changeColor"
+            @keyup.enter.native="loginOrReg"
           ></el-input>
           <div class="tips-text" v-show="regShow">使用邮箱注册登录</div>
         </div>
@@ -39,6 +41,7 @@
             class="login-input password"
             @focus="changeColor('password')"
             @blur="changeColor"
+            @keyup.enter.native="loginOrReg"
           >
             <i
               slot="suffix"
@@ -59,16 +62,16 @@
         </div>
       </div>
       <div class="login-btn" v-if="!regShow">
-        <el-button type="primary" @click="login">快速登录</el-button>
+        <el-button type="primary" @click="login" :loading="loading">{{loadingLoginText}}</el-button>
       </div>
       <div class="tool-wrap" v-if="regShow">
         <div class="retrieve">
           已有账号?
-          <a href="javascript:;" class="reg-btn" @click="renderReg(false)">去登录</a>
+          <a href="javascript:;" class="reg-btn" @click="renderReg(false)">去登陆</a>
         </div>
       </div>
       <div class="login-btn" v-if="regShow">
-        <el-button type="primary" @click="renderReg(true)">立即注册</el-button>
+        <el-button type="primary" @click="reg" :loading="loading">{{loadingRegText}}</el-button>
       </div>
       <div class="closebtn" @click="close">
         <i class="iconfont icon-close"></i>
@@ -80,6 +83,7 @@
 <script>
 import { mapState } from 'vuex'
 export default {
+  inject: ['reload'],
   name: 'Login',
   data () {
     return {
@@ -92,7 +96,10 @@ export default {
         blueStyle: '',
         iconEye: 'icon-close-eye',
         passwordShow: 'password'
-      }
+      },
+      loading: false,
+      loadingLoginText: '快速登录',
+      loadingRegText: '快速注册'
     }
   },
   methods: {
@@ -106,12 +113,15 @@ export default {
       this.colorStyle.iconEye = this.colorStyle.iconEye === 'icon-close-eye' ? 'icon-browse' : 'icon-close-eye'
     },
     renderReg (bool) {
+      this.loadingText = '快速注册'
       this.$store.commit('changeRegShow', bool)
     },
     close () {
       this.$store.commit('changeLoginBox', false)
     },
-    async login () {
+    async login (e) {
+      this.loading = true
+      this.loadingLoginText = '登陆中'
       // 设置了捕获错误的拦截器后,需使用 try catch 语句!
       try {
         const { data: res } = await this.axios.post('api/login', {
@@ -119,11 +129,44 @@ export default {
           password: this.userLogin.password
         })
         this.$message.success('登陆成功')
+        this.reload()
         this.$store.commit('changeuserInfo', res)
         this.$store.commit('changeIsLogin', true)
         this.$store.commit('changeLoginBox', false)
+        this.loading = false
+        this.loadingLoginText = '快速登录'
       } catch (err) {
         this.$message.error(err.message)
+        this.loading = false
+        this.loadingLoginText = '快速登录'
+      }
+    },
+    async reg () {
+      this.loadingRegText = '注册中'
+      try {
+        await this.axios.post('api/users', {
+          nickName: this.userLogin.username,
+          email: this.userLogin.email,
+          password: this.userLogin.password,
+          role: 'normal',
+          status: 1
+        })
+        this.$store.commit('changeRegShow', false)
+        this.$set(this.userLogin, 'username', '')
+        this.$set(this.userLogin, 'email', '')
+        this.$set(this.userLogin, 'password', '')
+        this.$message.success('注册成功!请登陆!')
+        this.loadingRegText = '快速注册'
+      } catch (err) {
+        this.$message.error(err.message)
+        this.loadingRegText = '快速注册'
+      }
+    },
+    loginOrReg () {
+      if (this.regShow) {
+        this.reg()
+      } else {
+        this.login()
       }
     }
   },
@@ -140,11 +183,12 @@ export default {
   width: 100%;
   height: 100%;
   transition: all 0.5s;
+  z-index: 9999;
 }
 
 .loginbox {
-  // width: 300px;
-  // height: 370px;
+  width: 300 / 40rem;
+  // height: 370 / 40rem;
   position: absolute;
   left: 50%;
   top: 50%;
@@ -160,7 +204,7 @@ export default {
   color: #bbb;
   cursor: pointer;
   i {
-    font-size: 18px;
+    font-size: 18 / 40rem;
     font-weight: 700;
   }
 }
@@ -175,8 +219,8 @@ export default {
   text-align: center;
   z-index: 2;
   .logobox {
-    width: 100px;
-    height: 50px;
+    width: 100 / 40rem;
+    height: 50 / 40rem;
     margin: 0 auto;
     .logoimg {
       width: 100%;
@@ -186,7 +230,7 @@ export default {
 
 .title {
   position: relative;
-  font-size: 14px;
+  font-size: 14 / 40rem;
   color: #bbb;
   z-index: 2;
 }
@@ -201,7 +245,7 @@ export default {
   .form-tips {
     position: absolute;
     z-index: 9;
-    font-size: 14px;
+    font-size: 14 / 40rem;
     color: #bbb;
     left: 15px;
     top: -8px;
@@ -224,7 +268,7 @@ export default {
     position: absolute;
     right: 0;
     top: 8px;
-    font-size: 24px;
+    font-size: 24 / 40rem;
     cursor: pointer;
   }
 }
@@ -242,14 +286,14 @@ export default {
 .tool-wrap {
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
+  font-size: 14 / 40rem;
   a {
     color: #409eff;
   }
 }
 
 .login-btn {
-  margin: 20px 0 10px 0;
+  margin: 20 / 40rem 0 10 / 40rem 0;
 }
 
 .slide-enter-active {

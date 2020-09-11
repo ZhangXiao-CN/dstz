@@ -7,7 +7,8 @@ import {
   Input,
   Avatar,
   Message,
-  Tag
+  Tag,
+  Loading
 } from 'element-ui'
 
 Vue.use(Button)
@@ -17,4 +18,5 @@ Vue.use(Card)
 Vue.use(Input)
 Vue.use(Avatar)
 Vue.use(Tag)
+Vue.use(Loading)
 Vue.prototype.$message = Message

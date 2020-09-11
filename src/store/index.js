@@ -8,7 +8,11 @@ export default new Vuex.Store({
     isLogin: false,
     loginBox: false,
     regShow: false,
-    userInfo: {}
+    userInfo: {},
+    categoryNav: [],
+    categories: [],
+    articleList: [],
+    currentCategory: '最新文章'
   },
   mutations: {
     changeIsLogin (state, bool) {
@@ -22,6 +26,18 @@ export default new Vuex.Store({
     },
     changeuserInfo (state, data) {
       state.userInfo = data
+    },
+    changeCategoryNav (state, data) {
+      state.categoryNav = data
+    },
+    categoriesPush (state, data) {
+      state.categories.push(data)
+    },
+    changeArticleList (state, data) {
+      state.articleList = data
+    },
+    changecurrentCategory (state, data) {
+      state.articleList = data
     }
   },
   actions: {

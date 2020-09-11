@@ -20,11 +20,25 @@
       "unicode_decimal": 58901
     },
     {
+      "icon_id": "986196",
+      "name": "qq",
+      "font_class": "qq-copy",
+      "unicode": "e656",
+      "unicode_decimal": 58966
+    },
+    {
       "icon_id": "1063395",
       "name": "标签",
       "font_class": "icontag",
       "unicode": "e61d",
       "unicode_decimal": 58909
+    },
+    {
+      "icon_id": "2860933",
+      "name": "新消息",
+      "font_class": "xinxiaoxi",
+      "unicode": "e627",
+      "unicode_decimal": 58919
     },
     {
       "icon_id": "3032218",
@@ -69,11 +83,18 @@
       "unicode_decimal": 59525
     },
     {
+      "icon_id": "5634857",
+      "name": "steam",
+      "font_class": "steam",
+      "unicode": "f23b",
+      "unicode_decimal": 62011
+    },
+    {
       "icon_id": "5640058",
       "name": "搜索",
       "font_class": "sousuo",
-      "unicode": "e627",
-      "unicode_decimal": 58919
+      "unicode": "e628",
+      "unicode_decimal": 58920
     },
     {
       "icon_id": "7008888",
@@ -389,6 +410,13 @@
       "font_class": "iconfront-",
       "unicode": "e619",
       "unicode_decimal": 58905
+    },
+    {
+      "icon_id": "9297226",
+      "name": "分类",
+      "font_class": "fenlei",
+      "unicode": "e620",
+      "unicode_decimal": 58912
     },
     {
       "icon_id": "16367924",

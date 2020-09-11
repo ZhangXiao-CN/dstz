@@ -1,43 +1,33 @@
 <template>
-  <div id="write">
+  <div id="user">
     <Header-View></Header-View>
-    <Write-form></Write-form>
     <transition name="opacityMask">
       <div class="mask" v-if="loginBox"></div>
     </transition>
     <transition name="bounceLogin">
       <Longin-View v-if="loginBox"></Longin-View>
     </transition>
+    <Persona-Center></Persona-Center>
   </div>
 </template>
 
 <script>
-import HeaderView from '../components/Header'
-import WriteForm from '../components/writeForm'
 import LonginView from '../components/Login'
+import HeaderView from '../components/Header'
+import PersonaCenter from '../components/PersonaCenter'
 import { mapState } from 'vuex'
 export default {
-  name: 'Write',
+  name: 'User',
   components: {
+    'Longin-View': LonginView,
     'Header-View': HeaderView,
-    'Write-form': WriteForm,
-    'Longin-View': LonginView
+    'Persona-Center': PersonaCenter
   },
   computed: {
     ...mapState(['loginBox'])
   }
 }
-</script>>
+</script>
+
 <style lang="less" scoped>
-#write {
-  height: 100%;
-}
-.mask {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.2);
-  z-index: 2001;
-}
 </style>

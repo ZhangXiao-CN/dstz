@@ -4,7 +4,12 @@
       <div class="header-top-wrap">
         <div class="top-left">
           <div class="logo">
-            <img class="logon-img" src="../assets/images/logo.png" />
+            <router-link to="/" @click.native="reloadSelf">
+              <img class="logon-img" src="../assets/images/logo.png" />
+            </router-link>
+          </div>
+          <div class="samll-logo">
+            <router-link to="/" @click.native="reloadSelf">前端社</router-link>
           </div>
           <div class="header-link">
             <div>
@@ -26,8 +31,11 @@
             <button class="login-btn" @click="popUpLoginBox(false)">登陆</button>
             <button class="reg-btn" @click="popUpLoginBox(true)">快速注册</button>
           </div>
+          <div class="samll-login-btn" @click="popUpLoginBox(false)" v-if="!isLogin">
+            <i class="iconfont icon-user"></i>
+          </div>
           <div class="user-btn" v-if="isLogin">
-            <button class="add-btn">
+            <button class="add-btn" @click="goWrite">
               <i class="iconfont icon-addition"></i>
             </button>
             <button class="news-btn">
@@ -36,7 +44,7 @@
           </div>
           <div class="user-info" @click="popUpuserToolBox" v-if="isLogin">
             <el-avatar
-              :src="userInfo.avatar"
+              :src="userInfo.avatar ? userInfo.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
               :key="userInfo.avatar"
               size="small"
               class="user-avatar"
@@ -45,9 +53,16 @@
               <div class="user-tools" v-if="userToolBox">
                 <ul>
                   <li>
-                    <router-link to="user" class="personal-center">
+                    <router-link
+                      :to="{name: 'user', params: {id: userInfo._id}}"
+                      class="personal-center"
+                    >
                       <div>
-                        <el-avatar :src="userInfo.avatar" :key="userInfo.avatar" size="medium"></el-avatar>
+                        <el-avatar
+                          :src="userInfo.avatar ? userInfo.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
+                          :key="userInfo.avatar"
+                          size="medium"
+                        ></el-avatar>
                       </div>
                       <p>
                         <span>{{userInfo.nickName}}</span>
@@ -91,13 +106,27 @@
           </div>
         </div>
       </div>
+      <div class="samll-header-link">
+        <div>
+          <a href="javascript:;">前端交流群</a>
+        </div>
+        <div>
+          <a href="javascript:;">文章发布教程</a>
+        </div>
+        <div>
+          <a href="javascript:;">成为管理员</a>
+        </div>
+      </div>
     </div>
+    <div class="split-line"></div>
+    <slot></slot>
   </div>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 export default {
+  inject: ['reload'],
   name: 'Header',
   data () {
     return {
@@ -107,6 +136,9 @@ export default {
     }
   },
   methods: {
+    reloadSelf () {
+      this.$router.go(0)
+    },
     popUpLoginBox (bool) {
       this.$store.commit('changeRegShow', bool)
       this.$store.commit('changeLoginBox', true)
@@ -120,9 +152,13 @@ export default {
         this.$store.commit('changeIsLogin', false)
         this.$store.commit('changeuserInfo', {})
         this.$message.success('退出成功')
+        this.reload()
       } catch (err) {
         this.$message.error('退出失败')
       }
+    },
+    goWrite () {
+      this.$router.push({ name: 'write' })
     }
   },
   computed: {
@@ -134,12 +170,15 @@ export default {
       if (res.isLogin) {
         this.$store.commit('changeIsLogin', true)
         this.$store.commit('changeuserInfo', res.userInfo)
+      } else {
+        if (this.$route.name === 'write') {
+          this.$store.commit('changeLoginBox', true)
+        }
       }
     } catch (err) {
       this.$message.error(err.message)
     }
   }
-
 }
 </script>>
 
@@ -148,6 +187,9 @@ export default {
   width: 100%;
   background-color: #fff;
   box-shadow: 0px 5px 40px 0px rgba(17, 58, 93, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 999;
 }
 
 .header-wrap {
@@ -163,19 +205,27 @@ export default {
   .top-left {
     display: flex;
     justify-content: space-around;
+    align-items: center;
     height: 100%;
     .logo {
       margin-right: 20px;
+      a {
+        display: block;
+      }
       .logon-img {
+        display: block;
         height: 58px;
+        padding-top: 10px;
+        padding-left: 10px;
       }
     }
     .header-link {
+      white-space: nowrap;
       display: flex;
       justify-content: space-around;
       align-items: center;
       div {
-        padding: 0 20px;
+        padding: 0 20 / 40rem;
         a {
           color: #304455;
         }
@@ -203,9 +253,9 @@ export default {
       justify-content: space-around;
       white-space: nowrap;
       button {
-        font-size: 14px;
-        padding: 4px 10px;
-        margin-right: 10px;
+        font-size: 14 / 40rem;
+        padding: 4 / 40rem 10 / 40rem;
+        margin-right: 10 / 40rem;
         border-radius: 8px;
         cursor: pointer;
       }
@@ -242,6 +292,7 @@ export default {
     border-bottom: none;
     background-color: #fff;
     border-radius: 8px;
+    z-index: 99;
     li {
       padding: 10px;
       border-bottom: 1px solid #ebeef5;
@@ -278,6 +329,33 @@ export default {
   }
 }
 
+.samll-header-link {
+  display: none;
+  justify-content: flex-start;
+  font-size: 14px;
+  padding: 5px 0 5px 15px;
+  font-weight: 700;
+  div {
+    margin-right: 10px;
+  }
+}
+
+.samll-logo {
+  display: none;
+  padding-left: 15px;
+  font-weight: 900;
+  font-size: 18px;
+}
+
+.samll-login-btn {
+  display: none;
+  margin-right: 10px;
+  i {
+    font-size: 20px;
+    cursor: pointer;
+  }
+}
+
 .slide-enter-active {
   animation: slide-in 0.4s linear;
 }
@@ -299,6 +377,45 @@ export default {
   }
   100% {
     top: 45px;
+  }
+}
+.split-line {
+  border-top: 1px solid #f5f5f5;
+}
+@media screen and (max-width: 1020px) {
+}
+
+@media screen and (max-width: 760px) {
+  .header-link div {
+    display: none;
+  }
+  .samll-header-link {
+    display: flex;
+  }
+  .logo {
+    display: none;
+  }
+  .samll-logo {
+    display: block;
+  }
+}
+
+@media screen and (max-width: 505px) {
+  .login-btn-wrap {
+    display: none !important;
+  }
+  .samll-login-btn {
+    display: block;
+  }
+  .header-top-wrap {
+    height: 42px;
+  }
+  .search {
+    border-radius: 10px !important;
+    overflow: hidden;
+    .icon-search {
+      top: 2px !important;
+    }
   }
 }
 </style>

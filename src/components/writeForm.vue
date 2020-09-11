@@ -2,8 +2,27 @@
   <div id="writeForm">
     <div class="form">
       <div class="top-form">
+        <div class="notice-wrap">
+          <p class="notice-title">
+            <strong>投稿规则</strong>
+          </p>
+          <p>
+            1、发布文章及回复或评论时请自觉遵守
+            <span class="red-text">中华人民共和国各项有关法律法规</span>
+          </p>
+          <p>2、支持原创,鼓励原创</p>
+          <p>
+            3、转载文章,必须取得
+            <strong>原作者同意,并标明出处及原作者,能够提供相关证明</strong>
+          </p>
+          <p>4、禁止发布垃圾广告</p>
+          <p>
+            5、如有违反以上规则,
+            <strong>您的文章可能会被删除,或者账户被封停</strong>
+          </p>
+        </div>
         <div class="tag">
-          <p class="point">请输入标签,最多可以设置4个</p>
+          <p class="point">标签最多只能设置4个哦</p>
           <div class="tag-tools">
             <div class="tag-title">
               <i class="iconfont icon-tag"></i>
@@ -28,7 +47,7 @@
                 placeholder="请输入标签"
                 @input="watchValue"
                 @blur="createTag"
-                @keyup.13="createTag"
+                @keyup.enter="createTag"
               />
             </div>
           </div>
@@ -67,8 +86,8 @@
         <div class="bottom-btn">
           <p>请尊重自己和别人的时间，不要发布垃圾和广告内容</p>
           <div>
-            <el-button type="primary" size="small">保存到草稿箱</el-button>
-            <el-button type="primary" size="small">发布</el-button>
+            <el-button type="primary" size="small" @click="publish(0)">保存到草稿箱</el-button>
+            <el-button type="primary" size="small" @click="publish(1)">发布</el-button>
           </div>
         </div>
       </div>
@@ -103,18 +122,26 @@
       <div class="article-title">
         <el-input type="textarea" autosize placeholder="标题" v-model="articleTitle"></el-input>
       </div>
-      <slot></slot>
+      <Editor ref="Editor"></Editor>
+    </div>
+    <div class="bottom-btn" id="footBtn">
+      <p>请尊重自己和别人的时间，不要发布垃圾和广告内容</p>
+      <div>
+        <el-button type="primary" size="small" @click="publish(0)">保存到草稿箱</el-button>
+        <el-button type="primary" size="small" @click="publish(1)">发布</el-button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import Editor from './Editor'
+import { mapState } from 'vuex'
 export default {
   name: 'writeForm',
   data () {
     return {
       thumb: '',
-      categories: [],
       selectIndex: '',
       currentCategory: {
         parentId: '',
@@ -126,6 +153,9 @@ export default {
       tagList: [],
       articleTitle: ''
     }
+  },
+  computed: {
+    ...mapState(['userInfo', 'categories', 'categoryNav', 'loginBox'])
   },
   methods: {
     async uploadImg (e) {
@@ -183,35 +213,104 @@ export default {
     },
     removeTag (index) {
       this.tagList.splice(index, 1)
+    },
+    async publish (state) {
+      if (this.isLogin === false) {
+        this.$message.error('登录后才能发布文章哦')
+        this.$store.commit('changeLoginBox', true)
+        return
+      }
+      if (this.selectIndex.toString().trim().length === 0) {
+        this.$message.error({
+          message: '请选择分类',
+          type: 'erroe'
+        })
+        return
+      }
+      if (this.articleTitle.trim().length === 0) {
+        this.$message.error('请输入标题')
+        return
+      }
+      if (this.$refs.Editor.article.trim().length === 0) {
+        this.$message.error('请输入文章内容')
+        return
+      }
+      const author = this.userInfo._id
+      const html = this.$refs.Editor.$refs.md.d_render
+      let summary = ''
+      summary = html.replace(/<(style|script|iframe)[^>]*?>[\s\S]+?<\/\1\s*>/gi, '').replace(/<[^>]+?>/g, '').replace(/\s+/g, ' ').replace(/ /g, ' ').replace(/>/g, ' ')
+      summary = summary.substr(0, 70) + '...'
+      const body = {
+        author: author,
+        title: this.articleTitle,
+        state: state,
+        content: this.$refs.Editor.article,
+        html: state === 1 ? html : null,
+        summary: summary,
+        category: this.currentCategory.parentId,
+        categoryChilren: this.currentCategory.childrenId ? this.currentCategory.childrenId : null,
+        thumbnail: this.thumb ? this.thumb : null,
+        tag: this.tagList.length > 0 ? this.tagList : null
+      }
+      try {
+        await this.axios.post('api/posts', body)
+        this.$message.success('文章发布成功')
+      } catch (err) {
+        console.log(err)
+        this.$message.error('文章发布失败')
+      }
+      if (this.$refs.Editor.imgList.length > 0) {
+        const delImgList = []
+        this.$refs.Editor.imgList.forEach((item) => {
+          if (this.$refs.Editor.article.indexOf(item) === -1) {
+            console.log(this.articleTitle)
+            delImgList.push(item.split('uploads/')[1])
+          }
+        })
+        if (delImgList.length > 0) {
+          try {
+            await this.axios.delete('api/deletefile/' + delImgList.join('-', ','))
+            this.thumb = ''
+          } catch (err) {
+            this.$message.error('图片切换或删除失败')
+          }
+        }
+      }
+      this.$router.push({ name: 'home' })
     }
   },
-  mounted: async function () {
-    // try {
-    const that = this
-    const { data: res } = await this.axios.get('/api/categories')
-    console.log(res)
-    res.forEach(function (item, index) {
-      if (item.children.length < 1) {
-        // console.log(res.item)
-        that.categories.push({ parentId: item._id, parentTitle: item.title })
-      } else {
-        item.children.forEach(function (childrenitem, index) {
-          that.categories.push({
-            parentId: item._id,
-            parentTitle: item.title,
-            childrenId: childrenitem._id,
-            childrenTitle: childrenitem.childrenTitle
+  created: async function () {
+    if (this.categoryNav.length === 0) {
+      const { data: res } = await this.axios.get('api/categories')
+      this.$store.commit('changeCategoryNav', res)
+    }
+    if (this.categories.length === 0) {
+      const that = this
+      this.categoryNav.forEach(function (item, index) {
+        if (item.children.length < 1) {
+          that.$store.commit('categoriesPush', { parentId: item._id, parentTitle: item.title })
+        } else {
+          item.children.forEach(function (childrenitem, index) {
+            that.$store.commit('categoriesPush', {
+              parentId: item._id,
+              parentTitle: item.title,
+              childrenId: childrenitem._id,
+              childrenTitle: childrenitem.childrenTitle
+            })
           })
-        })
-      }
-    })
-    // } catch (err) {
-    //   this.$message.error('获取分类失败')
-    // }
+        }
+      })
+    }
+  },
+  components: {
+    Editor
   }
 }
 </script>>
 <style lang="less" scoped>
+#footBtn {
+  display: none;
+}
 #writeForm {
   max-width: 1440px;
   margin: 0 auto;
@@ -220,6 +319,8 @@ export default {
     .article-title {
       background-color: #fff;
       border-bottom: 1px solid #ebebeb;
+      position: relative;
+      z-index: 1000;
     }
   }
   .form {
@@ -229,7 +330,7 @@ export default {
     margin: 10px 0;
     .thumb {
       position: relative;
-      min-height: 300px;
+      min-height: 200px;
       flex: 3;
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
       background-color: #fff;
@@ -284,6 +385,16 @@ export default {
         p {
           font-size: 12px;
           color: #999;
+        }
+      }
+      .notice-wrap {
+        padding: 10 / 40rem;
+        p {
+          font-size: 14 / 40rem;
+          text-align: left;
+          .red-text {
+            color: red;
+          }
         }
       }
     }
@@ -385,7 +496,6 @@ export default {
 
 .tag {
   border-top: 1px solid #ebebeb;
-  margin-top: 10px;
   .point {
     text-align: left;
     color: #999;
@@ -452,6 +562,92 @@ export default {
         /* Internet Explorer 10+  适配ie*/
         font-size: 12px;
         color: #999;
+      }
+    }
+  }
+}
+
+@media screen and (max-width: 1020px) {
+}
+
+@media screen and (max-width: 760px) {
+  .notice-wrap {
+    padding: 5px !important;
+    p {
+      font-size: 12px !important;
+    }
+  }
+  .form {
+    margin: 5px 0 !important;
+    flex-direction: column !important;
+    .top-form {
+      flex: initial !important;
+    }
+    .thumb {
+      flex: initial !important;
+      margin: 5px 0 0 0 !important;
+      min-height: 150px !important;
+      .upload-thumb {
+        min-height: 150px !important;
+        p {
+          opacity: 1 !important;
+        }
+      }
+    }
+    .bottom-btn {
+      display: none !important;
+    }
+    .tag-tools {
+      .tag-title {
+        display: none;
+      }
+      flex-direction: column !important;
+      align-items: flex-start;
+      .tag-list {
+        flex-direction: column !important;
+        align-items: flex-start;
+        padding-left: 10px !important;
+        span {
+          margin-top: 5px;
+        }
+      }
+      .tag-input {
+        input {
+          padding-left: 10px !important;
+        }
+      }
+    }
+  }
+  #footBtn {
+    display: flex !important;
+    justify-content: flex-start !important;
+    p {
+      display: none;
+    }
+    div {
+      display: flex;
+      width: 100% !important;
+      justify-content: flex-end;
+      padding: 5px;
+    }
+  }
+}
+
+@media screen and (max-width: 505px) {
+  .categories {
+    .categories-title {
+      font-size: 12px;
+      padding: 5px;
+      line-height: 32px;
+      .categories-text {
+        font-size: 12px;
+      }
+    }
+    .categories-select {
+      padding: 5px 10px;
+      select {
+        font-size: 12px !important;
+        padding: 5px;
       }
     }
   }

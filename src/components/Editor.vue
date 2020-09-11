@@ -8,6 +8,7 @@
       :codeStyle="'vs2015'"
       :tabSize="2"
       :fontSize="'16px'"
+      :autofocus="false"
       @imgAdd="$imgAdd"
       @imgDel="$imgDel"
     ></mavon-editor>
@@ -20,6 +21,7 @@ export default {
   data () {
     return {
       article: '',
+      imgList: [],
       toolbars: {
         bold: true, // 粗体
         italic: true, // 斜体
@@ -71,32 +73,20 @@ export default {
           headers: { 'Content-Type': 'multipart/form-data' }
         })
         this.$refs.md.$img2Url(pos, res[0].image)
+        this.imgList.push(res[0].image)
       } catch (err) {
         this.$message.error('图片上传失败')
       }
     },
     $imgDel (pos) {
-      // let fileName = pos[0]
-      // fileName = fileName.split('uploads\\')[1]
       try {
-        // await this.axios.delete('api/deletefile/' + fileName)
         const name = pos[1].name
         const path = pos[0]
-        // const div = document.querySelector('.v-note-show')
-        // const img = div.querySelectorAll('img')
-        // console.log(img)
-        // console.log(img[0].src)
-        // for (var i = 0; i < img.length; i++) {
-        //   img[i].src = img[i].src + '?q=123'
-        //   console.log(img[i])
-        //   console.log(img[i].src)
-        // }
-        // const text = '![' + name + ']' + '(' + path + ')'
         const text = `![${name}](${path})`
         this.article = this.article.replace(text, '')
         this.$message.success('删除图片成功')
       } catch (err) {
-        this.$message.error(err.message)
+        this.$message.error('删除图片失败')
       }
     }
   }
@@ -105,11 +95,18 @@ export default {
 
 <style lang="less" scoped>
 .v-note-wrapper {
-  min-height: 600px !important;
+  min-height: 500px;
   box-shadow: none !important;
 }
-.v-note-op {
-  border-radius: 0 !important;
-  // box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 12px 0
+
+@media screen and (max-width: 1020px) {
+}
+
+@media screen and (max-width: 760px) {
+  .v-note-wrapper {
+    min-height: 400px;
+  }
+}
+@media screen and (max-width: 505px) {
 }
 </style>
