@@ -125,9 +125,9 @@
       <Editor ref="Editor"></Editor>
     </div>
     <div class="bottom-btn" id="footBtn">
-      <p>请尊重自己和别人的时间，不要发布垃圾和广告内容</p>
       <div>
         <el-button type="primary" size="small" @click="publish(0)">保存到草稿箱</el-button>
+        <p>请尊重自己和别人的时间，不要发布垃圾和广告内容</p>
         <el-button type="primary" size="small" @click="publish(1)">发布</el-button>
       </div>
     </div>
@@ -330,7 +330,7 @@ export default {
     margin: 10px 0;
     .thumb {
       position: relative;
-      min-height: 200px;
+      min-height: 200 / 40rem;
       flex: 3;
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
       background-color: #fff;
@@ -567,33 +567,9 @@ export default {
   }
 }
 
-@media screen and (max-width: 1020px) {
-}
-
-@media screen and (max-width: 760px) {
-  .notice-wrap {
-    padding: 5px !important;
-    p {
-      font-size: 12px !important;
-    }
-  }
+@media screen and (max-width: 1024px) {
   .form {
     margin: 5px 0 !important;
-    flex-direction: column !important;
-    .top-form {
-      flex: initial !important;
-    }
-    .thumb {
-      flex: initial !important;
-      margin: 5px 0 0 0 !important;
-      min-height: 150px !important;
-      .upload-thumb {
-        min-height: 150px !important;
-        p {
-          opacity: 1 !important;
-        }
-      }
-    }
     .bottom-btn {
       display: none !important;
     }
@@ -619,21 +595,63 @@ export default {
     }
   }
   #footBtn {
+    margin-top: 2px;
+    background-color: #fff;
     display: flex !important;
     justify-content: flex-start !important;
     p {
-      display: none;
+      font-size: 12px;
+      color: #999;
     }
     div {
       display: flex;
       width: 100% !important;
-      justify-content: flex-end;
+      justify-content: space-between;
+      align-items: center;
       padding: 5px;
     }
   }
 }
 
+@media screen and (max-width: 768px) {
+  .notice-wrap {
+    padding: 5px !important;
+    p {
+      font-size: 12px !important;
+    }
+  }
+  .form {
+    margin: 5px 0 !important;
+    flex-direction: column !important;
+    .top-form {
+      flex: initial !important;
+    }
+    .thumb {
+      // min-height: 300px !important;
+      flex: initial !important;
+      margin: 5px 0 0 0 !important;
+      .upload-thumb {
+        min-height: 300 / 40rem !important;
+        p {
+          opacity: 1 !important;
+        }
+      }
+    }
+  }
+}
+
 @media screen and (max-width: 505px) {
+  .form .thumb {
+    // min-height: 300px !important;
+    // flex: initial !important;
+    // margin: 5px 0 0 0 !important;
+    .upload-thumb {
+      min-height: 200 / 40rem !important;
+      // p {
+      //   // opacity: 1 !important;
+      // }
+    }
+  }
   .categories {
     .categories-title {
       font-size: 12px;

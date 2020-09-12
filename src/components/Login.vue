@@ -313,4 +313,12 @@ export default {
     top: 0;
   }
 }
+@media screen and (max-width: 1024px) {
+}
+
+@media screen and (max-width: 768px) {
+}
+
+@media screen and (max-width: 505px) {
+}
 </style>

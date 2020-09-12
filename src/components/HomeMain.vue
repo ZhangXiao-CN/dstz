@@ -314,6 +314,7 @@ export default {
   max-width: 1440px;
   margin: 0 auto;
   position: relative;
+  margin-top: 10px;
   .article-wrap {
     float: left;
     width: 69.7%;
@@ -540,7 +541,13 @@ export default {
 }
 /* responsed */
 
-@media screen and (max-width: 1020px) {
+@media screen and (max-width: 1024px) {
+  .hot-article {
+    margin-top: 5px !important;
+  }
+  #homeMain {
+    margin-top: 5px;
+  }
   .article-info {
     flex: 1 !important;
   }
@@ -549,9 +556,10 @@ export default {
   }
 }
 
-@media screen and (max-width: 760px) {
+@media screen and (max-width: 768px) {
   #homeMain {
     flex-direction: column;
+    margin-top: 3px;
   }
   .article-wrap {
     float: none !important;

@@ -165,7 +165,7 @@ export default {
           width: 100%;
           height: 100%;
           display: block;
-          object-fit: cover;
+          // object-fit: cover;
           border-radius: 8px;
         }
       }
@@ -320,27 +320,24 @@ export default {
     }
   }
 }
-@media screen and (max-width: 1020px) {
-  // .article-info {
-  //   flex: 1 !important;
-  // }
-  // .article-img {
-  //   flex: 1 !important;
-  // }
+@media screen and (max-width: 1024px) {
   .article-img {
-    height: 130 / 40rem !important;
+    height: 125 / 40rem !important;
     // min-width: 50% !important;
   }
 }
 
-@media screen and (max-width: 760px) {
+@media screen and (max-width: 768px) {
   .article-img {
-    height: 120 / 40rem !important;
+    height: 140 / 40rem !important;
     // min-width: 50% !important;
   }
 }
 
 @media screen and (max-width: 505px) {
+  .article-info {
+    flex: 6.5 !important;
+  }
   .el-avatar {
     width: 18px !important;
     height: 18px !important;
@@ -351,6 +348,7 @@ export default {
   .article-img {
     height: 100 / 40rem !important;
     // min-width: 50% !important;
+    flex: 3.5 !important;
   }
   .article-info-summary {
     display: none !important;

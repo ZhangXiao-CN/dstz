@@ -94,6 +94,7 @@ export default {
   display: flex;
   justify-content: flex-start;
   max-width: 1440px;
+  max-height: 500 / 40rem;
   margin: 10 / 40rem auto;
   .silder-box {
     position: relative;
@@ -103,7 +104,6 @@ export default {
     border: 2px solid #fff;
     border-radius: 10px;
     margin-right: 7 / 40rem;
-    max-height: 500px;
     .swiper-container {
       height: 100%;
       .swiper-wrapper {
@@ -221,9 +221,13 @@ export default {
   }
 }
 
-@media screen and (max-width: 1020px) {
+@media screen and (max-width: 1024px) {
+  .top-item {
+    margin-bottom: 2px !important;
+  }
   #silder {
     margin: 4px auto;
+    max-height: 400 / 40rem;
   }
   .silder-box {
     margin-right: 2px !important;
@@ -233,7 +237,13 @@ export default {
   }
 }
 
-@media screen and (max-width: 760px) {
+@media screen and (max-width: 768px) {
+  .top-item {
+    margin-bottom: 0 !important;
+  }
+  #silder {
+    max-height: 300 / 40rem;
+  }
   .silder-article {
     display: none !important;
   }
@@ -244,13 +254,16 @@ export default {
 
 @media screen and (max-width: 505px) {
   #silder {
+    max-height: 200 / 40rem;
+  }
+  #silder {
     margin-right: 3px !important;
   }
   .silder-box {
     margin-right: 0 !important;
   }
   .top-articles {
-    display: none !important;
+    // display: none !important;
   }
 }
 </style>

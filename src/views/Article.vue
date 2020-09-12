@@ -33,9 +33,6 @@ export default {
 }
 </script>>
 <style lang="less" scoped>
-#homeMain {
-  margin-top: 10 /40rem;
-}
 .mask {
   position: fixed;
   top: 0;

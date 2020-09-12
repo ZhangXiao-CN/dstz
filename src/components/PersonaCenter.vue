@@ -1045,10 +1045,10 @@ export default {
   }
 }
 
-@media screen and (max-width: 1020px) {
+@media screen and (max-width: 1024px) {
 }
 
-@media screen and (max-width: 760px) {
+@media screen and (max-width: 768px) {
   .user-main {
     flex-direction: column;
     .left-bar {

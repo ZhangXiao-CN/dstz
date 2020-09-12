@@ -27,21 +27,32 @@
         <mavon-editor codeStyle="monokai" v-html="article.html"></mavon-editor>
       </div>
       <div class="like">
-        <div>
-          <i class="iconfont icon-collection_fill"></i>
-          <span>收藏</span>
+        <div :class="{'is-favorites ': articFavorites}">
+          <div v-if="articFavorites" @click="cancelFavorites">
+            <i class="iconfont icon-collection_fill"></i>
+            <span>已收藏</span>
+          </div>
+          <div v-else @click="favorites" de>
+            <i class="iconfont icon-collection_fill"></i>
+            <span>收藏</span>
+          </div>
         </div>
-        <div>
-          <i class="iconfont icon-like_fill is-like" v-if="articleLike"></i>
-          <i class="iconfont icon-like_fill" v-else @click="fabulous"></i>
-          <span>{{article.meta && article.meta.likes}}</span>
+        <div :class="{'is-like': articleLike}">
+          <div v-if="articleLike" @click="cancelFabulous">
+            <i class="iconfont icon-like_fill"></i>
+            <span>{{article.meta && article.meta.likes}}</span>
+          </div>
+          <div v-else @click="fabulous">
+            <i class="iconfont icon-like_fill"></i>
+            <span>{{article.meta && article.meta.likes}}</span>
+          </div>
         </div>
       </div>
     </div>
     <div class="article-comment">
       <div class="article-comment-title">
         全部评论&nbsp;&nbsp;
-        <span>{{commentList.total ? commentList.total : 0}}</span>&nbsp;&nbsp;
+        <span>{{article.meta && article.meta.comments}}</span>&nbsp;&nbsp;
       </div>
       <ul>
         <li v-for=" item in commentList.records" :key="item._id">
@@ -80,6 +91,14 @@
       </div>
       <div class="text">
         <textarea rows="2" placeholder="写下你的评论..." v-model="myComment"></textarea>
+        <picker
+          :include="['people']"
+          :showSearch="false"
+          :showPreview="false"
+          :showCategories="false"
+          :native="true"
+          @select="addEmoji"
+        />
       </div>
     </div>
     <div class="comment-btn">
@@ -90,22 +109,32 @@
 
 <script>
 import { mapState } from 'vuex'
+import { Picker } from 'emoji-mart-vue'
 export default {
   name: 'ArticleDetails',
   data () {
     return {
       article: '',
-      articleLike: false,
+      articleLike: false, // 是否点赞
+      likeFlag: true, // 点赞节流阀
+      articFavorites: false, // 是否收藏
+      favoritesFlag: true, // 收藏节流阀
       commentList: {},
       myComment: '',
-      loading: '',
-      category: ''
+      loading: ''
     }
   },
+  components: { Picker },
   computed: {
     ...mapState(['isLogin', 'userInfo'])
   },
   methods: {
+    addEmoji (e) {
+      this.myComment += e.native
+      console.log(this.myComment)
+      console.log(e)
+    },
+    // 评论
     async createComment (e) {
       this.loading = 1
       e.target.innerText = ''
@@ -131,19 +160,85 @@ export default {
         e.target.innerText = '提交'
       }
     },
+    // 点赞
     async fabulous () {
+      if (!this.likeFlag) return
+      this.likeFlag = false
       try {
         if (!this.isLogin) {
           this.$message.success('请登录后再点赞哦!')
           this.$store.commit('changeLoginBox', true)
+          this.likeFlag = true
           return
         }
         const { data: res } = await this.axios.post('api/posts/fabulous/' + this.$route.params.id)
-        console.log(res)
         this.articleLike = res.islike
         this.article.meta.likes = res.post.meta.likes
+        this.article.meta.likes = res.post.meta.likes
+        this.likeFlag = true
       } catch (err) {
         console.log(err)
+        this.likeFlag = true
+      }
+    },
+    // 取消点赞
+    async cancelFabulous () {
+      if (!this.likeFlag) return
+      this.likeFlag = false
+      try {
+        if (!this.isLogin) {
+          this.$message.success('请登录后再点赞哦!')
+          this.$store.commit('changeLoginBox', true)
+          this.likeFlag = true
+          return
+        }
+        const { data: res } = await this.axios.post('api/posts/cancelFabulous/' + this.$route.params.id)
+        this.articleLike = res.islike
+        this.article.meta.likes = res.post.meta.likes
+        this.likeFlag = true
+      } catch (err) {
+        console.log(err)
+        this.likeFlag = true
+      }
+    },
+    // 取消收藏
+    async cancelFavorites () {
+      if (!this.favoritesFlag) return
+      this.favoritesFlag = false
+      try {
+        if (!this.isLogin) {
+          this.$message.success('请登录再后取消收藏哦!')
+          this.$store.commit('changeLoginBox', true)
+          this.favoritesFlag = true
+          return
+        }
+        const { data: res } = await this.axios.post('api/posts/cancelFavorites/' + this.$route.params.id)
+        this.articFavorites = res.isFavorites
+        this.favoritesFlag = true
+      } catch (err) {
+        this.$message.error('取消收藏失败!')
+        console.log(err)
+        this.favoritesFlag = true
+      }
+    },
+    // 收藏
+    async favorites () {
+      if (!this.favoritesFlag) return
+      this.favoritesFlag = false
+      try {
+        if (!this.isLogin) {
+          this.$message.success('请登录后再收藏哦!')
+          this.$store.commit('changeLoginBox', true)
+          this.favoritesFlag = true
+          return
+        }
+        const { data: res } = await this.axios.post('api/posts/favorites/' + this.$route.params.id)
+        this.articFavorites = res.isFavorites
+        this.favoritesFlag = true
+      } catch (err) {
+        console.log(err)
+        this.$message.error('取消收藏失败!')
+        this.favoritesFlag = true
       }
     }
   },
@@ -152,6 +247,8 @@ export default {
       const { data: res } = await this.axios.get('api/posts/' + this.$route.params.id)
       this.article = res.post
       this.articleLike = res.islike
+      this.articFavorites = res.isFavorites
+      console.log(res)
     } catch (err) {
       this.$message.error('获取文章失败!')
     }
@@ -204,6 +301,7 @@ export default {
       display: block;
       // border-radius: 8px;
       max-height: 550px;
+      border-radius: 8px 8px 0 0;
     }
   }
   .article-attr {
@@ -260,7 +358,7 @@ export default {
     justify-content: space-between;
     padding: 10px;
     border-top: 1px solid #eeeeee;
-    div {
+    > div {
       background-color: #f6f6f6;
       color: #d0d0d0;
       font-size: 14px;
@@ -273,7 +371,12 @@ export default {
     }
   }
   .is-like {
-    color: #fe6673;
+    color: #fe6673 !important;
+    background-color: #fff !important;
+  }
+  .is-favorites {
+    color: #2ae0c8 !important;
+    background-color: #fff !important;
   }
 }
 .article-comment {
@@ -327,7 +430,13 @@ export default {
     }
   }
 }
-@media screen and (max-width: 1020px) {
+@media screen and (max-width: 1024px) {
+  .article-comment {
+    margin-top: 5px;
+  }
+}
+
+@media screen and (max-width: 768px) {
   .comment-avatar {
     display: none;
   }
@@ -339,9 +448,15 @@ export default {
   }
 }
 
-@media screen and (max-width: 760px) {
-}
-
 @media screen and (max-width: 505px) {
+  .article-wrap {
+    .comment-form {
+      .text {
+        textarea {
+          height: 80px;
+        }
+      }
+    }
+  }
 }
 </style>

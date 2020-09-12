@@ -31,7 +31,7 @@ export default {
       })
     },
     sideScroll () {
-      if (document.documentElement.clientWidth < 760) {
+      if (document.documentElement.clientWidth < 768) {
         return
       }
       const sideBar = document.getElementById('sideBar') // 子盒子
