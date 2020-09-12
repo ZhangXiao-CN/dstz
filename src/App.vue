@@ -69,6 +69,7 @@ export default {
     }
   },
   created () {
+    this.sideScroll()
     this.$nextTick(this.sideScroll())
     window.addEventListener('scroll', this.sideScroll)
   }
