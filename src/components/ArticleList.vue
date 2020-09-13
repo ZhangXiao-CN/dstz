@@ -165,7 +165,7 @@ export default {
           width: 100%;
           height: 100%;
           display: block;
-          // object-fit: cover;
+          object-fit: contain;
           border-radius: 8px;
         }
       }

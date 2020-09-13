@@ -91,14 +91,6 @@
       </div>
       <div class="text">
         <textarea rows="2" placeholder="写下你的评论..." v-model="myComment"></textarea>
-        <picker
-          :include="['people']"
-          :showSearch="false"
-          :showPreview="false"
-          :showCategories="false"
-          :native="true"
-          @select="addEmoji"
-        />
       </div>
     </div>
     <div class="comment-btn">
@@ -109,7 +101,6 @@
 
 <script>
 import { mapState } from 'vuex'
-import { Picker } from 'emoji-mart-vue'
 export default {
   name: 'ArticleDetails',
   data () {
@@ -124,16 +115,10 @@ export default {
       loading: ''
     }
   },
-  components: { Picker },
   computed: {
     ...mapState(['isLogin', 'userInfo'])
   },
   methods: {
-    addEmoji (e) {
-      this.myComment += e.native
-      console.log(this.myComment)
-      console.log(e)
-    },
     // 评论
     async createComment (e) {
       this.loading = 1
@@ -294,14 +279,18 @@ export default {
 .article-details-wrap {
   // padding-left: 10 / 40rem;
   background-color: #fff;
+  border-radius: 8px 8px 0 0;
+  overflow: hidden;
   .thumbnail-img {
+    // border-radius: 8px 8px 0 0;
     // width: 100%;
     img {
       width: 100%;
       display: block;
       // border-radius: 8px;
-      max-height: 550px;
-      border-radius: 8px 8px 0 0;
+      max-height: 600px;
+      object-fit: contain;
+      // border-radius: 8px 8px 0 0;
     }
   }
   .article-attr {

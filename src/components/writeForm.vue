@@ -335,7 +335,7 @@ export default {
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
       background-color: #fff;
       margin-left: 5px;
-      border-radius: 8px;
+      border-radius: 8px 8px 0 0;
       overflow: hidden;
       .upload-thumb {
         display: flex;
@@ -377,11 +377,14 @@ export default {
       box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
       background-color: #fff;
       border-radius: 8px;
+      position: relative;
+      min-height: 200 / 40rem;
       .bottom-btn {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding: 10px;
+        background-color: #fff;
         p {
           font-size: 12px;
           color: #999;
@@ -389,6 +392,8 @@ export default {
       }
       .notice-wrap {
         padding: 10 / 40rem;
+        z-index: 1;
+        background-color: #fff;
         p {
           font-size: 14 / 40rem;
           text-align: left;
@@ -403,22 +408,24 @@ export default {
 .thumb-show {
   position: relative;
   width: 100%;
-  height: 100%;
+  height: 298px;
   img {
+    display: block;
+    object-fit: contain;
     width: 100%;
-    height: 100%;
+    height: 298px;
   }
   .thumb-tools {
-    display: none;
+    display: flex;
     justify-content: flex-start;
     flex-wrap: wrap;
     position: absolute;
     right: 0;
     bottom: 0;
     padding: 5px 10px;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.2);
     i {
-      font-size: 30px;
+      font-size: 20px;
       color: #fff;
       cursor: pointer;
       input {
@@ -439,6 +446,7 @@ export default {
   justify-content: space-between;
   border-top: 1px solid #ebebeb;
   border-bottom: 1px solid #ebebeb;
+  background-color: #fff;
   .categories-title {
     white-space: nowrap;
     padding: 15px;
@@ -495,6 +503,7 @@ export default {
 }
 
 .tag {
+  background-color: #fff;
   border-top: 1px solid #ebebeb;
   .point {
     text-align: left;
@@ -613,6 +622,30 @@ export default {
   }
 }
 
+.slideImg-enter-active {
+  animation: slide-in 0.4s linear;
+}
+.slideImg-leave-active {
+  animation: slide-in 0.4s linear reverse;
+}
+@keyframes slide-in {
+  0% {
+    height: 0;
+  }
+  25% {
+    height: 25%;
+  }
+  50% {
+    height: 50%;
+  }
+  75% {
+    height: 75%;
+  }
+  100% {
+    height: 100%;
+  }
+}
+
 @media screen and (max-width: 768px) {
   .notice-wrap {
     padding: 5px !important;
@@ -645,6 +678,13 @@ export default {
     // min-height: 300px !important;
     // flex: initial !important;
     // margin: 5px 0 0 0 !important;
+    .thumb-show {
+      height: 100%;
+      img {
+        object-fit: fill;
+        height: 100%;
+      }
+    }
     .upload-thumb {
       min-height: 200 / 40rem !important;
       // p {
