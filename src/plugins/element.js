@@ -8,7 +8,8 @@ import {
   Avatar,
   Message,
   Tag,
-  Loading
+  Loading,
+  Pagination
 } from 'element-ui'
 
 Vue.use(Button)
@@ -19,4 +20,5 @@ Vue.use(Input)
 Vue.use(Avatar)
 Vue.use(Tag)
 Vue.use(Loading)
+Vue.use(Pagination)
 Vue.prototype.$message = Message

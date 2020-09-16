@@ -154,19 +154,21 @@ export default {
       padding-bottom: 5 / 40rem;
       margin-top: 10 / 40rem;
       border-bottom: 1px solid #f5f5f5;
+      max-height: 130px;
       // align-items: center;
       .article-img {
         flex: 3;
         height: 150 / 40rem;
         width: 35%;
-        border-radius: 8px;
-        overflow: hidden;
+        // border-radius: 8px;
+        max-height: 130px;
+        // overflow: hidden;
         img {
           width: 100%;
           height: 100%;
           display: block;
           object-fit: contain;
-          border-radius: 8px;
+          // border-radius: 8px;
         }
       }
     }
@@ -341,9 +343,6 @@ export default {
   .el-avatar {
     width: 18px !important;
     height: 18px !important;
-  }
-  .article-info {
-    // max-width: 50%;
   }
   .article-img {
     height: 100 / 40rem !important;

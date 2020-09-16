@@ -92,7 +92,7 @@ export default {
   }
 }
 
-@media screen and (max-width: 1020px) {
+@media screen and (max-width: 1024px) {
   .footer-box {
     margin-right: 10px !important;
     .footer-title {

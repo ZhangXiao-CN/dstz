@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "551914",
+      "name": "笑脸",
+      "font_class": "smiling",
+      "unicode": "e63d",
+      "unicode_decimal": 58941
+    },
+    {
       "icon_id": "584065",
       "name": "退出",
       "font_class": "084tuichu",
@@ -396,6 +403,13 @@
       "font_class": "unfold",
       "unicode": "e74a",
       "unicode_decimal": 59210
+    },
+    {
+      "icon_id": "7116483",
+      "name": "笑脸",
+      "font_class": "xiaolian",
+      "unicode": "e605",
+      "unicode_decimal": 58885
     },
     {
       "icon_id": "7310556",

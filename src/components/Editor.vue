@@ -99,10 +99,10 @@ export default {
   box-shadow: none !important;
 }
 
-@media screen and (max-width: 1020px) {
+@media screen and (max-width: 1024px) {
 }
 
-@media screen and (max-width: 760px) {
+@media screen and (max-width: 768px) {
   .v-note-wrapper {
     min-height: 400px;
   }
