@@ -55,33 +55,112 @@
         全部评论&nbsp;&nbsp;
         <span>{{article.meta && article.meta.comments}}</span>&nbsp;&nbsp;
       </div>
-      <ul>
-        <li v-for=" item in commentList.records" :key="item._id">
+      <ul class="comment-list">
+        <li v-for=" item in commentList.records" :key="item._id" class="comment-item">
           <el-avatar
             shape="square"
             :src="item.author.avatar ? item.author.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
             size="medium"
           ></el-avatar>
           <div class="comment-info">
-            <div class="usermeta">
-              <div class="username">{{item.author.nickName && item.author.nickName}}</div>
-              <div class="create-date"></div>
+            <div class="comment-wrap">
+              <div class="usermeta">
+                <router-link
+                  :to="{name: 'user', params: {id: item.author._id}}"
+                  class="username"
+                >{{item.author.nickName && item.author.nickName}}</router-link>
+                <div class="create-date"></div>
+              </div>
+              <div class="conmment-content" v-html="item.content"></div>
+              <div class="comment-tools">
+                <button>
+                  <i class="iconfont icon-like_fill"></i>
+                  <span>{{item.likeCount}}</span>
+                </button>
+                <button @click="changereply(item._id)" class="reply-btn" v-if="reply !== item._id">
+                  <i class="iconfont icon-interactive_fill"></i>
+                  <span>回复</span>
+                </button>
+                <button @click="changereply('0')" class="reply-btn" v-if="reply === item._id">
+                  <i class="iconfont icon-interactive_fill"></i>
+                  <span>取消回复</span>
+                </button>
+              </div>
             </div>
-            <div class="conmment-content" v-html="item.content"></div>
-            <div class="comment-tools">
-              <button>
-                <i class="iconfont icon-like_fill"></i>
-                <span>{{item.likeCount}}</span>
-              </button>
-              <button @click="changereply(item._id)" class="reply-btn" v-if="reply !== item._id">
-                <i class="iconfont icon-interactive_fill"></i>
-                <span>回复</span>
-              </button>
-              <button @click="changereply('0')" class="reply-btn" v-if="reply === item._id">
-                <i class="iconfont icon-interactive_fill"></i>
-                <span>取消回复</span>
-              </button>
-            </div>
+            <ul class="comment-list" v-if="item.replies.length > 0">
+              <li v-for=" childItem in item.replies" :key="childItem._id" class="comment-item">
+                <el-avatar
+                  shape="square"
+                  :src="childItem.from_uid.avatar ? childItem.from_uid.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
+                  size="medium"
+                ></el-avatar>
+                <div class="comment-info">
+                  <div class="comment-wrap">
+                    <div class="usermeta">
+                      <div class="reply-users">
+                        <router-link
+                          :to="{name: 'user', params: {id: childItem.from_uid._id}}"
+                          class="username"
+                        >{{childItem.from_uid.nickName && childItem.from_uid.nickName}}</router-link>
+                        <div class="to-icon">@</div>
+                        <router-link
+                          :to="{name: 'user', params: {id: childItem.to_uid._id}}"
+                          class="username"
+                        >{{childItem.to_uid.nickName && childItem.to_uid.nickName}}</router-link>
+                      </div>
+                      <div class="create-date"></div>
+                    </div>
+                    <div class="conmment-content" v-html="childItem.content"></div>
+                    <div class="comment-tools">
+                      <button>
+                        <i class="iconfont icon-like_fill"></i>
+                        <span>{{1}}</span>
+                      </button>
+                      <button
+                        @click="changereply(childItem._id)"
+                        class="reply-btn"
+                        v-if="reply !== childItem._id"
+                      >
+                        <i class="iconfont icon-interactive_fill"></i>
+                        <span>回复</span>
+                      </button>
+                      <button
+                        @click="changereply('0')"
+                        class="reply-btn"
+                        v-if="reply === childItem._id"
+                      >
+                        <i class="iconfont icon-interactive_fill"></i>
+                        <span>取消回复</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="reply-wrap" v-if="reply === childItem._id">
+                    <div class="comment-form">
+                      <div class="comment-avatar">
+                        <el-avatar
+                          shape="square"
+                          :size="35"
+                          :src="userInfo.avatar ? userInfo.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
+                          v-cloak
+                        ></el-avatar>
+                      </div>
+                      <div class="text">
+                        <Emoji @comments="getComments" :myComment="myComment"></Emoji>
+                      </div>
+                    </div>
+                    <div class="comment-btn">
+                      <el-button
+                        type="primary"
+                        :size="'mini'"
+                        reply
+                        @click="createReply($event, item._id, childItem.from_uid._id)"
+                        :loading="loading === 1"
+                      >提交</el-button>
+                    </div>
+                  </div>
+                </div>
+              </li>
+            </ul>
             <div class="reply-wrap" v-if="reply === item._id">
               <div class="comment-form">
                 <div class="comment-avatar">
@@ -159,7 +238,7 @@ export default {
       myComment: '',
       loading: '',
       commentLoading: false,
-      reply: '0'
+      reply: '0' // 控制弹出评论框的位置
     }
   },
   components: { Emoji },
@@ -174,6 +253,13 @@ export default {
     async createComment (e) {
       this.loading = 1
       e.target.innerText = ''
+      if (!this.isLogin) {
+        this.$message.error('登录后才能评论哦!')
+        this.$store.commit('changeLoginBox', true)
+        this.loading = ''
+        e.target.innerText = '提交'
+        return
+      }
       if (this.myComment.length < 3) {
         this.$message.error('评论怎么也得2个字以上吧!--!')
         this.loading = ''
@@ -186,7 +272,6 @@ export default {
           post: this.article._id,
           author: this.userInfo._id
         })
-        console.log(res)
         this.loading = ''
         const textarea = document.getElementById('textarea')
         textarea.innerHTML = ''
@@ -216,7 +301,6 @@ export default {
         this.article.meta.likes = res.post.meta.likes
         this.likeFlag = true
       } catch (err) {
-        console.log(err)
         this.likeFlag = true
       }
     },
@@ -236,7 +320,6 @@ export default {
         this.article.meta.likes = res.post.meta.likes
         this.likeFlag = true
       } catch (err) {
-        console.log(err)
         this.likeFlag = true
       }
     },
@@ -256,7 +339,6 @@ export default {
         this.favoritesFlag = true
       } catch (err) {
         this.$message.error('取消收藏失败!')
-        console.log(err)
         this.favoritesFlag = true
       }
     },
@@ -275,7 +357,6 @@ export default {
         this.articFavorites = res.isFavorites
         this.favoritesFlag = true
       } catch (err) {
-        console.log(err)
         this.$message.error('取消收藏失败!')
         this.favoritesFlag = true
       }
@@ -299,6 +380,19 @@ export default {
     async createReply (e, commentID, authorId) {
       this.loading = 1
       e.target.innerText = ''
+      if (!this.isLogin) {
+        this.$message.error('登录后才能评论哦!')
+        this.$store.commit('changeLoginBox', true)
+        this.loading = ''
+        e.target.innerText = '提交'
+        return
+      }
+      if (authorId === this.userInfo._id) {
+        this.$message.error('请不要自己给自己回复呃!--!')
+        this.loading = ''
+        e.target.innerText = '提交'
+        return
+      }
       if (this.myComment.length < 3) {
         this.$message.error('回复怎么也得2个字以上吧!--!')
         this.loading = ''
@@ -311,12 +405,15 @@ export default {
           content: this.myComment,
           postId: this.article._id
         })
-        console.log(res)
         this.loading = ''
         const textarea = document.getElementById('textarea')
         textarea.innerHTML = ''
         this.myComment = ''
-        // this.commentList.records.push(res)
+        this.commentList.records.forEach((item) => {
+          if (item._id === res._id) {
+            item.replies = res.replies
+          }
+        })
         e.target.innerText = '提交'
         this.reply = '0'
       } catch (err) {
@@ -332,7 +429,6 @@ export default {
       this.article = res.post
       this.articleLike = res.islike
       this.articFavorites = res.isFavorites
-      console.log(res)
     } catch (err) {
       this.$message.error('获取文章失败!')
     }
@@ -452,7 +548,7 @@ export default {
       font-size: 14px;
       cursor: pointer;
       i {
-        font-size: 14px;
+        font-size: 16px;
         margin-right: 2px;
       }
     }
@@ -483,12 +579,30 @@ export default {
       font-size: 12px;
     }
   }
-  ul {
-    li {
+  .comment-list {
+    .comment-item {
       display: flex;
       padding: 10px 5px;
       justify-content: flex-start;
       border-bottom: 1px solid #eeeeee;
+      .comment-list {
+        margin: 10px 0;
+        .comment-item {
+          padding: 10px 10px 10px 15px;
+          margin-top: 7px;
+          background-color: #f9f9f9;
+          border: none;
+          .reply-users {
+            display: flex;
+            .to-icon {
+              margin: 0 7px;
+              font-size: 12px;
+              color: #999999;
+              font-weight: normal;
+            }
+          }
+        }
+      }
       .comment-info {
         width: 100%;
         margin-left: 10px;
@@ -513,7 +627,7 @@ export default {
           padding: 2px 5px;
           cursor: pointer;
           i {
-            font-size: 12px;
+            font-size: 14px;
           }
         }
       }
@@ -522,7 +636,7 @@ export default {
         transition: all 0.2s;
       }
     }
-    li:hover .reply-btn {
+    .comment-wrap:hover .reply-btn {
       opacity: 1;
     }
   }
@@ -549,5 +663,13 @@ export default {
 }
 
 @media screen and (max-width: 505px) {
+  .comment-item {
+    .comment-item {
+      padding: 5px !important;
+    }
+  }
+  .conmment-content {
+    font-size: 15px;
+  }
 }
 </style>
