@@ -50,12 +50,12 @@
         </div>
       </div>
     </div>
-    <div class="article-comment">
+    <div class="article-comment" v-if="commentFlag">
       <div class="article-comment-title">
         全部评论&nbsp;&nbsp;
         <span>{{article.meta && article.meta.comments}}</span>&nbsp;&nbsp;
       </div>
-      <ul class="comment-list">
+      <ul class="comment-list" v-if="commentList.records && commentList.records.length > 0">
         <li v-for=" item in commentList.records" :key="item._id" class="comment-item">
           <el-avatar
             shape="square"
@@ -65,11 +65,11 @@
           <div class="comment-info">
             <div class="comment-wrap">
               <div class="usermeta">
-                <div>
+                <div v-if="item.author && article.author">
                   <router-link
                     :to="{name: 'user', params: {id: item.author._id}}"
                     class="username"
-                  >{{item.author.nickName && item.author.nickName}}</router-link>
+                  >{{item.author.nickName}}</router-link>
                   <span class="is-author" v-if="item.author._id === article.author._id">作者</span>
                 </div>
                 <div class="create-date">123</div>
@@ -98,7 +98,7 @@
                 </button>
               </div>
             </div>
-            <ul class="comment-list" v-if="item.replies.length > 0">
+            <ul class="comment-list" v-if="item.replies && item.replies.length > 0">
               <li v-for=" childItem in item.replies" :key="childItem._id" class="comment-item">
                 <el-avatar
                   shape="square"
@@ -109,22 +109,22 @@
                   <div class="comment-wrap">
                     <div class="usermeta">
                       <div class="reply-users">
-                        <div>
+                        <div v-if="childItem.from_uid && article.author">
                           <router-link
                             :to="{name: 'user', params: {id: childItem.from_uid._id}}"
                             class="username"
-                          >{{childItem.from_uid.nickName && childItem.from_uid.nickName}}</router-link>
+                          >{{childItem.from_uid.nickName}}</router-link>
                           <span
                             class="is-author"
                             v-if="childItem.from_uid._id === article.author._id"
                           >作者</span>
                         </div>
                         <div class="to-icon">@</div>
-                        <div>
+                        <div v-if="childItem.to_uid && article.author">
                           <router-link
                             :to="{name: 'user', params: {id: childItem.to_uid._id}}"
                             class="username"
-                          >{{childItem.to_uid.nickName && childItem.to_uid.nickName}}</router-link>
+                          >{{childItem.to_uid.nickName}}</router-link>
                           <span
                             class="is-author"
                             v-if="childItem.to_uid._id === article.author._id"
@@ -272,7 +272,8 @@ export default {
       myComment: '',
       loading: '',
       commentLoading: false,
-      reply: '0' // 控制弹出评论框的位置
+      reply: '0', // 控制弹出评论框的位置
+      commentFlag: true // 控制评论区是否渲染
     }
   },
   components: { Emoji },
@@ -447,10 +448,13 @@ export default {
           if (item._id === res._id) {
             item.likeCount = res.likeCount
             item.islike = res.islike
+            this.likeFlag = true
+            // 让评论区强制渲染,解决第一次评论点赞无法响应渲染到视图的BUG
+            this.commentFlag = false
+            this.commentFlag = true
             break
           }
         }
-        this.likeFlag = true
       } catch (err) {
         this.$message.error('点赞失败了!--! 请刷新后重试, 或联系站长')
         this.likeFlag = true
@@ -472,13 +476,13 @@ export default {
               if (reply._id === res.replyId) {
                 reply.likeCount = res.likeCount
                 reply.islike = res.islike
+                this.likeFlag = true
                 break
               }
             }
             break
           }
         }
-        this.likeFlag = true
       } catch (err) {
         console.log(err)
         this.$message.error('点赞失败了!--! 请刷新后重试, 或联系站长')
@@ -486,6 +490,14 @@ export default {
       }
     }
   },
+  // watch: {
+  //   commentList: {
+  //     handler (newVal, objVal) {
+  //     },
+  //     deep: true,
+  //     immediate: true
+  //   }
+  // },
   created () {
     // 让两个请求同时发出 所以不使用 async await 同步语法
     this.axios.get('api/posts/' + this.$route.params.id).then(res => {
