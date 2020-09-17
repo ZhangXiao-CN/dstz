@@ -486,21 +486,20 @@ export default {
       }
     }
   },
-  async created () {
-    try {
-      const { data: res } = await this.axios.get('api/posts/' + this.$route.params.id)
-      this.article = res.post
-      this.articleLike = res.islike
-      this.articFavorites = res.isFavorites
-    } catch (err) {
+  created () {
+    // 让两个请求同时发出 所以不使用 async await 同步语法
+    this.axios.get('api/posts/' + this.$route.params.id).then(res => {
+      this.article = res.data.post
+      this.articleLike = res.data.islike
+      this.articFavorites = res.data.isFavorites
+    }).catch(() => {
       this.$message.error('获取文章失败! 请刷新后重试, 或联系站长')
-    }
-    try {
-      const { data: res } = await this.axios.get('api/comments/' + this.$route.params.id)
-      this.commentList = res.records.length > 0 ? res : ''
-    } catch (err) {
+    })
+    this.axios.get('api/comments/' + this.$route.params.id).then(res => {
+      this.commentList = res.data.records.length > 0 ? res.data : ''
+    }).catch(() => {
       this.$message.error('获取评论列表失败! 请刷新后重试, 或联系站长')
-    }
+    })
   }
 }
 </script>

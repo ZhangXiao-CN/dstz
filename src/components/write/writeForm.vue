@@ -279,7 +279,7 @@ export default {
       this.$router.push({ name: 'home' })
     }
   },
-  created: async function () {
+  async created () {
     if (this.categoryNav.length === 0) {
       const { data: res } = await this.axios.get('api/categories')
       this.$store.commit('changeCategoryNav', res)

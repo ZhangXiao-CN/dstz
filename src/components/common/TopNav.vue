@@ -80,7 +80,7 @@ export default {
   computed: {
     ...mapState(['categoryNav'])
   },
-  mounted: async function () {
+  async created () {
     if (this.categoryNav.length > 0) {
       return
     }

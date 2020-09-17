@@ -38,17 +38,17 @@ export default {
       if (!sideBar) {
         return
       }
-      const homeMain = document.getElementById('homeMain') // 父盒子
-      const homeMainHeigth = homeMain.offsetHeight // 父盒子高度
+      const mainAndSidebar = document.getElementById('mainAndSidebar') // 父盒子
+      const mainAndSidebarHeigth = mainAndSidebar.offsetHeight // 父盒子高度
       const sidBarHeigth = sideBar.offsetHeight // 子盒子的高度
-      if (homeMainHeigth < sidBarHeigth) {
-        homeMain.style.height = sidBarHeigth + 'px'
+      if (mainAndSidebarHeigth < sidBarHeigth) {
+        mainAndSidebar.style.height = sidBarHeigth + 'px'
       }
-      const homeMainOffsetTop = homeMain.offsetTop // 盒子距顶部
+      const mainAndSidebarOffsetTop = mainAndSidebar.offsetTop // 盒子距顶部
       const scrollTop = document.body.scrollTop + document.documentElement.scrollTop // 卷去高度
       const clientHeight = document.documentElement.clientHeight // 可视区高度
       // 距离顶部的高度 + 自身的高度 - 可视区的高度 = 需要被卷去的距离
-      const moveY = homeMainOffsetTop + sidBarHeigth - clientHeight // 需要被卷去的距离
+      const moveY = mainAndSidebarOffsetTop + sidBarHeigth - clientHeight // 需要被卷去的距离
       const footer = document.getElementById('footer')
       const footerClientHeight = footer.offsetTop - scrollTop // footer距顶部
       if (scrollTop > moveY) {
@@ -58,8 +58,8 @@ export default {
           sideBar.style.top = scrollTop - moveY + 'px' // 记得加单位
         } else {
           // 否则定位到最底部
-          if (homeMainHeigth > sidBarHeigth) {
-            sideBar.style.top = homeMain.offsetHeight - sidBarHeigth + 'px' // 记得加单位
+          if (mainAndSidebarHeigth > sidBarHeigth) {
+            sideBar.style.top = mainAndSidebar.offsetHeight - sidBarHeigth + 'px' // 记得加单位
           }
         }
       } else {

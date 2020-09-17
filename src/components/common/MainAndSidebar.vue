@@ -1,5 +1,5 @@
 <template>
-  <div ref="HomeMain" id="homeMain" class="clearfix">
+  <div id="mainAndSidebar" class="clearfix">
     <div class="article-wrap">
       <slot></slot>
     </div>
@@ -293,7 +293,7 @@
 
 <script>
 export default {
-  name: 'HomeMain',
+  name: 'MainAndSidebar',
   data () {
     return {
       text: '我大明天下无敌啊! 这个mod的知名度怕是不需要我多说了吧,哈哈! 由东方朔曼倩大大精心制作的大型mod 华夏国家基本都有专属任务树 增加了...'
@@ -308,7 +308,7 @@ export default {
 </script>
 
 <style lang="less" scoped>
-#homeMain {
+#mainAndSidebar {
   // display: flex;
   // justify-content: flex-start;
   max-width: 1440px;
@@ -545,7 +545,7 @@ export default {
   .hot-article {
     margin-top: 5px !important;
   }
-  #homeMain {
+  #mainAndSidebar {
     margin-top: 5px;
   }
   .article-info {
@@ -557,7 +557,7 @@ export default {
 }
 
 @media screen and (max-width: 768px) {
-  #homeMain {
+  #mainAndSidebar {
     flex-direction: column;
     margin-top: 3px;
   }
@@ -582,7 +582,7 @@ export default {
 }
 
 @media screen and (max-width: 505px) {
-  #homeMain {
+  #mainAndSidebar {
     flex-direction: column;
   }
   .el-avatar {

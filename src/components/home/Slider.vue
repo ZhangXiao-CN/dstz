@@ -76,15 +76,17 @@ export default {
       }
     }
   },
-  async created () {
-    try {
-      const { data: slides } = await this.axios.get('api/slides')
-      const { data: fix } = await this.axios.get('api/slides/fix')
-      this.swiperList = slides
-      this.fixList = fix
-    } catch (err) {
+  created () {
+    this.axios.get('api/slides').then(res => {
+      this.swiperList = res.data
+    }).catch(() => {
       this.$message.error('获取轮播图失败!')
-    }
+    })
+    this.axios.get('api/slides/fix').then(res => {
+      this.fixList = res.data
+    }).catch(() => {
+      this.$message.error('获取轮播图失败!')
+    })
   }
 }
 </script>
