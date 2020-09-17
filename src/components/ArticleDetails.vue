@@ -29,21 +29,21 @@
       </div>
       <div class="like">
         <div :class="{'is-favorites ': articFavorites}">
-          <div v-if="articFavorites" @click="cancelFavorites">
+          <div v-if="articFavorites" @click="favorites('cancelFavorites')">
             <i class="iconfont icon-collection_fill"></i>
             <span>已收藏</span>
           </div>
-          <div v-else @click="favorites">
+          <div v-else @click="favorites('favorites')">
             <i class="iconfont icon-collection_fill"></i>
             <span>收藏</span>
           </div>
         </div>
         <div :class="{'is-like': articleLike}">
-          <div v-if="articleLike" @click="cancelFabulous">
+          <div v-if="articleLike" @click="fabulous('cancelFabulous')">
             <i class="iconfont icon-like_fill"></i>
             <span>{{article.meta && article.meta.likes}}</span>
           </div>
-          <div v-else @click="fabulous">
+          <div v-else @click="fabulous('fabulous')">
             <i class="iconfont icon-like_fill"></i>
             <span>{{article.meta && article.meta.likes}}</span>
           </div>
@@ -73,7 +73,15 @@
               </div>
               <div class="conmment-content" v-html="item.content"></div>
               <div class="comment-tools">
-                <button>
+                <button
+                  class="is-like"
+                  v-if="item.islike"
+                  @click="commentFabulous('cancelFabulous', item._id)"
+                >
+                  <i class="iconfont icon-like_fill"></i>
+                  <span>{{item.likeCount}}</span>
+                </button>
+                <button v-else @click="commentFabulous('fabulous', item._id)">
                   <i class="iconfont icon-like_fill"></i>
                   <span>{{item.likeCount}}</span>
                 </button>
@@ -112,9 +120,20 @@
                     </div>
                     <div class="conmment-content" v-html="childItem.content"></div>
                     <div class="comment-tools">
-                      <button>
+                      <button
+                        class="is-like-reply"
+                        v-if="childItem.islike"
+                        @click="replyFabulous('cancelReplyFabulous', item._id, childItem._id)"
+                      >
                         <i class="iconfont icon-like_fill"></i>
-                        <span>{{1}}</span>
+                        <span>{{childItem.likeCount}}</span>
+                      </button>
+                      <button
+                        v-else
+                        @click="replyFabulous('replyFabulous', item._id, childItem._id)"
+                      >
+                        <i class="iconfont icon-like_fill"></i>
+                        <span>{{childItem.likeCount}}</span>
                       </button>
                       <button
                         @click="changereply(childItem._id)"
@@ -234,7 +253,7 @@ export default {
       likeFlag: true, // 点赞节流阀
       articFavorites: false, // 是否收藏
       favoritesFlag: true, // 收藏节流阀
-      commentList: '',
+      commentList: {},
       myComment: '',
       loading: '',
       commentLoading: false,
@@ -249,13 +268,21 @@ export default {
     getComments (comment) {
       this.myComment = comment
     },
+    // 判断是否登录,未登录弹出登录框
+    isLoginAndEject (msg) {
+      if (!this.isLogin) {
+        this.$message.error(msg)
+        this.$store.commit('changeLoginBox', true)
+        return false
+      } else {
+        return true
+      }
+    },
     // 评论
     async createComment (e) {
       this.loading = 1
       e.target.innerText = ''
-      if (!this.isLogin) {
-        this.$message.error('登录后才能评论哦!')
-        this.$store.commit('changeLoginBox', true)
+      if (!this.isLoginAndEject('登录后才能评论哦!')) {
         this.loading = ''
         e.target.innerText = '提交'
         return
@@ -276,113 +303,28 @@ export default {
         const textarea = document.getElementById('textarea')
         textarea.innerHTML = ''
         this.myComment = ''
-        this.commentList.records.push(res)
+        // 如果评论为空, 需要定义空数组, 才能push
+        if (!this.commentList) {
+          this.commentList = {}
+          this.commentList.records = []
+          this.commentList.records.push(res.com)
+        } else {
+          this.commentList.records.push(res.com)
+        }
+        this.article.meta = res.post.meta
         e.target.innerText = '提交'
+        this.loading = ''
       } catch (err) {
-        this.$message.error('提交评论失败!')
+        this.$message.error('提交评论失败! 请刷新后重试, 或联系站长')
         this.loading = ''
         e.target.innerText = '提交'
       }
     },
-    // 点赞
-    async fabulous () {
-      if (!this.likeFlag) return
-      this.likeFlag = false
-      try {
-        if (!this.isLogin) {
-          this.$message.success('请登录后再点赞哦!')
-          this.$store.commit('changeLoginBox', true)
-          this.likeFlag = true
-          return
-        }
-        const { data: res } = await this.axios.post('api/posts/fabulous/' + this.$route.params.id)
-        this.articleLike = res.islike
-        this.article.meta.likes = res.post.meta.likes
-        this.article.meta.likes = res.post.meta.likes
-        this.likeFlag = true
-      } catch (err) {
-        this.likeFlag = true
-      }
-    },
-    // 取消点赞
-    async cancelFabulous () {
-      if (!this.likeFlag) return
-      this.likeFlag = false
-      try {
-        if (!this.isLogin) {
-          this.$message.success('请登录后再点赞哦!')
-          this.$store.commit('changeLoginBox', true)
-          this.likeFlag = true
-          return
-        }
-        const { data: res } = await this.axios.post('api/posts/cancelFabulous/' + this.$route.params.id)
-        this.articleLike = res.islike
-        this.article.meta.likes = res.post.meta.likes
-        this.likeFlag = true
-      } catch (err) {
-        this.likeFlag = true
-      }
-    },
-    // 取消收藏
-    async cancelFavorites () {
-      if (!this.favoritesFlag) return
-      this.favoritesFlag = false
-      try {
-        if (!this.isLogin) {
-          this.$message.success('请登录再后取消收藏哦!')
-          this.$store.commit('changeLoginBox', true)
-          this.favoritesFlag = true
-          return
-        }
-        const { data: res } = await this.axios.post('api/posts/cancelFavorites/' + this.$route.params.id)
-        this.articFavorites = res.isFavorites
-        this.favoritesFlag = true
-      } catch (err) {
-        this.$message.error('取消收藏失败!')
-        this.favoritesFlag = true
-      }
-    },
-    // 收藏
-    async favorites () {
-      if (!this.favoritesFlag) return
-      this.favoritesFlag = false
-      try {
-        if (!this.isLogin) {
-          this.$message.success('请登录后再收藏哦!')
-          this.$store.commit('changeLoginBox', true)
-          this.favoritesFlag = true
-          return
-        }
-        const { data: res } = await this.axios.post('api/posts/favorites/' + this.$route.params.id)
-        this.articFavorites = res.isFavorites
-        this.favoritesFlag = true
-      } catch (err) {
-        this.$message.error('取消收藏失败!')
-        this.favoritesFlag = true
-      }
-    },
-    async toPage (e) {
-      this.commentLoading = true
-      try {
-        const { data: res } = await this.axios.get('api/comments/' + this.$route.params.id + '?page=' + e)
-        this.commentList = res.records.length > 0 ? res : ''
-        this.commentLoading = false
-      } catch (err) {
-        this.$message.error('获取评论列表失败!')
-        this.commentLoading = false
-      }
-      this.commentLoading = false
-    },
-    changereply (id) {
-      this.reply = id
-      this.myComment = ''
-    },
+    // 回复
     async createReply (e, commentID, authorId) {
       this.loading = 1
       e.target.innerText = ''
-      if (!this.isLogin) {
-        this.$message.error('登录后才能评论哦!')
-        this.$store.commit('changeLoginBox', true)
+      if (!this.isLoginAndEject('登录后才能回复哦!')) {
         this.loading = ''
         e.target.innerText = '提交'
         return
@@ -409,17 +351,123 @@ export default {
         const textarea = document.getElementById('textarea')
         textarea.innerHTML = ''
         this.myComment = ''
-        this.commentList.records.forEach((item) => {
-          if (item._id === res._id) {
-            item.replies = res.replies
+        for (const item of this.commentList.records) {
+          if (item._id === res.comment._id) {
+            item.replies = res.comment.replies
+            break
           }
-        })
+        }
+        this.article.meta = res.post.meta
         e.target.innerText = '提交'
         this.reply = '0'
       } catch (err) {
-        this.$message.error('提交评论失败!')
+        this.$message.error('提交评论失败! 请刷新后重试, 或联系站长')
         this.loading = ''
         e.target.innerText = '提交'
+      }
+    },
+    // 点赞与取消
+    async fabulous (path) {
+      if (!this.likeFlag) return
+      this.likeFlag = false
+      try {
+        if (!this.isLoginAndEject('登录后才能点赞哦!')) {
+          this.likeFlag = true
+          return
+        }
+        const { data: res } = await this.axios.post('api/posts/' + path + '/' + this.$route.params.id)
+        this.articleLike = res.islike
+        this.article.meta.likes = res.post.meta.likes
+        this.likeFlag = true
+      } catch (err) {
+        this.likeFlag = true
+      }
+    },
+    // 收藏与取消
+    async favorites (path) {
+      if (!this.favoritesFlag) return
+      this.favoritesFlag = false
+      try {
+        if (!this.isLoginAndEject('登录后才能收藏哦!')) {
+          this.favoritesFlag = true
+          return
+        }
+        const { data: res } = await this.axios.post('api/posts/' + path + '/' + this.$route.params.id)
+        this.articFavorites = res.isFavorites
+        this.favoritesFlag = true
+      } catch (err) {
+        this.$message.error('取消收藏失败! 请刷新后重试, 或联系站长')
+        this.favoritesFlag = true
+      }
+    },
+    // 评论翻页
+    async toPage (e) {
+      this.commentLoading = true
+      try {
+        const { data: res } = await this.axios.get('api/comments/' + this.$route.params.id + '?page=' + e)
+        this.commentList = res.records.length > 0 ? res : ''
+        this.commentLoading = false
+      } catch (err) {
+        this.$message.error('获取评论列表失败! 请刷新后重试, 或联系站长')
+        this.commentLoading = false
+      }
+      this.commentLoading = false
+    },
+    // 显示回复框
+    changereply (id) {
+      this.reply = id
+      this.myComment = ''
+    },
+    // 评论点赞
+    async commentFabulous (path, commentId) {
+      if (!this.likeFlag) return
+      this.likeFlag = false
+      try {
+        if (!this.isLoginAndEject('登录后才能点赞哦')) {
+          this.likeFlag = true
+          return
+        }
+        const { data: res } = await this.axios.post('api/comments/' + path + '/' + commentId)
+        for (const item of this.commentList.records) {
+          if (item._id === res._id) {
+            item.likeCount = res.likeCount
+            item.islike = res.islike
+            break
+          }
+        }
+        this.likeFlag = true
+      } catch (err) {
+        this.$message.error('点赞失败了!--! 请刷新后重试, 或联系站长')
+        this.likeFlag = true
+      }
+    },
+    // 回复点赞
+    async replyFabulous (path, commentId, replyId) {
+      if (!this.likeFlag) return
+      this.likeFlag = false
+      try {
+        if (!this.isLoginAndEject('登录后才能点赞哦!')) {
+          this.likeFlag = true
+          return
+        }
+        const { data: res } = await this.axios.post('api/comments/' + path + '/' + commentId, { replyId })
+        for (const item of this.commentList.records) {
+          if (item._id === res.commentId) {
+            for (const reply of item.replies) {
+              if (reply._id === res.replyId) {
+                reply.likeCount = res.likeCount
+                reply.islike = res.islike
+                break
+              }
+            }
+            break
+          }
+        }
+        this.likeFlag = true
+      } catch (err) {
+        console.log(err)
+        this.$message.error('点赞失败了!--! 请刷新后重试, 或联系站长')
+        this.likeFlag = true
       }
     }
   },
@@ -430,13 +478,13 @@ export default {
       this.articleLike = res.islike
       this.articFavorites = res.isFavorites
     } catch (err) {
-      this.$message.error('获取文章失败!')
+      this.$message.error('获取文章失败! 请刷新后重试, 或联系站长')
     }
     try {
       const { data: res } = await this.axios.get('api/comments/' + this.$route.params.id)
       this.commentList = res.records.length > 0 ? res : ''
     } catch (err) {
-      this.$message.error('获取评论列表失败!')
+      this.$message.error('获取评论列表失败! 请刷新后重试, 或联系站长')
     }
   }
 }
@@ -542,10 +590,11 @@ export default {
     padding: 10px;
     border-top: 1px solid #eeeeee;
     > div {
-      padding: 2px 5px;
+      padding: 2px 10px;
       background-color: #f6f6f6;
       color: #d0d0d0;
       font-size: 14px;
+      border-radius: 8px;
       cursor: pointer;
       i {
         font-size: 16px;
@@ -557,14 +606,18 @@ export default {
     position: relative;
     top: 1px;
   }
-  .is-like {
-    color: #fe6673 !important;
-    background-color: #fff !important;
-  }
-  .is-favorites {
-    color: #2ae0c8 !important;
-    background-color: #fff !important;
-  }
+}
+.is-like {
+  color: #fe6673 !important;
+  background-color: #fff !important;
+}
+.is-like-reply {
+  color: #fe6673 !important;
+  background-color: #f9f9f9 !important;
+}
+.is-favorites {
+  color: #2ae0c8 !important;
+  background-color: #fff !important;
 }
 .article-comment {
   background-color: #fff;
