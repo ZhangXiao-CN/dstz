@@ -65,11 +65,14 @@
           <div class="comment-info">
             <div class="comment-wrap">
               <div class="usermeta">
-                <router-link
-                  :to="{name: 'user', params: {id: item.author._id}}"
-                  class="username"
-                >{{item.author.nickName && item.author.nickName}}</router-link>
-                <div class="create-date"></div>
+                <div>
+                  <router-link
+                    :to="{name: 'user', params: {id: item.author._id}}"
+                    class="username"
+                  >{{item.author.nickName && item.author.nickName}}</router-link>
+                  <span class="is-author" v-if="item.author._id === article.author._id">作者</span>
+                </div>
+                <div class="create-date">123</div>
               </div>
               <div class="conmment-content" v-html="item.content"></div>
               <div class="comment-tools">
@@ -106,15 +109,27 @@
                   <div class="comment-wrap">
                     <div class="usermeta">
                       <div class="reply-users">
-                        <router-link
-                          :to="{name: 'user', params: {id: childItem.from_uid._id}}"
-                          class="username"
-                        >{{childItem.from_uid.nickName && childItem.from_uid.nickName}}</router-link>
+                        <div>
+                          <router-link
+                            :to="{name: 'user', params: {id: childItem.from_uid._id}}"
+                            class="username"
+                          >{{childItem.from_uid.nickName && childItem.from_uid.nickName}}</router-link>
+                          <span
+                            class="is-author"
+                            v-if="childItem.from_uid._id === article.author._id"
+                          >作者</span>
+                        </div>
                         <div class="to-icon">@</div>
-                        <router-link
-                          :to="{name: 'user', params: {id: childItem.to_uid._id}}"
-                          class="username"
-                        >{{childItem.to_uid.nickName && childItem.to_uid.nickName}}</router-link>
+                        <div>
+                          <router-link
+                            :to="{name: 'user', params: {id: childItem.to_uid._id}}"
+                            class="username"
+                          >{{childItem.to_uid.nickName && childItem.to_uid.nickName}}</router-link>
+                          <span
+                            class="is-author"
+                            v-if="childItem.to_uid._id === article.author._id"
+                          >作者</span>
+                        </div>
                       </div>
                       <div class="create-date"></div>
                     </div>
@@ -242,7 +257,7 @@
 </template>
 
 <script>
-import Emoji from './Emoji'
+import Emoji from '../comment/Emoji'
 import { mapState } from 'vuex'
 export default {
   name: 'ArticleDetails',
@@ -618,6 +633,13 @@ export default {
 .is-favorites {
   color: #2ae0c8 !important;
   background-color: #fff !important;
+}
+.is-author {
+  font-size: 12px;
+  margin-left: 4px;
+  border: 1px solid rgba(244, 53, 71, 0.3);
+  color: rgba(244, 55, 72, 0.6);
+  border-radius: 4px;
 }
 .article-comment {
   background-color: #fff;

@@ -7,24 +7,24 @@
     <transition name="bounceLogin">
       <Longin-View v-if="loginBox"></Longin-View>
     </transition>
-    <Home-Main>
+    <Main-And-Sidebar>
       <Article-Details></Article-Details>
-    </Home-Main>
+    </Main-And-Sidebar>
   </div>
 </template>
 
 <script>
-import HeaderView from '../components/Header'
-import LonginView from '../components/Login'
-import HomeMain from '../components/HomeMain'
-import ArticleDetails from '../components/ArticleDetails'
+import HeaderView from '../components/common/Header'
+import LonginView from '../components/common/Login'
+import MainAndSidebar from '../components/common/MainAndSidebar'
+import ArticleDetails from '../components/ArticleDetails/ArticleDetails'
 import { mapState } from 'vuex'
 export default {
   name: 'Article',
   components: {
     'Header-View': HeaderView,
     'Longin-View': LonginView,
-    'Home-Main': HomeMain,
+    'Main-And-Sidebar': MainAndSidebar,
     'Article-Details': ArticleDetails
   },
   computed: {

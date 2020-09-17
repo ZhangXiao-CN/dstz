@@ -106,21 +106,6 @@ export default {
       this.$message.error('获取文章列表失败')
     }
   }
-  // filters: {
-  //   filterCategory: (article) => {
-  //     let category = ''
-  //     if (!article.categoryChilren) {
-  //       category = article.category.title
-  //     } else {
-  //       article.category.children.forEach((item) => {
-  //         if (article.categoryChilren === item._id) {
-  //           category = item.childrenTitle
-  //         }
-  //       })
-  //     }
-  //     return category
-  //   }
-  // }
 }
 </script>
 

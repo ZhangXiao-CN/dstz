@@ -3,7 +3,7 @@
     <el-card shadow="always" class="loginbox" id="loginbox">
       <div class="logo-con">
         <div class="logobox">
-          <img src="../assets/images/logo.png" class="logoimg" />
+          <img src="../../assets/images/logo.png" class="logoimg" />
         </div>
       </div>
       <div class="title">登陆</div>

@@ -5,7 +5,7 @@
         <div class="top-left">
           <div class="logo">
             <router-link to="/" @click.native="reloadSelf">
-              <img class="logon-img" src="../assets/images/logo.png" />
+              <img class="logon-img" src="../../assets/images/logo.png" />
             </router-link>
           </div>
           <div class="samll-logo">

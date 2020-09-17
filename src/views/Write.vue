@@ -12,9 +12,9 @@
 </template>
 
 <script>
-import HeaderView from '../components/Header'
-import WriteForm from '../components/writeForm'
-import LonginView from '../components/Login'
+import HeaderView from '../components/common/Header'
+import WriteForm from '../components/write/writeForm'
+import LonginView from '../components/common/Login'
 import { mapState } from 'vuex'
 export default {
   name: 'Write',

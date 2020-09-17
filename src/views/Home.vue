@@ -10,19 +10,19 @@
       <Longin-View v-if="loginBox"></Longin-View>
     </transition>
     <Slider></Slider>
-    <Home-Main>
+    <Main-And-Sidebar>
       <Article-List></Article-List>
-    </Home-Main>
+    </Main-And-Sidebar>
   </div>
 </template>
 
 <script>
-import LonginView from '../components/Login'
-import HeaderView from '../components/Header'
-import TopNavView from '../components/topNav'
-import Slider from '../components/Slider'
-import HomeMain from '../components/HomeMain'
-import ArticleList from '../components/ArticleList'
+import LonginView from '../components/common/Login'
+import HeaderView from '../components/common/Header'
+import TopNavView from '../components/common/TopNav'
+import Slider from '../components/home/Slider'
+import MainAndSidebar from '../components/common/MainAndSidebar'
+import ArticleList from '../components/home/ArticleList'
 
 import { mapState } from 'vuex'
 export default {
@@ -32,7 +32,7 @@ export default {
     'Header-View': HeaderView,
     'TopNav-View': TopNavView,
     Slider,
-    'Home-Main': HomeMain,
+    'Main-And-Sidebar': MainAndSidebar,
     'Article-List': ArticleList
   },
   computed: {

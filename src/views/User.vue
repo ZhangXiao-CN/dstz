@@ -12,9 +12,9 @@
 </template>
 
 <script>
-import LonginView from '../components/Login'
-import HeaderView from '../components/Header'
-import PersonaCenter from '../components/PersonaCenter'
+import LonginView from '../components/common/Login'
+import HeaderView from '../components/common/Header'
+import PersonaCenter from '../components/PersonaCenter/PersonaCenter'
 import { mapState } from 'vuex'
 export default {
   name: 'User',

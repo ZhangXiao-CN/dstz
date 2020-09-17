@@ -262,8 +262,5 @@ export default {
   .silder-box {
     margin-right: 0 !important;
   }
-  .top-articles {
-    // display: none !important;
-  }
 }
 </style>
