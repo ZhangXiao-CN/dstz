@@ -18,6 +18,11 @@ import PersonaCenter from '../components/PersonaCenter/PersonaCenter'
 import { mapState } from 'vuex'
 export default {
   name: 'User',
+  data () {
+    return {
+      PersonaCenterFlag: true
+    }
+  },
   components: {
     'Longin-View': LonginView,
     'Header-View': HeaderView,
@@ -25,9 +30,24 @@ export default {
   },
   computed: {
     ...mapState(['loginBox'])
+  },
+  watch: {
+    $route (to, from) {
+      if (to.params.id !== from.params.id) {
+        this.$router.go(0)
+      }
+    }
   }
 }
 </script>
 
 <style lang="less" scoped>
+.mask {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
+  z-index: 3;
+}
 </style>

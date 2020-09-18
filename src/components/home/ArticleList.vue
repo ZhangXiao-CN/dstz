@@ -5,7 +5,10 @@
       <li class="article-item" v-for="item in articleList" :key="item._id">
         <div class="article-info">
           <div class="article-info-title">
-            <router-link :to="{name: 'article', params: {id: item._id}}">{{item.title}}</router-link>
+            <router-link
+              :to="{name: 'article', params: {id: item._id}}"
+              target="_blank"
+            >{{item.title}}</router-link>
           </div>
           <div class="article-info-summary">
             <div class="summary">{{item.summary}}</div>
@@ -55,6 +58,7 @@
           :to="{name: 'article', params: {id: item._id}}"
           class="article-img"
           v-if="item.thumbnail"
+          target="_blank"
         >
           <img :src="item.thumbnail" />
         </router-link>
@@ -298,7 +302,7 @@ export default {
         }
         .icon-fenlei {
           margin-right: 1px;
-          color: #607d8b;
+          color: #a2e1d4;
         }
       }
       i {

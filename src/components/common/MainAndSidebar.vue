@@ -9,79 +9,29 @@
           <i class="iconfont icon-xinxiaoxi"></i>
           <span>最新评论</span>
         </div>
-        <ul>
-          <li>
-            <div class="author">
-              <el-avatar src="http://localhost:3000/assets/img/defaultAvatar.png" size="small"></el-avatar>
-              <p>欺孀</p>
-            </div>
-            <div class="comment-text">
-              <p>大佬流弊!!!!!!!!!</p>
-            </div>
-            <div class="comment-from">
-              <span class="comment-article">[文章]</span>
-              <router-link to="/article">
-                <p>来自:亚陆风云V12.0中文版正式发布，适用于1.28.211111111111111111</p>
+        <ul v-if="latestedComment && latestedComment.length > 0">
+          <li v-for="item in latestedComment" :key="item._id">
+            <div class="top-info">
+              <router-link
+                v-if="item.author"
+                :to="{name: 'user', params: {id: item.author._id}}"
+                class="author"
+              >
+                <el-avatar
+                  :src="item.author.avatar ? item.author.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
+                  size="small"
+                ></el-avatar>
+                <p>{{item.author.nickName}}</p>
               </router-link>
-            </div>
-          </li>
-          <li>
-            <div class="author">
-              <el-avatar src="http://localhost:3000/assets/img/defaultAvatar.png" size="small"></el-avatar>
-              <p>欺孀</p>
+              <div class="create-date">{{item.createAt | filterDate}}</div>
             </div>
             <div class="comment-text">
-              <p>大佬流弊!!!!!!!!!</p>
+              <p>{{item.content}}</p>
             </div>
-            <div class="comment-from">
+            <div class="comment-from" v-if="item.post">
               <span class="comment-article">[文章]</span>
-              <router-link to="/article">
-                <p>来自:亚陆风云V12.0中文版正式发布，适用于1.28.211111111111111111</p>
-              </router-link>
-            </div>
-          </li>
-          <li>
-            <div class="author">
-              <el-avatar src="http://localhost:3000/assets/img/defaultAvatar.png" size="small"></el-avatar>
-              <p>欺孀</p>
-            </div>
-            <div class="comment-text">
-              <p>大佬流弊!!!!!!!!!</p>
-            </div>
-            <div class="comment-from">
-              <span class="comment-article">[文章]</span>
-              <router-link to="/article">
-                <p>来自:亚陆风云V12.0中文版正式发布，适用于1.28.211111111111111111</p>
-              </router-link>
-            </div>
-          </li>
-          <li>
-            <div class="author">
-              <el-avatar src="http://localhost:3000/assets/img/defaultAvatar.png" size="small"></el-avatar>
-              <p>欺孀</p>
-            </div>
-            <div class="comment-text">
-              <p>大佬流弊!!!!!!!!!</p>
-            </div>
-            <div class="comment-from">
-              <span class="comment-article">[文章]</span>
-              <router-link to="/article">
-                <p>来自:亚陆风云V12.0中文版正式发布，适用于1.28.211111111111111111</p>
-              </router-link>
-            </div>
-          </li>
-          <li>
-            <div class="author">
-              <el-avatar src="http://localhost:3000/assets/img/defaultAvatar.png" size="small"></el-avatar>
-              <p>欺孀</p>
-            </div>
-            <div class="comment-text">
-              <p>大佬流弊!!!!!!!!!</p>
-            </div>
-            <div class="comment-from">
-              <span class="comment-article">[文章]</span>
-              <router-link to="/article">
-                <p>来自:亚陆风云V12.0中文版正式发布，适用于1.28.211111111111111111</p>
+              <router-link :to="{name: 'article', params: {id: item.post._id}}" target="_blank">
+                <p>{{item.post.title}}</p>
               </router-link>
             </div>
           </li>
@@ -92,195 +42,25 @@
           <i class="iconfont icon-praise"></i>
           <span>热门文章</span>
         </div>
-        <ul>
-          <li>
+        <ul v-if="hotArticles && hotArticles.length > 0">
+          <li v-for="item in hotArticles" :key="item.id">
             <div class="article-info">
               <div class="article-info-title">
-                <router-link to="article">亚陆风云V12.0中文版正式发布，适用于1.28.2</router-link>
+                <router-link
+                  :to="{name: 'article', params: {id: item._id}}"
+                  target="_blank"
+                >{{item.title}}</router-link>
               </div>
               <div class="article-info-summary">
-                <div class="summary">{{text}}</div>
+                <div class="summary">{{item.summary}}</div>
               </div>
-              <div class="count">
-                <div class="comment-count">
-                  <i class="iconfont icon-interactive_fill"></i>
-                  <span>5000</span>
+              <div class="category-wrap">
+                <div class="category">
+                  <i class="iconfont icon-fenlei"></i>
+                  <span>{{ item | filterCategory }}</span>
                 </div>
-                <div class="views-count">
-                  <i class="iconfont icon-browse_fill"></i>
-                  <span>5000</span>
-                </div>
-                <div class="likes-count">
-                  <i class="iconfont icon-like_fill"></i>
-                  <span>5000</span>
-                </div>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div class="article-info">
-              <div class="article-info-title">
-                <router-link to="article">亚陆风云V12.0中文版正式发布，适用于1.28.2</router-link>
-              </div>
-              <div class="article-info-summary">
-                <div class="summary">{{text}}</div>
-              </div>
-              <div class="count">
-                <div class="comment-count">
-                  <i class="iconfont icon-interactive_fill"></i>
-                  <span>5000</span>
-                </div>
-                <div class="views-count">
-                  <i class="iconfont icon-browse_fill"></i>
-                  <span>5000</span>
-                </div>
-                <div class="likes-count">
-                  <i class="iconfont icon-like_fill"></i>
-                  <span>5000</span>
-                </div>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div class="article-info">
-              <div class="article-info-title">
-                <router-link to="article">亚陆风云V12.0中文版正式发布，适用于1.28.2</router-link>
-              </div>
-              <div class="article-info-summary">
-                <div class="summary">{{text}}</div>
-              </div>
-              <div class="count">
-                <div class="comment-count">
-                  <i class="iconfont icon-interactive_fill"></i>
-                  <span>5000</span>
-                </div>
-                <div class="views-count">
-                  <i class="iconfont icon-browse_fill"></i>
-                  <span>5000</span>
-                </div>
-                <div class="likes-count">
-                  <i class="iconfont icon-like_fill"></i>
-                  <span>5000</span>
-                </div>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div class="article-info">
-              <div class="article-info-title">
-                <router-link to="article">亚陆风云V12.0中文版正式发布，适用于1.28.2</router-link>
-              </div>
-              <div class="article-info-summary">
-                <div class="summary">{{text}}</div>
-              </div>
-              <div class="count">
-                <div class="comment-count">
-                  <i class="iconfont icon-interactive_fill"></i>
-                  <span>5000</span>
-                </div>
-                <div class="views-count">
-                  <i class="iconfont icon-browse_fill"></i>
-                  <span>5000</span>
-                </div>
-                <div class="likes-count">
-                  <i class="iconfont icon-like_fill"></i>
-                  <span>5000</span>
-                </div>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div class="article-info">
-              <div class="article-info-title">
-                <router-link to="article">亚陆风云V12.0中文版正式发布，适用于1.28.2</router-link>
-              </div>
-              <div class="article-info-summary">
-                <div class="summary">{{text}}</div>
-              </div>
-              <div class="count">
-                <div class="comment-count">
-                  <i class="iconfont icon-interactive_fill"></i>
-                  <span>5000</span>
-                </div>
-                <div class="views-count">
-                  <i class="iconfont icon-browse_fill"></i>
-                  <span>5000</span>
-                </div>
-                <div class="likes-count">
-                  <i class="iconfont icon-like_fill"></i>
-                  <span>5000</span>
-                </div>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div class="article-info">
-              <div class="article-info-title">
-                <router-link to="article">亚陆风云V12.0中文版正式发布，适用于1.28.2</router-link>
-              </div>
-              <div class="article-info-summary">
-                <div class="summary">{{text}}</div>
-              </div>
-              <div class="count">
-                <div class="comment-count">
-                  <i class="iconfont icon-interactive_fill"></i>
-                  <span>5000</span>
-                </div>
-                <div class="views-count">
-                  <i class="iconfont icon-browse_fill"></i>
-                  <span>5000</span>
-                </div>
-                <div class="likes-count">
-                  <i class="iconfont icon-like_fill"></i>
-                  <span>5000</span>
-                </div>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div class="article-info">
-              <div class="article-info-title">
-                <router-link to="article">亚陆风云V12.0中文版正式发布，适用于1.28.2</router-link>
-              </div>
-              <div class="article-info-summary">
-                <div class="summary">{{text}}</div>
-              </div>
-              <div class="count">
-                <div class="comment-count">
-                  <i class="iconfont icon-interactive_fill"></i>
-                  <span>5000</span>
-                </div>
-                <div class="views-count">
-                  <i class="iconfont icon-browse_fill"></i>
-                  <span>5000</span>
-                </div>
-                <div class="likes-count">
-                  <i class="iconfont icon-like_fill"></i>
-                  <span>5000</span>
-                </div>
-              </div>
-            </div>
-          </li>
-          <li>
-            <div class="article-info">
-              <div class="article-info-title">
-                <router-link to="article">亚陆风云V12.0中文版正式发布，适用于1.28.2</router-link>
-              </div>
-              <div class="article-info-summary">
-                <div class="summary">{{text}}</div>
-              </div>
-              <div class="count">
-                <div class="comment-count">
-                  <i class="iconfont icon-interactive_fill"></i>
-                  <span>5000</span>
-                </div>
-                <div class="views-count">
-                  <i class="iconfont icon-browse_fill"></i>
-                  <span>5000</span>
-                </div>
-                <div class="likes-count">
-                  <i class="iconfont icon-like_fill"></i>
-                  <span>5000</span>
+                <div class="hot-article-date">
+                  <span>{{item.createAt.split('T')[0]}}</span>
                 </div>
               </div>
             </div>
@@ -296,13 +76,23 @@ export default {
   name: 'MainAndSidebar',
   data () {
     return {
-      text: '我大明天下无敌啊! 这个mod的知名度怕是不需要我多说了吧,哈哈! 由东方朔曼倩大大精心制作的大型mod 华夏国家基本都有专属任务树 增加了...'
+      latestedComment: '',
+      hotArticles: ''
     }
   },
   methods: {
   },
   created () {
-    // this.$nextTick(this.sideScroll())
+    this.axios.get('api/comments/find/lasted').then(res => {
+      this.latestedComment = res.data
+    }).catch(() => {
+      this.$message.error('获取最新评论失败! 请刷新后重试, 或联系站长')
+    })
+    this.axios.get('api/posts/recommend').then(res => {
+      this.hotArticles = res.data
+    }).catch(() => {
+      this.$message.error('获取热门文章失败! 请刷新后重试, 或联系站长')
+    })
   }
 }
 </script>
@@ -315,6 +105,14 @@ export default {
   margin: 0 auto;
   position: relative;
   margin-top: 10px;
+  .top-info {
+    display: flex;
+    justify-content: space-between;
+    .create-date {
+      font-size: 12px;
+      color: #c1c1c1;
+    }
+  }
   .article-wrap {
     float: left;
     width: 69.7%;
@@ -335,17 +133,19 @@ export default {
     a:hover {
       text-decoration: underline;
     }
-    .count {
+    .category-wrap {
       font-size: 13 / 40rem;
       color: #c1c1c1;
       display: flex;
       justify-content: flex-start;
       div {
         margin: 5 /40rem 3 /40rem 0;
+        margin-right: 10px;
       }
       i {
         font-size: 13 / 40rem;
         margin-right: 1px;
+        color: #a2e1d4;
       }
     }
     .article-info-summary {
@@ -448,7 +248,7 @@ export default {
         margin: 0;
         text-align: left;
       }
-      .count {
+      .category-wrap {
         font-size: 11px;
         i {
           font-size: 11px;
@@ -533,6 +333,7 @@ export default {
           .comment-article {
             white-space: nowrap;
             color: #409eff;
+            margin-right: 1px;
           }
         }
       }
@@ -602,8 +403,8 @@ export default {
   .bottom-info span {
     font-size: 11px !important;
   }
-  .count i,
-  .count span {
+  .category-wrap i,
+  .category-wrap span {
     font-size: 11px !important;
   }
   .side-bar-title {

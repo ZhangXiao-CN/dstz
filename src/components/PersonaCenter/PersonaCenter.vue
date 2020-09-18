@@ -8,7 +8,7 @@
         >
           <img :src="userThumb" />
         </div>
-        <div class="thumb">
+        <div class="thumb" v-else>
           <label
             class="upload-thumb"
             v-if="userSelf && userThumb === 'http://localhost:3000/assets/img/defaultthumb.jpg'"
@@ -43,7 +43,12 @@
       </div>
       <div class="user-info">
         <div class="user-avatar">
-          <el-avatar shape="square" :size="120" :src="userAvatar" v-cloak></el-avatar>
+          <el-avatar
+            shape="square"
+            :size="120"
+            :src="userAvatar ? userAvatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
+            v-cloak
+          ></el-avatar>
           <label v-if="userSelf">
             修改头像
             <input type="file" @change="changeAvatar" />
@@ -53,14 +58,29 @@
           <div class="username">{{author.nickName}}</div>
           <div class="autograph">{{author.autograph ? author.autograph : '这个人很懒,什么都没有留下'}}</div>
         </div>
-        <el-button type="primary" size="small" v-if="!userSelf">关注</el-button>
+        <div v-if="!userSelf">
+          <el-button
+            type="primary"
+            size="small"
+            v-if="!isAttention"
+            :loading="isAttentionLoading"
+            @click="attention('Attention')"
+          >关注</el-button>
+          <el-button
+            type="primary"
+            size="small"
+            v-else
+            class="is-attention"
+            @click="attention('cancelAttention')"
+          >已关注</el-button>
+        </div>
       </div>
     </div>
     <div class="user-main">
       <div class="left-bar">
         <ul>
           <li>
-            <a href="javascript:;" @click="checkbox(0)">
+            <a href="javascript:;" @click="checkbox(0, false)">
               <div class="btn">
                 <i class="iconfont icon-user"></i>
                 <span>概览</span>
@@ -69,7 +89,7 @@
             </a>
           </li>
           <li>
-            <a href="javascript:;" @click="checkbox(1)">
+            <a href="javascript:;" @click="checkbox(1, false)">
               <div class="btn">
                 <i class="iconfont icon-mianxingyumaobi"></i>
                 <span>发布</span>
@@ -78,7 +98,7 @@
             </a>
           </li>
           <li>
-            <a href="javascript:;" @click="checkbox(2)">
+            <a href="javascript:;" @click="checkbox(2, false)">
               <div class="btn">
                 <i class="iconfont icon-select"></i>
                 <span>收藏</span>
@@ -87,7 +107,7 @@
             </a>
           </li>
           <li>
-            <a href="javascript:;" @click="checkbox(3)">
+            <a href="javascript:;" @click="checkbox(3, false)">
               <div class="btn">
                 <i class="iconfont icon-yanjing"></i>
                 <span>关注</span>
@@ -96,7 +116,7 @@
             </a>
           </li>
           <li>
-            <a href="javascript:;" @click="checkbox(4)">
+            <a href="javascript:;" @click="checkbox(4, false)">
               <div class="btn">
                 <i class="iconfont icon-like"></i>
                 <span>粉丝</span>
@@ -105,7 +125,7 @@
             </a>
           </li>
           <li v-if="userSelf">
-            <a href="javascript:;" @click="checkbox(5)">
+            <a href="javascript:;" @click="checkbox(5, false)">
               <div class="btn">
                 <i class="iconfont icon-setup"></i>
                 <span>设置</span>
@@ -151,307 +171,158 @@
           </ul>
         </div>
         <div class="publish-viwe" v-if="tabIndex === 1">
-          <ul>
-            <li>
+          <ul v-if="publish && publish.length > 0">
+            <li v-for="item in publish" :key="item._id">
               <div>
-                <router-link to="article">
-                  <p>亚陆风云V12.0中文版正式发布，适用于1.28.2</p>
+                <router-link target="_blank" :to="{name:'article', params: {id: item._id}}">
+                  <p>{{item.title}}</p>
                 </router-link>
                 <div data-v-5cc3ab68 class="count">
                   <div data-v-5cc3ab68 class="comment-count">
                     <i data-v-5cc3ab68 class="iconfont icon-interactive_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
+                    <span data-v-5cc3ab68>{{item.meta && item.meta.comments}}</span>
                   </div>
                   <div data-v-5cc3ab68 class="views-count">
                     <i data-v-5cc3ab68 class="iconfont icon-browse_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
+                    <span data-v-5cc3ab68>{{item.meta && item.meta.views}}</span>
                   </div>
                   <div data-v-5cc3ab68 class="likes-count">
                     <i data-v-5cc3ab68 class="iconfont icon-like_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
+                    <span data-v-5cc3ab68>{{item.meta && item.meta.likes}}</span>
                   </div>
                 </div>
               </div>
-              <div class="btn-wrap">
-                <el-button type="primary" :size="'mini'">主要按钮</el-button>
-                <el-button type="danger" :size="'mini'">主要按钮</el-button>
+              <div class="btn-wrap" v-if="userSelf">
+                <el-button type="danger" :size="'mini'">删除</el-button>
               </div>
             </li>
-            <li>
-              <div>
-                <router-link to="article">
-                  <p>亚陆风云V12.0中文版正式发布，适用于1.28.2</p>
-                </router-link>
-                <div data-v-5cc3ab68 class="count">
-                  <div data-v-5cc3ab68 class="comment-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-interactive_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                  <div data-v-5cc3ab68 class="views-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-browse_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                  <div data-v-5cc3ab68 class="likes-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-like_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                </div>
-              </div>
-              <div class="btn-wrap">
-                <el-button type="primary" :size="'mini'">主要按钮</el-button>
-                <el-button type="danger" :size="'mini'">主要按钮</el-button>
-              </div>
-            </li>
-            <li>
-              <div>
-                <router-link to="article">
-                  <p>亚陆风云V12.0中文版正式发布，适用于1.28.2</p>
-                </router-link>
-                <div data-v-5cc3ab68 class="count">
-                  <div data-v-5cc3ab68 class="comment-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-interactive_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                  <div data-v-5cc3ab68 class="views-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-browse_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                  <div data-v-5cc3ab68 class="likes-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-like_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                </div>
-              </div>
-              <div class="btn-wrap">
-                <el-button type="primary" :size="'mini'">主要按钮</el-button>
-                <el-button type="danger" :size="'mini'">主要按钮</el-button>
-              </div>
-            </li>
-            <li>
-              <div>
-                <router-link to="article">
-                  <p>亚陆风云V12.0中文版正式发布，适用于1.28.2</p>
-                </router-link>
-                <div data-v-5cc3ab68 class="count">
-                  <div data-v-5cc3ab68 class="comment-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-interactive_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                  <div data-v-5cc3ab68 class="views-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-browse_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                  <div data-v-5cc3ab68 class="likes-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-like_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                </div>
-              </div>
-              <div class="btn-wrap">
-                <el-button type="primary" :size="'mini'">主要按钮</el-button>
-                <el-button type="danger" :size="'mini'">主要按钮</el-button>
-              </div>
-            </li>
-            <li>
-              <div>
-                <router-link to="article">
-                  <p>亚陆风云V12.0中文版正式发布，适用于1.28.2</p>
-                </router-link>
-                <div data-v-5cc3ab68 class="count">
-                  <div data-v-5cc3ab68 class="comment-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-interactive_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                  <div data-v-5cc3ab68 class="views-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-browse_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                  <div data-v-5cc3ab68 class="likes-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-like_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                </div>
-              </div>
-              <div class="btn-wrap">
-                <el-button type="primary" :size="'mini'">主要按钮</el-button>
-                <el-button type="danger" :size="'mini'">主要按钮</el-button>
-              </div>
-            </li>
+            <a
+              href="javascript:;"
+              class="more"
+              v-loading="moreLoading"
+              @click="getmroe(1)"
+              v-if="isMore"
+            >加载更多</a>
+            <div href="javascript:;" class="more nomore" v-if="!isMore">没有更多了</div>
           </ul>
+          <div v-else class="clean">
+            <div>
+              <p>这里很干净</p>
+              <p>什么都没有^_^|||</p>
+            </div>
+          </div>
         </div>
         <div class="favorites-viwe" v-if="tabIndex === 2">
-          <ul>
-            <li>
+          <ul v-if="favorites && favorites.length > 0">
+            <li v-for="item in favorites" :key="item._id">
               <div>
-                <router-link to="article">
-                  <p>亚陆风云V12.0中文版正式发布，适用于1.28.2</p>
+                <router-link target="_blank" :to="{name:'article', params: {id: item._id}}">
+                  <p>{{item.title}}</p>
                 </router-link>
                 <div data-v-5cc3ab68 class="count">
                   <div data-v-5cc3ab68 class="comment-count">
                     <i data-v-5cc3ab68 class="iconfont icon-interactive_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
+                    <span data-v-5cc3ab68>{{item.meta && item.meta.comments}}</span>
                   </div>
                   <div data-v-5cc3ab68 class="views-count">
                     <i data-v-5cc3ab68 class="iconfont icon-browse_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
+                    <span data-v-5cc3ab68>{{item.meta && item.meta.views}}</span>
                   </div>
                   <div data-v-5cc3ab68 class="likes-count">
                     <i data-v-5cc3ab68 class="iconfont icon-like_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
+                    <span data-v-5cc3ab68>{{item.meta && item.meta.likes}}</span>
                   </div>
                 </div>
               </div>
             </li>
-            <li>
-              <div>
-                <router-link to="article">
-                  <p>亚陆风云V12.0中文版正式发布，适用于1.28.2</p>
-                </router-link>
-                <div data-v-5cc3ab68 class="count">
-                  <div data-v-5cc3ab68 class="comment-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-interactive_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                  <div data-v-5cc3ab68 class="views-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-browse_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                  <div data-v-5cc3ab68 class="likes-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-like_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                </div>
-              </div>
-            </li>
-            <li>
-              <div>
-                <router-link to="article">
-                  <p>亚陆风云V12.0中文版正式发布，适用于1.28.2</p>
-                </router-link>
-                <div data-v-5cc3ab68 class="count">
-                  <div data-v-5cc3ab68 class="comment-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-interactive_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                  <div data-v-5cc3ab68 class="views-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-browse_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                  <div data-v-5cc3ab68 class="likes-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-like_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                </div>
-              </div>
-            </li>
-            <li>
-              <div>
-                <router-link to="article">
-                  <p>亚陆风云V12.0中文版正式发布，适用于1.28.2</p>
-                </router-link>
-                <div data-v-5cc3ab68 class="count">
-                  <div data-v-5cc3ab68 class="comment-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-interactive_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                  <div data-v-5cc3ab68 class="views-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-browse_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                  <div data-v-5cc3ab68 class="likes-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-like_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                </div>
-              </div>
-            </li>
-            <li>
-              <div>
-                <router-link to="article">
-                  <p>亚陆风云V12.0中文版正式发布，适用于1.28.2</p>
-                </router-link>
-                <div data-v-5cc3ab68 class="count">
-                  <div data-v-5cc3ab68 class="comment-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-interactive_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                  <div data-v-5cc3ab68 class="views-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-browse_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                  <div data-v-5cc3ab68 class="likes-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-like_fill"></i>
-                    <span data-v-5cc3ab68>5000</span>
-                  </div>
-                </div>
-              </div>
-            </li>
+            <a
+              href="javascript:;"
+              class="more"
+              v-loading="moreLoading"
+              @click="getmroe(2)"
+              v-if="isMore"
+            >加载更多</a>
+            <div href="javascript:;" class="more nomore" v-if="!isMore">没有更多了</div>
           </ul>
+          <div v-else class="clean">
+            <div>
+              <p>这里很干净</p>
+              <p>什么都没有^_^|||</p>
+            </div>
+          </div>
         </div>
         <div class="attention-viwe" v-if="tabIndex === 3">
-          <ul>
-            <li>
+          <ul v-if="attentions && attentions.length > 0">
+            <li v-for="item in attentions" :key="item._id">
               <div class="attention-wrap">
-                <el-avatar shape="square" :size="80" :src="author.avatar"></el-avatar>
+                <router-link :to="{name: 'user', params: {id: item._id}}">
+                  <el-avatar
+                    shape="square"
+                    :size="80"
+                    :src="item.avatar ? item.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
+                  ></el-avatar>
+                </router-link>
                 <div class="attention-user">
-                  <router-link to="user" class="user-name">龙小娇</router-link>
-                  <p>个性签名</p>
+                  <router-link
+                    :to="{name: 'user', params: {id: item._id}}"
+                    class="user-name"
+                  >{{item.nickName}}</router-link>
+                  <p>{{item.autograph && item.autograph ? item.autograph : '这个人很懒, 什么都没有留下'}}</p>
                 </div>
               </div>
               <div class="btn-wrap">
-                <el-button type="primary" :size="'mini'">取消关注</el-button>
+                <el-button type="primary" :size="'mini'" @click="cancleAttentions(item._id)">取消关注</el-button>
               </div>
             </li>
-            <li>
-              <div class="attention-wrap">
-                <el-avatar shape="square" :size="80" :src="author.avatar"></el-avatar>
-                <div class="attention-user">
-                  <router-link to="user" class="user-name">龙小娇</router-link>
-                  <p>个性签名</p>
-                </div>
-              </div>
-              <div class="btn-wrap">
-                <el-button type="primary" :size="'mini'">取消关注</el-button>
-              </div>
-            </li>
-            <li>
-              <div class="attention-wrap">
-                <el-avatar shape="square" :size="80" :src="author.avatar"></el-avatar>
-                <div class="attention-user">
-                  <router-link to="user" class="user-name">龙小娇</router-link>
-                  <p>个性签名</p>
-                </div>
-              </div>
-              <div class="btn-wrap">
-                <el-button type="primary" :size="'mini'">取消关注</el-button>
-              </div>
-            </li>
+            <a
+              href="javascript:;"
+              class="more"
+              v-loading="moreLoading"
+              @click="getmroe(3)"
+              v-if="isMore"
+            >加载更多</a>
+            <div href="javascript:;" class="more nomore" v-if="!isMore">没有更多了</div>
           </ul>
+          <div v-else class="clean">
+            <div>
+              <p>这里很干净</p>
+              <p>什么都没有^_^|||</p>
+            </div>
+          </div>
         </div>
         <div class="fans-viwe" v-if="tabIndex === 4">
-          <ul>
-            <li>
-              <el-avatar shape="square" :size="80" :src="author.avatar"></el-avatar>
+          <ul v-if="fans && fans.length > 0">
+            <li v-for="item in fans" :key="item._id">
+              <router-link :to="{name: 'user', params: {id: item._id}}">
+                <el-avatar
+                  shape="square"
+                  :size="80"
+                  :src="item.avatar ? item.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
+                ></el-avatar>
+              </router-link>
               <div class="fans-user">
-                <router-link to="user" class="user-name">龙小娇</router-link>
-                <p>个性签名</p>
+                <router-link
+                  :to="{name: 'user', params: {id: item._id}}"
+                  class="user-name"
+                >{{item.nickName}}</router-link>
+                <p>{{item.autograph && item.autograph ? item.autograph : '这个人很懒, 什么都没有留下'}}</p>
               </div>
             </li>
-            <li>
-              <el-avatar shape="square" :size="80" :src="author.avatar"></el-avatar>
-              <div class="fans-user">
-                <router-link to="user" class="user-name">龙小娇</router-link>
-                <p>个性签名</p>
-              </div>
-            </li>
-            <li>
-              <el-avatar shape="square" :size="80" :src="author.avatar"></el-avatar>
-              <div class="fans-user">
-                <router-link to="user" class="user-name">龙小娇</router-link>
-                <p>个性签名</p>
-              </div>
-            </li>
+            <a
+              href="javascript:;"
+              class="more"
+              v-loading="moreLoading"
+              @click="getmroe(4)"
+              v-if="isMore"
+            >加载更多</a>
+            <div href="javascript:;" class="more nomore" v-if="!isMore">没有更多了</div>
           </ul>
+          <div v-else class="clean">
+            <div>
+              <p>这里很干净</p>
+              <p>什么都没有^_^|||</p>
+            </div>
+          </div>
         </div>
         <div class="userset-viwe" v-if="tabIndex === 5">
           <ul>
@@ -562,6 +433,7 @@ export default {
   data () {
     return {
       tabIndex: 0,
+      // 用户信息修改表单
       userEdit: {
         nickName: '',
         email: '',
@@ -576,13 +448,42 @@ export default {
       userThumb: '',
       userSelf: false,
       author: {},
-      loading: ''
+      loading: '',
+      publish: '', // 发布
+      favorites: '', // 收藏
+      attentions: '', // 关注
+      fans: '', // 粉丝
+      publishLimit: 5,
+      favoritesLimit: 5,
+      attentionsLimit: 5,
+      fansLimit: 5,
+      isMore: true,
+      moreLoading: false,
+      isAttention: false, // 是否关注
+      isAttentionLoading: false
     }
   },
   computed: {
     ...mapState(['userInfo'])
   },
   methods: {
+    async attention (path) {
+      this.isAttentionLoading = true
+      if (!this.$store.state.isLogin) {
+        this.isAttentionLoading = false
+        this.$store.commit('changeLoginBox', true)
+        this.$message.error('登陆后才能关注哦!')
+        return
+      }
+      try {
+        const { data: res } = await this.axios.put('api/users/' + path + '/' + this.author._id)
+        this.isAttention = res.isAttention
+        this.isAttentionLoading = false
+      } catch (err) {
+        this.isAttentionLoading = false
+        this.$message.error('操作失败了!--! 请刷新后重试, 或联系站长')
+      }
+    },
     async uploadImg (e) {
       const file = e.target.files[0]
       const formdata = new FormData()
@@ -613,8 +514,86 @@ export default {
         this.$message.error('图片切换或删除失败')
       }
     },
-    checkbox (index) {
+    async checkbox (index, flag) {
+      if (flag) {
+        this.moreLoading = true
+      }
+      this.isMore = true
+      if (index === 1) {
+        const { data: res } = await this.axios.get('api/posts/findAuthor/' + this.author._id + '?limit=' + this.publishLimit)
+        if (res.length === this.publish.length) {
+          if (flag) {
+            this.isMore = false
+          }
+        } else {
+          this.publish = res
+        }
+      }
+      if (index === 2) {
+        const { data: res } = await this.axios.get('api/posts/findFavorites/' + this.author._id + '?limit=' + this.favoritesLimit)
+        if (res.length === this.favorites.length) {
+          if (flag) {
+            this.isMore = false
+          }
+        } else {
+          this.favorites = res
+        }
+      }
+      if (index === 3) {
+        const { data: res } = await this.axios.get('api/users/findAttention/' + this.author._id + '?limit=' + this.attentionsLimit)
+        if (res.length === this.attentions.length) {
+          if (flag) {
+            this.isMore = false
+          }
+        } else {
+          this.attentions = res
+        }
+      }
+      if (index === 4) {
+        const { data: res } = await this.axios.get('api/users/findFans/' + this.author._id + '?limit=' + this.fansLimit)
+        if (res.fans.length === this.fans.length) {
+          if (flag) {
+            this.isMore = false
+          }
+        } else {
+          this.fans = res.fans
+        }
+      }
       this.tabIndex = index
+      this.moreLoading = false
+    },
+    getmroe (index) {
+      if (index === 1) {
+        this.publishLimit += 5
+      }
+      if (index === 2) {
+        this.favoritesLimit += 5
+      }
+      if (index === 3) {
+        this.attentionsLimit += 5
+      }
+      if (index === 4) {
+        this.fansLimit += 5
+      }
+      this.checkbox(index, true)
+    },
+    async cancleAttentions (id) {
+      this.loading = 6
+      if (!this.userSelf) {
+        this.loading = ''
+        return
+      }
+      try {
+        const { data: res } = await this.axios.put('api/users/cancelAttention/' + id)
+        if (!res.isAttention) {
+          this.attentionsLimit -= 5
+          this.checkbox(3)
+        }
+        this.loading = ''
+      } catch (err) {
+        this.loading = ''
+        this.$message.error('操作失败了!--! 请刷新后重试, 或联系站长')
+      }
     },
     async changeAvatar (e) {
       if (this.userAvatar && this.userAvatar !== 'http://localhost:3000/assets/img/defaultAvatar.png') {
@@ -683,7 +662,7 @@ export default {
       }
     }
   },
-  async mounted () {
+  async created () {
     try {
       const { data: res } = await this.axios.get('api/login/status')
       if (res.isLogin && res.userInfo._id === this.$route.params.id) {
@@ -699,7 +678,6 @@ export default {
       } else {
         try {
           const { data: res } = await this.axios.get('api/users/' + this.$route.params.id)
-          console.log(res)
           this.author = res
           this.userAvatar = res.avatar ? res.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'
           this.userThumb = res.thumb ? res.thumb : 'http://localhost:3000/assets/img/defaultthumb.jpg'
@@ -707,6 +685,8 @@ export default {
           this.$message.error('查询用户失败')
         }
       }
+      const { data: response } = await this.axios.get('api/users/isAttention/' + this.author._id)
+      this.isAttention = response.isAttention
     } catch (err) {
       this.$message.error(err.message)
     }
@@ -715,6 +695,16 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.more {
+  display: block;
+  text-align: center;
+  padding: 10 / 40rem 0 !important;
+  font-size: 14px;
+  color: #409eff;
+}
+.nomore {
+  color: #304430;
+}
 #personaCenter {
   max-width: 1440px;
   margin: 0 auto;
@@ -776,7 +766,16 @@ export default {
     }
   }
 }
-
+.clean {
+  min-height: 300px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: #c1c1c1;
+  p {
+    text-align: center;
+  }
+}
 .user-main {
   display: flex;
   margin-top: -20px;

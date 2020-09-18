@@ -3,7 +3,7 @@
     <div class="silder-box">
       <swiper :options="swiperOption">
         <swiper-slide class="swiper-slide" v-for=" item in swiperList" :key="item._id">
-          <router-link :to="{name: 'article', params: {id: item._id}}">
+          <router-link :to="{name: 'article', params: {id: item._id}}" target="_blank">
             <img :src="item.thumbnail" />
             <div class="silder-article">
               <div class="silder-article-category">
@@ -28,7 +28,7 @@
     </div>
     <div class="top-articles">
       <div class="top-item" v-for=" item in fixList" :key="item._id">
-        <router-link :to="{name: 'article', params: {id: item._id}}">
+        <router-link :to="{name: 'article', params: {id: item._id}}" target="_blank">
           <img :src="item.thumbnail" />
           <div class="silder-article">
             <div class="silder-article-category">
@@ -65,11 +65,11 @@ export default {
           clickable: true
         },
         // 自动轮播
-        // autoplay: {
-        //   delay: 2000,
-        //   // 当用户滑动图片后继续自动轮播
-        //   disableOnInteraction: false
-        // },
+        autoplay: {
+          delay: 2000,
+          // 当用户滑动图片后继续自动轮播
+          disableOnInteraction: false
+        },
         // 开启循环模式
         loop: true,
         speed: 700
@@ -205,7 +205,7 @@ export default {
     .silder-article-category {
       font-size: 14 / 40rem;
       i {
-        color: #409eff;
+        color: #a2e1d4;
         font-size: 14 / 40rem;
       }
     }

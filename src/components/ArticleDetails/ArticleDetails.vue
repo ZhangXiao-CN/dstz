@@ -10,19 +10,44 @@
           <span to="category">{{article | filterCategory}}</span>
           <i class="iconfont icon-browse_fill viewicon"></i>
           <span class="viewCount">{{article.meta && article.meta.views}}</span>
+          <span class="article-date">{{article.updateAt && article.updateAt.split('T')[0]}}</span>
         </div>
         <div class="article-title">{{article.title && article.title}}</div>
       </div>
       <div class="article-author">
-        <div class="author-wrap">
-          <el-avatar
-            shape="square"
-            :src="article.author && article.author.avatar ? article.author && article.author.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
-            size="medium"
-          ></el-avatar>
-          <p>{{article.author && article.author.nickName}}</p>
+        <div v-if="article.author">
+          <router-link :to="{name: 'user', params: {id: article.author._id}}" class="author-wrap">
+            <el-avatar
+              shape="square"
+              :src="article.author && article.author.avatar ? article.author && article.author.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
+              size="medium"
+            ></el-avatar>
+            <p>{{article.author && article.author.nickName}}</p>
+          </router-link>
         </div>
-        <el-button type="primary" size="mini" :loading="loading === 0">关注</el-button>
+        <div v-if="article.author && userInfo._id !== article.author._id">
+          <el-button
+            type="primary"
+            size="mini"
+            :loading="loading === 0"
+            v-if="!isAttention"
+            @click="attention('attention')"
+          >关注</el-button>
+          <el-button
+            type="primary"
+            size="mini"
+            :loading="loading === 0"
+            v-else
+            @click="attention('cancelAttention')"
+            class="is-attention"
+          >已关注</el-button>
+        </div>
+        <div class="right-btn" v-else>
+          <router-link :to="{name: 'write'}">
+            <i class="iconfont icon-mianxingyumaobi"></i>
+            <span>写文章</span>
+          </router-link>
+        </div>
       </div>
       <div class="article-view">
         <mavon-editor codeStyle="monokai" v-html="article.html"></mavon-editor>
@@ -37,6 +62,12 @@
             <i class="iconfont icon-collection_fill"></i>
             <span>收藏</span>
           </div>
+        </div>
+        <div class="tags-wrap" v-if="article.tag && article.tag.length > 0">
+          <el-tag size="mini" v-for="( item, index ) in article.tag" :key="index">
+            <i class="iconfont icon-icontag"></i>
+            {{item}}
+          </el-tag>
         </div>
         <div :class="{'is-like': articleLike}">
           <div v-if="articleLike" @click="fabulous('cancelFabulous')">
@@ -72,7 +103,7 @@
                   >{{item.author.nickName}}</router-link>
                   <span class="is-author" v-if="item.author._id === article.author._id">作者</span>
                 </div>
-                <div class="create-date">123</div>
+                <div class="create-date">{{item.createAt | filterDate}}</div>
               </div>
               <div class="conmment-content" v-html="item.content"></div>
               <div class="comment-tools">
@@ -131,7 +162,7 @@
                           >作者</span>
                         </div>
                       </div>
-                      <div class="create-date"></div>
+                      <div class="create-date">{{childItem.createAt | filterDate}}</div>
                     </div>
                     <div class="conmment-content" v-html="childItem.content"></div>
                     <div class="comment-tools">
@@ -268,6 +299,7 @@ export default {
       likeFlag: true, // 点赞节流阀
       articFavorites: false, // 是否收藏
       favoritesFlag: true, // 收藏节流阀
+      isAttention: false, // 是否关注
       commentList: {},
       myComment: '',
       loading: '',
@@ -292,6 +324,22 @@ export default {
         return false
       } else {
         return true
+      }
+    },
+    // 关注
+    async attention (path) {
+      this.loading = 0
+      if (!this.isLoginAndEject('登录后才能关注哦!')) {
+        this.loading = ''
+        return
+      }
+      try {
+        const { data: res } = await this.axios.put('api/users/' + path + '/' + this.article.author._id)
+        this.isAttention = res.isAttention
+        this.loading = ''
+      } catch (err) {
+        this.loading = ''
+        this.$message.error('操作失败了!--! 请刷新后重试, 或联系站长')
       }
     },
     // 评论
@@ -412,7 +460,7 @@ export default {
         this.articFavorites = res.isFavorites
         this.favoritesFlag = true
       } catch (err) {
-        this.$message.error('取消收藏失败! 请刷新后重试, 或联系站长')
+        this.$message.error('操作失败了!--! 请刷新后重试, 或联系站长')
         this.favoritesFlag = true
       }
     },
@@ -433,6 +481,10 @@ export default {
     changereply (id) {
       this.reply = id
       this.myComment = ''
+      if (this.reply !== '0') {
+        const textarea = document.getElementById('textarea')
+        textarea.focus()
+      }
     },
     // 评论点赞
     async commentFabulous (path, commentId) {
@@ -456,7 +508,7 @@ export default {
           }
         }
       } catch (err) {
-        this.$message.error('点赞失败了!--! 请刷新后重试, 或联系站长')
+        this.$message.error('操作失败了!--! 请刷新后重试, 或联系站长')
         this.likeFlag = true
       }
     },
@@ -484,26 +536,23 @@ export default {
           }
         }
       } catch (err) {
-        console.log(err)
-        this.$message.error('点赞失败了!--! 请刷新后重试, 或联系站长')
+        this.$message.error('操作失败!--! 请刷新后重试, 或联系站长')
         this.likeFlag = true
       }
     }
   },
-  // watch: {
-  //   commentList: {
-  //     handler (newVal, objVal) {
-  //     },
-  //     deep: true,
-  //     immediate: true
-  //   }
-  // },
   created () {
     // 让两个请求同时发出 所以不使用 async await 同步语法
     this.axios.get('api/posts/' + this.$route.params.id).then(res => {
       this.article = res.data.post
       this.articleLike = res.data.islike
       this.articFavorites = res.data.isFavorites
+      if (this.isLogin) {
+        this.axios.get('api/users/isAttention/' + this.article.author._id).then(res => {
+          this.isAttention = res.data.isAttention
+        }).catch(() => {
+        })
+      }
     }).catch(() => {
       this.$message.error('获取文章失败! 请刷新后重试, 或联系站长')
     })
@@ -517,6 +566,20 @@ export default {
 </script>
 
 <style lang="less" scoped>
+.right-btn {
+  a {
+    padding: 2px 10px;
+    margin-right: 5px;
+    font-size: 12px;
+    color: #409eff;
+    cursor: pointer;
+    border: 1px solid #409eff;
+    border-radius: 8px;
+    i {
+      font-size: 12px;
+    }
+  }
+}
 .reply-wrap {
   background-color: #f9f9f9;
   border-radius: 8px;
@@ -570,11 +633,14 @@ export default {
     .articlecategory {
       font-size: 14px;
       color: #999999;
+      .article-date {
+        margin-left: 15px;
+      }
       i {
         color: #607d8b;
         margin-right: 5px;
         font-size: 14px;
-        color: #409eff;
+        color: #a2e1d4;
       }
       .viewicon {
         margin-left: 15px;
@@ -584,7 +650,7 @@ export default {
     .article-title {
       font-size: 22px;
       font-weight: 700;
-      margin: 6px 0;
+      margin-top: 6px;
     }
   }
   .article-author {
@@ -615,17 +681,34 @@ export default {
     justify-content: space-between;
     padding: 10px;
     border-top: 1px solid #eeeeee;
+    align-items: center;
     > div {
       padding: 2px 10px;
       background-color: #f6f6f6;
       color: #d0d0d0;
       font-size: 14px;
       border-radius: 8px;
+      white-space: nowrap;
       cursor: pointer;
       i {
         font-size: 16px;
         margin-right: 2px;
       }
+    }
+    .tags-wrap {
+      padding: 0;
+      background-color: transparent;
+      cursor: initial;
+      justify-self: flex-start;
+      align-items: center;
+      white-space: normal;
+      .el-tag {
+        margin: 5px;
+      }
+    }
+    .tags-wrap:active {
+      position: relative;
+      top: 0;
     }
   }
   .like > div:active {
@@ -685,6 +768,7 @@ export default {
               font-size: 12px;
               color: #999999;
               font-weight: normal;
+              line-height: 21px;
             }
           }
         }
@@ -693,13 +777,21 @@ export default {
         width: 100%;
         margin-left: 10px;
       }
+      .usermeta {
+        display: flex;
+        justify-content: space-between;
+        .create-date {
+          font-size: 12px;
+          color: #c1c1c1;
+        }
+      }
       .username {
         font-size: 14px;
         font-weight: 700;
         color: #000000;
       }
       .conmment-content {
-        margin: 7px 0;
+        margin: 10px 0;
       }
       .comment-tools {
         width: 100%;
