@@ -192,7 +192,11 @@
             </li>
           </ul>
         </div>
-        <div class="publish-viwe" v-if="tabIndex === 1">
+        <div
+          class="publish-viwe"
+          v-if="tabIndex === 1"
+          v-loading="deleteLoading"
+        >
           <ul v-if="publish && publish.length > 0">
             <li v-for="item in publish" :key="item._id">
               <div>
@@ -227,7 +231,12 @@
                 </div>
               </div>
               <div class="btn-wrap" v-if="userSelf">
-                <el-button type="danger" :size="'mini'">删除</el-button>
+                <el-button
+                  type="danger"
+                  :size="'mini'"
+                  @click="deleteArticle(item._id)"
+                  >删除</el-button
+                >
               </div>
             </li>
             <a
@@ -578,13 +587,15 @@ export default {
       isMore: true,
       moreLoading: false,
       isAttention: false, // 是否关注
-      isAttentionLoading: false
+      isAttentionLoading: false, // 关注loading
+      deleteLoading: false // 删除loading
     }
   },
   computed: {
     ...mapState(['userInfo'])
   },
   methods: {
+    // 关注与取消
     async attention (path) {
       this.isAttentionLoading = true
       if (!this.$store.state.isLogin) {
@@ -697,6 +708,40 @@ export default {
       }
       this.checkbox(index, true)
     },
+    deleteArticle (id) {
+      this.$messageBox.confirm('此操作将永久删除该文章, 是否继续?', '提示', {
+        showClose: false,
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        this.deleteLoading = true
+        try {
+          await this.axios.delete('api/posts/' + id)
+          const { data: res } = await this.axios.get('api/posts/findAuthor/' + this.author._id + '?limit=' + this.publishLimit)
+          this.publish = res
+          this.deleteLoading = false
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+          this.checkbox(1, false)
+        } catch (err) {
+          this.deleteLoading = false
+          this.$message({
+            type: 'error',
+            message: '删除失败!'
+          })
+          this.checkbox(1, false)
+        }
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+    },
+    // 关注列表取消关注
     async cancleAttentions (id) {
       this.loading = 6
       if (!this.userSelf) {

@@ -1,27 +1,37 @@
 <template>
   <div class="article-list-wrap" id="articleList">
-    <div class="article-category">{{currentCategory}}</div>
+    <div class="article-category">{{ currentCategory }}</div>
     <ul class="article-list">
       <li class="article-item" v-for="item in articleList" :key="item._id">
         <div class="article-info">
           <div class="article-info-title">
             <router-link
-              :to="{name: 'article', params: {id: item._id}}"
+              :to="{ name: 'article', params: { id: item._id } }"
               target="_blank"
-            >{{item.title}}</router-link>
+              >{{ item.title }}</router-link
+            >
           </div>
           <div class="article-info-summary">
-            <div class="summary">{{item.summary}}</div>
+            <div class="summary">{{ item.summary }}</div>
           </div>
-          <div class="bottom-info" :class="{'noarticle-thumbnail': !item.thumbnail}">
+          <div
+            class="bottom-info"
+            :class="{ 'noarticle-thumbnail': !item.thumbnail }"
+          >
             <div class="article-info-author">
-              <router-link :to="{name: 'user', params: {id: item.author._id}}">
+              <router-link
+                :to="{ name: 'user', params: { id: item.author._id } }"
+              >
                 <el-avatar
-                  :src="item.author.avatar ? item.author.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
+                  :src="
+                    item.author.avatar
+                      ? item.author.avatar
+                      : 'http://localhost:3000/assets/img/defaultAvatar.png'
+                  "
                   size="small"
                 ></el-avatar>
                 <div class="silder-author">
-                  <span>{{item.author.nickName}}</span>
+                  <span>{{ item.author.nickName }}</span>
                 </div>
               </router-link>
             </div>
@@ -32,30 +42,33 @@
               </div>
             </div>
           </div>
-          <div class="count" :class="{'noarticle-thumbnail': !item.thumbnail}">
+          <div
+            class="count"
+            :class="{ 'noarticle-thumbnail': !item.thumbnail }"
+          >
             <div class="count-box">
               <div class="views-count">
                 <i class="iconfont icon-browse_fill"></i>
-                <span>{{item.meta.views}}</span>
+                <span>{{ item.meta.views }}</span>
               </div>
               <div class="comment-count">
                 <i class="iconfont icon-interactive_fill"></i>
-                <span>{{item.meta.comments}}</span>
+                <span>{{ item.meta.comments }}</span>
               </div>
               <div class="likes-count">
                 <i class="iconfont icon-like_fill"></i>
-                <span>{{item.meta.likes}}</span>
+                <span>{{ item.meta.likes }}</span>
               </div>
             </div>
             <div class="date">
               <div>
-                <span>{{item.updateAt.split('T')[0]}}</span>
+                <span>{{ item.updateAt.split('T')[0] }}</span>
               </div>
             </div>
           </div>
         </div>
         <router-link
-          :to="{name: 'article', params: {id: item._id}}"
+          :to="{ name: 'article', params: { id: item._id } }"
           class="article-img"
           v-if="item.thumbnail"
           target="_blank"
@@ -64,7 +77,14 @@
         </router-link>
       </li>
     </ul>
-    <a href="javascript:;" class="more" v-loading="loading" @click="getmroe" v-if="isMore">加载更多</a>
+    <a
+      href="javascript:;"
+      class="more"
+      v-loading="loading"
+      @click="getmroe"
+      v-if="isMore"
+      >加载更多</a
+    >
     <div href="javascript:;" class="more nomore" v-if="!isMore">没有更多了</div>
   </div>
 </template>

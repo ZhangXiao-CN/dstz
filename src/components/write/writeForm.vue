@@ -258,6 +258,26 @@ export default {
       const html = this.$refs.Editor.$refs.md.d_render
       const text = html.replace(/<(style|script|iframe)[^>]*?>[\s\S]+?<\/\1\s*>/gi, '').replace(/<[^>]+?>/g, '').replace(/\s+/g, ' ').replace(/ /g, ' ').replace(/>/g, ' ')
       const summary = text.substr(0, 70) + '...'
+      const delImgList = []
+      const imgList = []
+      if (this.$refs.Editor.imgList.length > 0) {
+        this.$refs.Editor.imgList.forEach((item) => {
+          if (this.$refs.Editor.article.indexOf(item) === -1) {
+            console.log(this.articleTitle)
+            delImgList.push(item.split('uploads/')[1])
+          } else {
+            imgList.push(item)
+          }
+        })
+        if (delImgList.length > 0) {
+          try {
+            await this.axios.delete('api/deletefile/' + delImgList.join('-', ','))
+            this.thumb = ''
+          } catch (err) {
+            this.$message.error('图片切换或删除失败')
+          }
+        }
+      }
       const body = {
         author: author,
         title: this.articleTitle,
@@ -270,7 +290,7 @@ export default {
         categoryChilren: this.currentCategory.childrenId ? this.currentCategory.childrenId : null,
         thumbnail: this.thumb ? this.thumb : null,
         tag: this.tagList.length > 0 ? this.tagList : null,
-        imgList: this.$refs.Editor.imgList
+        imgList: imgList
       }
       try {
         await this.axios.post('api/posts', body)
@@ -278,23 +298,6 @@ export default {
       } catch (err) {
         console.log(err)
         this.$message.error('文章发布失败')
-      }
-      if (this.$refs.Editor.imgList.length > 0) {
-        const delImgList = []
-        this.$refs.Editor.imgList.forEach((item) => {
-          if (this.$refs.Editor.article.indexOf(item) === -1) {
-            console.log(this.articleTitle)
-            delImgList.push(item.split('uploads/')[1])
-          }
-        })
-        if (delImgList.length > 0) {
-          try {
-            await this.axios.delete('api/deletefile/' + delImgList.join('-', ','))
-            this.thumb = ''
-          } catch (err) {
-            this.$message.error('图片切换或删除失败')
-          }
-        }
       }
       this.$router.push({ name: 'home' })
     }
@@ -348,6 +351,8 @@ export default {
     overflow: hidden;
     justify-content: flex-start;
     margin: 10px 0;
+    max-height: 300px;
+    min-height: 300px;
     .thumb {
       position: relative;
       min-height: 200 / 40rem;
@@ -676,6 +681,8 @@ export default {
   .form {
     margin: 5px 0 !important;
     flex-direction: column !important;
+    max-height: initial !important;
+    min-height: initial !important;
     .top-form {
       flex: initial !important;
     }

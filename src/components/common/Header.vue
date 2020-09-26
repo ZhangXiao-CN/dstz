@@ -24,14 +24,27 @@
           </div>
         </div>
         <div class="top-right">
-          <el-input placeholder="搜索" v-model="searchText" class="search" size="mini">
+          <el-input
+            placeholder="搜索"
+            v-model="searchText"
+            class="search"
+            size="mini"
+          >
             <i slot="prefix" class="iconfont icon-search"></i>
           </el-input>
           <div class="login-btn-wrap" v-if="!isLogin">
-            <button class="login-btn" @click="popUpLoginBox(false)">登陆</button>
-            <button class="reg-btn" @click="popUpLoginBox(true)">快速注册</button>
+            <button class="login-btn" @click="popUpLoginBox(false)">
+              登陆
+            </button>
+            <button class="reg-btn" @click="popUpLoginBox(true)">
+              快速注册
+            </button>
           </div>
-          <div class="samll-login-btn" @click="popUpLoginBox(false)" v-if="!isLogin">
+          <div
+            class="samll-login-btn"
+            @click="popUpLoginBox(false)"
+            v-if="!isLogin"
+          >
             <i class="iconfont icon-user"></i>
           </div>
           <div class="user-btn" v-if="isLogin">
@@ -44,7 +57,11 @@
           </div>
           <div class="user-info" @click="popUpuserToolBox" v-if="isLogin">
             <el-avatar
-              :src="userInfo.avatar ? userInfo.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
+              :src="
+                userInfo.avatar
+                  ? userInfo.avatar
+                  : 'http://localhost:3000/assets/img/defaultAvatar.png'
+              "
               :key="userInfo.avatar"
               size="small"
               class="user-avatar"
@@ -54,18 +71,22 @@
                 <ul>
                   <li>
                     <router-link
-                      :to="{name: 'user', params: {id: userInfo._id}}"
+                      :to="{ name: 'user', params: { id: userInfo._id } }"
                       class="personal-center"
                     >
                       <div>
                         <el-avatar
-                          :src="userInfo.avatar ? userInfo.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
+                          :src="
+                            userInfo.avatar
+                              ? userInfo.avatar
+                              : 'http://localhost:3000/assets/img/defaultAvatar.png'
+                          "
                           :key="userInfo.avatar"
                           size="medium"
                         ></el-avatar>
                       </div>
                       <p>
-                        <span>{{userInfo.nickName}}</span>
+                        <span>{{ userInfo.nickName }}</span>
                         <span class="explain">个人中心</span>
                       </p>
                     </router-link>
@@ -149,10 +170,10 @@ export default {
     async logout () {
       try {
         await this.axios.post('api/logout')
-        this.$store.commit('changeIsLogin', false)
-        this.$store.commit('changeuserInfo', {})
-        this.$message.success('退出成功')
-        this.reload()
+        // this.$store.commit('changeIsLogin', false)
+        // this.$store.commit('changeuserInfo', {})
+        // this.$message.success('退出成功')
+        this.$router.go(0)
       } catch (err) {
         this.$message.error('退出失败')
       }

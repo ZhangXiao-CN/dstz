@@ -9,7 +9,8 @@ import {
   Message,
   Tag,
   Loading,
-  Pagination
+  Pagination,
+  MessageBox
 } from 'element-ui'
 
 Vue.use(Button)
@@ -22,3 +23,4 @@ Vue.use(Tag)
 Vue.use(Loading)
 Vue.use(Pagination)
 Vue.prototype.$message = Message
+Vue.prototype.$messageBox = MessageBox
