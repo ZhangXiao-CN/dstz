@@ -4,14 +4,20 @@
       <div class="user-mask">
         <div
           class="nothumb"
-          v-if="userThumb === 'http://localhost:3000/assets/img/defaultthumb.jpg' && !userSelf"
+          v-if="
+            userThumb === 'http://localhost:3000/assets/img/defaultthumb.jpg' &&
+            !userSelf
+          "
         >
           <img :src="userThumb" />
         </div>
         <div class="thumb" v-else>
           <label
             class="upload-thumb"
-            v-if="userSelf && userThumb === 'http://localhost:3000/assets/img/defaultthumb.jpg'"
+            v-if="
+              userSelf &&
+              userThumb === 'http://localhost:3000/assets/img/defaultthumb.jpg'
+            "
           >
             <i class="iconfont icon-xiazai40"></i>
             <input
@@ -23,7 +29,9 @@
           </label>
           <div
             class="thumb-show"
-            v-if="userThumb !== 'http://localhost:3000/assets/img/defaultthumb.jpg'"
+            v-if="
+              userThumb !== 'http://localhost:3000/assets/img/defaultthumb.jpg'
+            "
           >
             <img :src="userThumb" />
             <div class="thumb-tools" v-if="userSelf">
@@ -46,7 +54,11 @@
           <el-avatar
             shape="square"
             :size="120"
-            :src="userAvatar ? userAvatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
+            :src="
+              userAvatar
+                ? userAvatar
+                : 'http://localhost:3000/assets/img/defaultAvatar.png'
+            "
             v-cloak
           ></el-avatar>
           <label v-if="userSelf">
@@ -55,8 +67,12 @@
           </label>
         </div>
         <div class="username-wrap">
-          <div class="username">{{author.nickName}}</div>
-          <div class="autograph">{{author.autograph ? author.autograph : '这个人很懒,什么都没有留下'}}</div>
+          <div class="username">{{ author.nickName }}</div>
+          <div class="autograph">
+            {{
+              author.autograph ? author.autograph : '这个人很懒,什么都没有留下'
+            }}
+          </div>
         </div>
         <div v-if="!userSelf">
           <el-button
@@ -65,14 +81,16 @@
             v-if="!isAttention"
             :loading="isAttentionLoading"
             @click="attention('Attention')"
-          >关注</el-button>
+            >关注</el-button
+          >
           <el-button
             type="primary"
             size="small"
             v-else
             class="is-attention"
             @click="attention('cancelAttention')"
-          >已关注</el-button>
+            >已关注</el-button
+          >
         </div>
       </div>
     </div>
@@ -141,31 +159,35 @@
             <li>
               <p>
                 <span>昵称:</span>
-                <span>{{author.nickName}}</span>
+                <span>{{ author.nickName }}</span>
               </p>
             </li>
             <li>
               <p>
                 <span>邮箱:</span>
-                <span>{{author.email}}</span>
+                <span>{{ author.email }}</span>
               </p>
             </li>
             <li>
               <p>
                 <span>性别:</span>
-                <span>{{author.gender}}</span>
+                <span>{{ author.gender }}</span>
               </p>
             </li>
             <li>
               <p>
                 <span>网址:</span>
-                <span>{{author.site ? author.site : '没有网址'}}</span>
+                <span>{{ author.site ? author.site : '没有网址' }}</span>
               </p>
             </li>
             <li>
               <p>
                 <span>签名:</span>
-                <span>{{author.autograph ? author.autograph : '这个人很懒,什么都没有留下'}}</span>
+                <span>{{
+                  author.autograph
+                    ? author.autograph
+                    : '这个人很懒,什么都没有留下'
+                }}</span>
               </p>
             </li>
           </ul>
@@ -174,21 +196,33 @@
           <ul v-if="publish && publish.length > 0">
             <li v-for="item in publish" :key="item._id">
               <div>
-                <router-link target="_blank" :to="{name:'article', params: {id: item._id}}">
-                  <p>{{item.title}}</p>
+                <router-link
+                  target="_blank"
+                  :to="{ name: 'article', params: { id: item._id } }"
+                >
+                  <p>{{ item.title }}</p>
                 </router-link>
                 <div data-v-5cc3ab68 class="count">
                   <div data-v-5cc3ab68 class="comment-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-interactive_fill"></i>
-                    <span data-v-5cc3ab68>{{item.meta && item.meta.comments}}</span>
+                    <i
+                      data-v-5cc3ab68
+                      class="iconfont icon-interactive_fill"
+                    ></i>
+                    <span data-v-5cc3ab68>{{
+                      item.meta && item.meta.comments
+                    }}</span>
                   </div>
                   <div data-v-5cc3ab68 class="views-count">
                     <i data-v-5cc3ab68 class="iconfont icon-browse_fill"></i>
-                    <span data-v-5cc3ab68>{{item.meta && item.meta.views}}</span>
+                    <span data-v-5cc3ab68>{{
+                      item.meta && item.meta.views
+                    }}</span>
                   </div>
                   <div data-v-5cc3ab68 class="likes-count">
                     <i data-v-5cc3ab68 class="iconfont icon-like_fill"></i>
-                    <span data-v-5cc3ab68>{{item.meta && item.meta.likes}}</span>
+                    <span data-v-5cc3ab68>{{
+                      item.meta && item.meta.likes
+                    }}</span>
                   </div>
                 </div>
               </div>
@@ -202,8 +236,11 @@
               v-loading="moreLoading"
               @click="getmroe(1)"
               v-if="isMore"
-            >加载更多</a>
-            <div href="javascript:;" class="more nomore" v-if="!isMore">没有更多了</div>
+              >加载更多</a
+            >
+            <div href="javascript:;" class="more nomore" v-if="!isMore">
+              没有更多了
+            </div>
           </ul>
           <div v-else class="clean">
             <div>
@@ -216,21 +253,33 @@
           <ul v-if="favorites && favorites.length > 0">
             <li v-for="item in favorites" :key="item._id">
               <div>
-                <router-link target="_blank" :to="{name:'article', params: {id: item._id}}">
-                  <p>{{item.title}}</p>
+                <router-link
+                  target="_blank"
+                  :to="{ name: 'article', params: { id: item._id } }"
+                >
+                  <p>{{ item.title }}</p>
                 </router-link>
                 <div data-v-5cc3ab68 class="count">
                   <div data-v-5cc3ab68 class="comment-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-interactive_fill"></i>
-                    <span data-v-5cc3ab68>{{item.meta && item.meta.comments}}</span>
+                    <i
+                      data-v-5cc3ab68
+                      class="iconfont icon-interactive_fill"
+                    ></i>
+                    <span data-v-5cc3ab68>{{
+                      item.meta && item.meta.comments
+                    }}</span>
                   </div>
                   <div data-v-5cc3ab68 class="views-count">
                     <i data-v-5cc3ab68 class="iconfont icon-browse_fill"></i>
-                    <span data-v-5cc3ab68>{{item.meta && item.meta.views}}</span>
+                    <span data-v-5cc3ab68>{{
+                      item.meta && item.meta.views
+                    }}</span>
                   </div>
                   <div data-v-5cc3ab68 class="likes-count">
                     <i data-v-5cc3ab68 class="iconfont icon-like_fill"></i>
-                    <span data-v-5cc3ab68>{{item.meta && item.meta.likes}}</span>
+                    <span data-v-5cc3ab68>{{
+                      item.meta && item.meta.likes
+                    }}</span>
                   </div>
                 </div>
               </div>
@@ -241,8 +290,11 @@
               v-loading="moreLoading"
               @click="getmroe(2)"
               v-if="isMore"
-            >加载更多</a>
-            <div href="javascript:;" class="more nomore" v-if="!isMore">没有更多了</div>
+              >加载更多</a
+            >
+            <div href="javascript:;" class="more nomore" v-if="!isMore">
+              没有更多了
+            </div>
           </ul>
           <div v-else class="clean">
             <div>
@@ -255,23 +307,39 @@
           <ul v-if="attentions && attentions.length > 0">
             <li v-for="item in attentions" :key="item._id">
               <div class="attention-wrap">
-                <router-link :to="{name: 'user', params: {id: item._id}}">
+                <router-link :to="{ name: 'user', params: { id: item._id } }">
                   <el-avatar
                     shape="square"
                     :size="80"
-                    :src="item.avatar ? item.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
+                    :src="
+                      item.avatar
+                        ? item.avatar
+                        : 'http://localhost:3000/assets/img/defaultAvatar.png'
+                    "
                   ></el-avatar>
                 </router-link>
                 <div class="attention-user">
                   <router-link
-                    :to="{name: 'user', params: {id: item._id}}"
+                    :to="{ name: 'user', params: { id: item._id } }"
                     class="user-name"
-                  >{{item.nickName}}</router-link>
-                  <p>{{item.autograph && item.autograph ? item.autograph : '这个人很懒, 什么都没有留下'}}</p>
+                    >{{ item.nickName }}</router-link
+                  >
+                  <p>
+                    {{
+                      item.autograph && item.autograph
+                        ? item.autograph
+                        : '这个人很懒, 什么都没有留下'
+                    }}
+                  </p>
                 </div>
               </div>
               <div class="btn-wrap">
-                <el-button type="primary" :size="'mini'" @click="cancleAttentions(item._id)">取消关注</el-button>
+                <el-button
+                  type="primary"
+                  :size="'mini'"
+                  @click="cancleAttentions(item._id)"
+                  >取消关注</el-button
+                >
               </div>
             </li>
             <a
@@ -280,8 +348,11 @@
               v-loading="moreLoading"
               @click="getmroe(3)"
               v-if="isMore"
-            >加载更多</a>
-            <div href="javascript:;" class="more nomore" v-if="!isMore">没有更多了</div>
+              >加载更多</a
+            >
+            <div href="javascript:;" class="more nomore" v-if="!isMore">
+              没有更多了
+            </div>
           </ul>
           <div v-else class="clean">
             <div>
@@ -293,19 +364,30 @@
         <div class="fans-viwe" v-if="tabIndex === 4">
           <ul v-if="fans && fans.length > 0">
             <li v-for="item in fans" :key="item._id">
-              <router-link :to="{name: 'user', params: {id: item._id}}">
+              <router-link :to="{ name: 'user', params: { id: item._id } }">
                 <el-avatar
                   shape="square"
                   :size="80"
-                  :src="item.avatar ? item.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
+                  :src="
+                    item.avatar
+                      ? item.avatar
+                      : 'http://localhost:3000/assets/img/defaultAvatar.png'
+                  "
                 ></el-avatar>
               </router-link>
               <div class="fans-user">
                 <router-link
-                  :to="{name: 'user', params: {id: item._id}}"
+                  :to="{ name: 'user', params: { id: item._id } }"
                   class="user-name"
-                >{{item.nickName}}</router-link>
-                <p>{{item.autograph && item.autograph ? item.autograph : '这个人很懒, 什么都没有留下'}}</p>
+                  >{{ item.nickName }}</router-link
+                >
+                <p>
+                  {{
+                    item.autograph && item.autograph
+                      ? item.autograph
+                      : '这个人很懒, 什么都没有留下'
+                  }}
+                </p>
               </div>
             </li>
             <a
@@ -314,8 +396,11 @@
               v-loading="moreLoading"
               @click="getmroe(4)"
               v-if="isMore"
-            >加载更多</a>
-            <div href="javascript:;" class="more nomore" v-if="!isMore">没有更多了</div>
+              >加载更多</a
+            >
+            <div href="javascript:;" class="more nomore" v-if="!isMore">
+              没有更多了
+            </div>
           </ul>
           <div v-else class="clean">
             <div>
@@ -338,7 +423,8 @@
                 :size="'mini'"
                 @click="saveEdit(0)"
                 :loading="loading === 0"
-              >保存</el-button>
+                >保存</el-button
+              >
             </li>
             <li>
               <div class="input-wrap">
@@ -352,20 +438,36 @@
                 :size="'mini'"
                 @click="saveEdit(1)"
                 :loading="loading === 1"
-              >保存</el-button>
+                >保存</el-button
+              >
             </li>
             <li>
               <div class="label">性别:</div>
               <label>
-                <input type="radio" name="gender" value="男" v-model="userEdit.gender" />
+                <input
+                  type="radio"
+                  name="gender"
+                  value="男"
+                  v-model="userEdit.gender"
+                />
                 男
               </label>
               <label>
-                <input type="radio" name="gender" value="女" v-model="userEdit.gender" />
+                <input
+                  type="radio"
+                  name="gender"
+                  value="女"
+                  v-model="userEdit.gender"
+                />
                 女
               </label>
               <label>
-                <input type="radio" name="gender" value="保密" v-model="userEdit.gender" />
+                <input
+                  type="radio"
+                  name="gender"
+                  value="保密"
+                  v-model="userEdit.gender"
+                />
                 保密
               </label>
               <el-button
@@ -373,7 +475,8 @@
                 :size="'mini'"
                 @click="saveEdit(2)"
                 :loading="loading === 2"
-              >保存</el-button>
+                >保存</el-button
+              >
             </li>
             <li>
               <div class="input-wrap">
@@ -387,7 +490,8 @@
                 :size="'mini'"
                 @click="saveEdit(3)"
                 :loading="loading === 3"
-              >保存</el-button>
+                >保存</el-button
+              >
             </li>
             <li>
               <div class="input-wrap">
@@ -401,15 +505,28 @@
                 :size="'mini'"
                 @click="saveEdit(4)"
                 :loading="loading === 4"
-              >保存</el-button>
+                >保存</el-button
+              >
             </li>
             <li class="pass">
               <label>
                 <span>密码:</span>
                 <div>
-                  <input type="password" placeholder="原密码" v-model="oldPassword" />
-                  <input type="password" placeholder="新密码" v-model="newPassword" />
-                  <input type="password" placeholder="重复新密码" v-model="repeatPassword" />
+                  <input
+                    type="password"
+                    placeholder="原密码"
+                    v-model="oldPassword"
+                  />
+                  <input
+                    type="password"
+                    placeholder="新密码"
+                    v-model="newPassword"
+                  />
+                  <input
+                    type="password"
+                    placeholder="重复新密码"
+                    v-model="repeatPassword"
+                  />
                 </div>
               </label>
               <el-button
@@ -417,7 +534,8 @@
                 :size="'mini'"
                 @click="savePsaaword(5)"
                 :loading="loading === 5"
-              >保存</el-button>
+                >保存</el-button
+              >
             </li>
           </ul>
         </div>
@@ -514,6 +632,7 @@ export default {
         this.$message.error('图片切换或删除失败')
       }
     },
+    // 切换选项卡
     async checkbox (index, flag) {
       if (flag) {
         this.moreLoading = true
@@ -562,6 +681,7 @@ export default {
       this.tabIndex = index
       this.moreLoading = false
     },
+    // 加载更多
     getmroe (index) {
       if (index === 1) {
         this.publishLimit += 5
@@ -978,14 +1098,18 @@ export default {
     z-index: 1;
     height: 280 / 40rem;
     .thumb-show {
+      position: relative;
       width: 100%;
       height: 100%;
       text-align: center;
       line-height: 280 /40rem;
       .thumb-tools {
+        display: flex;
         position: absolute;
-        top: 10px;
+        align-items: center;
+        top: 0;
         right: 10px;
+        height: 100%;
         i {
           // display: inline-block;
           color: #ffffff;
@@ -1045,6 +1169,11 @@ export default {
 }
 
 @media screen and (max-width: 1024px) {
+  .user-avatar {
+    label:hover {
+      opacity: 0 !important;
+    }
+  }
 }
 
 @media screen and (max-width: 768px) {
@@ -1168,5 +1297,9 @@ export default {
 }
 
 @media screen and (max-width: 505px) {
+  .thumb-tools {
+    right: 10px;
+    font-size: 13px;
+  }
 }
 </style>

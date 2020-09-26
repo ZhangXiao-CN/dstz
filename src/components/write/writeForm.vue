@@ -32,11 +32,11 @@
                 <el-tag
                   @click="removeTag(index)"
                   size="mini"
-                  v-for="( item, index ) in tagList"
+                  v-for="(item, index) in tagList"
                   :key="index"
                 >
                   <i class="iconfont icon-icontag"></i>
-                  {{item}}
+                  {{ item }}
                 </el-tag>
               </template>
             </div>
@@ -60,14 +60,16 @@
               type="danger"
               v-if="currentCategory && currentCategory.parentTitle"
               @click="removeSelect"
-            >{{currentCategory.parentTitle}}</el-tag>
+              >{{ currentCategory.parentTitle }}</el-tag
+            >
             <el-tag
               effect="dark"
               type="warning"
               size="medium"
               v-if="currentCategory && currentCategory.childrenTitle"
               @click="removeSelect"
-            >{{currentCategory.childrenTitle}}</el-tag>
+              >{{ currentCategory.childrenTitle }}</el-tag
+            >
           </div>
           <div class="categories-select">
             <select @change="selectCategory" v-model="selectIndex">
@@ -77,8 +79,12 @@
                   :value="index"
                   v-if="item.childrenId"
                   :key="item.childrenId"
-                >{{item.childrenTitle}}</option>
-                <option :value="index" v-else :key="item.parentId">{{item.parentTitle}}</option>
+                >
+                  {{ item.childrenTitle }}
+                </option>
+                <option :value="index" v-else :key="item.parentId">
+                  {{ item.parentTitle }}
+                </option>
               </template>
             </select>
           </div>
@@ -86,8 +92,12 @@
         <div class="bottom-btn">
           <p>请尊重自己和别人的时间，不要发布垃圾和广告内容</p>
           <div>
-            <el-button type="primary" size="small" @click="publish(0)">保存到草稿箱</el-button>
-            <el-button type="primary" size="small" @click="publish(1)">发布</el-button>
+            <el-button type="primary" size="small" @click="publish(0)"
+              >保存到草稿箱</el-button
+            >
+            <el-button type="primary" size="small" @click="publish(1)"
+              >发布</el-button
+            >
           </div>
         </div>
       </div>
@@ -120,15 +130,24 @@
     </div>
     <div class="editor-container">
       <div class="article-title">
-        <el-input type="textarea" autosize placeholder="标题" v-model="articleTitle"></el-input>
+        <el-input
+          type="textarea"
+          autosize
+          placeholder="标题"
+          v-model="articleTitle"
+        ></el-input>
       </div>
       <Editor ref="Editor"></Editor>
     </div>
     <div class="bottom-btn" id="footBtn">
       <div>
-        <el-button type="primary" size="small" @click="publish(0)">保存到草稿箱</el-button>
+        <el-button type="primary" size="small" @click="publish(0)"
+          >保存到草稿箱</el-button
+        >
         <p>请尊重自己和别人的时间，不要发布垃圾和广告内容</p>
-        <el-button type="primary" size="small" @click="publish(1)">发布</el-button>
+        <el-button type="primary" size="small" @click="publish(1)"
+          >发布</el-button
+        >
       </div>
     </div>
   </div>
@@ -237,20 +256,21 @@ export default {
       }
       const author = this.userInfo._id
       const html = this.$refs.Editor.$refs.md.d_render
-      let summary = ''
-      summary = html.replace(/<(style|script|iframe)[^>]*?>[\s\S]+?<\/\1\s*>/gi, '').replace(/<[^>]+?>/g, '').replace(/\s+/g, ' ').replace(/ /g, ' ').replace(/>/g, ' ')
-      summary = summary.substr(0, 70) + '...'
+      const text = html.replace(/<(style|script|iframe)[^>]*?>[\s\S]+?<\/\1\s*>/gi, '').replace(/<[^>]+?>/g, '').replace(/\s+/g, ' ').replace(/ /g, ' ').replace(/>/g, ' ')
+      const summary = text.substr(0, 70) + '...'
       const body = {
         author: author,
         title: this.articleTitle,
         state: state,
         content: this.$refs.Editor.article,
+        text: text,
         html: state === 1 ? html : null,
         summary: summary,
         category: this.currentCategory.parentId,
         categoryChilren: this.currentCategory.childrenId ? this.currentCategory.childrenId : null,
         thumbnail: this.thumb ? this.thumb : null,
-        tag: this.tagList.length > 0 ? this.tagList : null
+        tag: this.tagList.length > 0 ? this.tagList : null,
+        imgList: this.$refs.Editor.imgList
       }
       try {
         await this.axios.post('api/posts', body)
