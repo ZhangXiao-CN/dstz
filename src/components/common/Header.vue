@@ -197,8 +197,9 @@ export default {
         }
       }
     } catch (err) {
-      this.$message.error(err.message)
+      this.$message.error('无法判断是否登录')
     }
+    this.$store.commit('changeHeaderIsOver', true)
   }
 }
 </script>>

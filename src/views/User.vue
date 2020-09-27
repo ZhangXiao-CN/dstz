@@ -7,7 +7,8 @@
     <transition name="bounceLogin">
       <Longin-View v-if="loginBox"></Longin-View>
     </transition>
-    <Persona-Center></Persona-Center>
+    <!-- header组件created判断登陆状态后,再加载个人中心组件 -->
+    <Persona-Center v-if="headerIsOver"></Persona-Center>
   </div>
 </template>
 
@@ -29,7 +30,7 @@ export default {
     'Persona-Center': PersonaCenter
   },
   computed: {
-    ...mapState(['loginBox'])
+    ...mapState(['loginBox', 'headerIsOver'])
   },
   watch: {
     $route (to, from) {

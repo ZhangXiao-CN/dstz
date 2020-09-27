@@ -12,7 +12,8 @@ export default new Vuex.Store({
     categoryNav: [],
     categories: [],
     articleList: [],
-    currentCategory: '最新文章'
+    currentCategory: '最新文章',
+    headerIsOver: false
   },
   mutations: {
     changeIsLogin (state, bool) {
@@ -38,6 +39,9 @@ export default new Vuex.Store({
     },
     changecurrentCategory (state, data) {
       state.articleList = data
+    },
+    changeHeaderIsOver (state, bool) {
+      state.headerIsOver = bool
     }
   },
   actions: {

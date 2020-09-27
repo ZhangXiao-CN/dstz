@@ -98,7 +98,11 @@
       <div class="left-bar">
         <ul>
           <li>
-            <a href="javascript:;" @click="checkbox(0, false)">
+            <a
+              href="javascript:;"
+              @click="checkbox(0, false)"
+              :class="{ 'current-color': leftBarIndex === 0 }"
+            >
               <div class="btn">
                 <i class="iconfont icon-user"></i>
                 <span>概览</span>
@@ -107,7 +111,11 @@
             </a>
           </li>
           <li>
-            <a href="javascript:;" @click="checkbox(1, false)">
+            <a
+              href="javascript:;"
+              @click="checkbox(1, false, 1)"
+              :class="{ 'current-color': leftBarIndex === 1 }"
+            >
               <div class="btn">
                 <i class="iconfont icon-mianxingyumaobi"></i>
                 <span>发布</span>
@@ -116,7 +124,11 @@
             </a>
           </li>
           <li>
-            <a href="javascript:;" @click="checkbox(2, false)">
+            <a
+              href="javascript:;"
+              @click="checkbox(2, false)"
+              :class="{ 'current-color': leftBarIndex === 2 }"
+            >
               <div class="btn">
                 <i class="iconfont icon-select"></i>
                 <span>收藏</span>
@@ -125,7 +137,11 @@
             </a>
           </li>
           <li>
-            <a href="javascript:;" @click="checkbox(3, false)">
+            <a
+              href="javascript:;"
+              @click="checkbox(3, false)"
+              :class="{ 'current-color': leftBarIndex === 3 }"
+            >
               <div class="btn">
                 <i class="iconfont icon-yanjing"></i>
                 <span>关注</span>
@@ -134,7 +150,11 @@
             </a>
           </li>
           <li>
-            <a href="javascript:;" @click="checkbox(4, false)">
+            <a
+              href="javascript:;"
+              @click="checkbox(4, false)"
+              :class="{ 'current-color': leftBarIndex === 4 }"
+            >
               <div class="btn">
                 <i class="iconfont icon-like"></i>
                 <span>粉丝</span>
@@ -143,7 +163,11 @@
             </a>
           </li>
           <li v-if="userSelf">
-            <a href="javascript:;" @click="checkbox(5, false)">
+            <a
+              href="javascript:;"
+              @click="checkbox(5, false)"
+              :class="{ 'current-color': leftBarIndex === 5 }"
+            >
               <div class="btn">
                 <i class="iconfont icon-setup"></i>
                 <span>设置</span>
@@ -197,6 +221,27 @@
           v-if="tabIndex === 1"
           v-loading="deleteLoading"
         >
+          <div class="top-nav">
+            <a
+              href="javascript:;"
+              :class="{ 'publish-current': publishCurrent === 0 }"
+              @click="checkbox(1, false, 1)"
+              >文章</a
+            >
+            <a
+              v-if="userSelf"
+              href="javascript:;"
+              :class="{ 'publish-current': publishCurrent === 1 }"
+              @click="checkbox(1, false, 0)"
+              >草稿箱</a
+            >
+            <a
+              href="javascript:;"
+              :class="{ 'publish-current': publishCurrent === 2 }"
+              @click="checkbox(12)"
+              >评论</a
+            >
+          </div>
           <ul v-if="publish && publish.length > 0">
             <li v-for="item in publish" :key="item._id">
               <div>
@@ -206,7 +251,7 @@
                 >
                   <p>{{ item.title }}</p>
                 </router-link>
-                <div data-v-5cc3ab68 class="count">
+                <div data-v-5cc3ab68 class="count" v-if="publishCurrent === 0">
                   <div data-v-5cc3ab68 class="comment-count">
                     <i
                       data-v-5cc3ab68
@@ -229,8 +274,18 @@
                     }}</span>
                   </div>
                 </div>
+                <div class="summary" v-if="publishCurrent === 1">
+                  {{ item.summary }}
+                </div>
               </div>
               <div class="btn-wrap" v-if="userSelf">
+                <el-button
+                  type="primary"
+                  :size="'mini'"
+                  @click="editArticle(item._id)"
+                  v-if="publishCurrent === 1"
+                  >编辑</el-button
+                >
                 <el-button
                   type="danger"
                   :size="'mini'"
@@ -581,6 +636,7 @@ export default {
       attentions: '', // 关注
       fans: '', // 粉丝
       publishLimit: 5,
+      draftLimit: 5,
       favoritesLimit: 5,
       attentionsLimit: 5,
       fansLimit: 5,
@@ -588,11 +644,13 @@ export default {
       moreLoading: false,
       isAttention: false, // 是否关注
       isAttentionLoading: false, // 关注loading
-      deleteLoading: false // 删除loading
+      deleteLoading: false, // 删除loading
+      leftBarIndex: 0, // 侧边栏导航索引
+      publishCurrent: 0 // 发布栏头部导航索引
     }
   },
   computed: {
-    ...mapState(['userInfo'])
+    ...mapState(['userInfo', 'isLogin', 'userInfo'])
   },
   methods: {
     // 关注与取消
@@ -644,19 +702,20 @@ export default {
       }
     },
     // 切换选项卡
-    async checkbox (index, flag) {
+    async checkbox (index, flag, state) {
+      this.leftBarIndex = index
       if (flag) {
         this.moreLoading = true
       }
       this.isMore = true
       if (index === 1) {
-        const { data: res } = await this.axios.get('api/posts/findAuthor/' + this.author._id + '?limit=' + this.publishLimit)
+        this.publishCurrent = state === 1 ? 0 : 1
+        const { data: res } = await this.axios.get('api/posts/findAuthor/' + this.author._id + '?limit=' + (state === 1 ? this.publishLimit : this.draftLimit) + '&state=' + state)
+        this.publish = res
         if (res.length === this.publish.length) {
           if (flag) {
             this.isMore = false
           }
-        } else {
-          this.publish = res
         }
       }
       if (index === 2) {
@@ -694,8 +753,15 @@ export default {
     },
     // 加载更多
     getmroe (index) {
+      let state = ''
       if (index === 1) {
-        this.publishLimit += 5
+        if (this.publishCurrent === 0) {
+          this.publishLimit += 5
+          state = 1
+        } else if (this.publishCurrent === 1) {
+          this.draftLimit += 5
+          state = 0
+        }
       }
       if (index === 2) {
         this.favoritesLimit += 5
@@ -706,7 +772,7 @@ export default {
       if (index === 4) {
         this.fansLimit += 5
       }
-      this.checkbox(index, true)
+      this.checkbox(index, true, state)
     },
     deleteArticle (id) {
       this.$messageBox.confirm('此操作将永久删除该文章, 是否继续?', '提示', {
@@ -725,7 +791,11 @@ export default {
             type: 'success',
             message: '删除成功!'
           })
-          this.checkbox(1, false)
+          if (this.publishCurrent === 0) {
+            this.checkbox(1, false, 1)
+          } else if (this.publishCurrent === 1) {
+            this.checkbox(1, false, 0)
+          }
         } catch (err) {
           this.deleteLoading = false
           this.$message({
@@ -740,6 +810,14 @@ export default {
           message: '已取消删除'
         })
       })
+    },
+    editArticle (id) {
+      // this.$router.push({ name: 'write', params: { id: id } })
+      const routeData = this.$router.resolve({
+        name: 'write',
+        query: { id: id }
+      })
+      window.open(routeData.href, '_blank')
     },
     // 关注列表取消关注
     async cancleAttentions (id) {
@@ -829,17 +907,18 @@ export default {
   },
   async created () {
     try {
-      const { data: res } = await this.axios.get('api/login/status')
-      if (res.isLogin && res.userInfo._id === this.$route.params.id) {
+      // const { data: res } = await this.axios.get('api/login/status')
+      if (this.isLogin && this.userInfo._id === this.$route.params.id) {
         this.userSelf = true
-        this.author = res.userInfo
-        this.userAvatar = res.userInfo.avatar ? res.userInfo.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'
-        this.userThumb = res.userInfo.thumb ? res.userInfo.thumb : 'http://localhost:3000/assets/img/defaultthumb.jpg'
-        this.userEdit.nickName = res.userInfo.nickName
-        this.userEdit.email = res.userInfo.email
-        this.userEdit.gender = res.userInfo.gender
-        this.userEdit.site = res.userInfo.site
-        this.userEdit.autograph = res.userInfo.autograph
+        this.author = this.userInfo
+        this.userAvatar = this.userInfo.avatar ? this.userInfo.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'
+        this.userThumb = this.userInfo.thumb ? this.userInfo.thumb : 'http://localhost:3000/assets/img/defaultthumb.jpg'
+        this.userEdit.nickName = this.userInfo.nickName
+        this.userEdit.email = this.userInfo.email
+        this.userEdit.gender = this.userInfo.gender
+        this.userEdit.site = this.userInfo.site
+        this.userEdit.autograph = this.userInfo.autograph
+        this.$store.commit('changeuserInfo', this.userInfo)
       } else {
         try {
           const { data: res } = await this.axios.get('api/users/' + this.$route.params.id)
@@ -869,6 +948,18 @@ export default {
 }
 .nomore {
   color: #304430;
+}
+.summary {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  font-size: 12px;
+  text-align: left;
+  color: #999;
+  line-height: 1.5;
+  padding-left: 5px;
 }
 #personaCenter {
   max-width: 1440px;
@@ -941,6 +1032,15 @@ export default {
     text-align: center;
   }
 }
+
+.current-color {
+  color: #409eff;
+}
+
+.publish-current {
+  border-bottom: 2px solid #fc3c2d !important;
+}
+
 .user-main {
   display: flex;
   margin-top: -20px;
@@ -988,6 +1088,25 @@ export default {
           span:nth-last-of-type(1) {
             padding-left: 10px;
           }
+        }
+      }
+    }
+    .publish-viwe {
+      .top-nav {
+        padding: 7px;
+        border-bottom: 1px solid #f3f3f3;
+        a {
+          display: inline-block;
+          width: initial;
+          // color: #409eff;
+          padding: 5px 0;
+          margin: 0 10px;
+          font-size: 14px;
+          border-bottom: 2px solid transparent;
+        }
+        a:hover {
+          text-decoration: none;
+          border-bottom: 2px solid #fc3c2d;
         }
       }
     }

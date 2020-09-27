@@ -170,11 +170,12 @@ export default {
       },
       tagValue: '',
       tagList: [],
-      articleTitle: ''
+      articleTitle: '',
+      isEdit: false
     }
   },
   computed: {
-    ...mapState(['userInfo', 'categories', 'categoryNav', 'loginBox'])
+    ...mapState(['userInfo', 'categories', 'categoryNav', 'loginBox', 'isLogin'])
   },
   methods: {
     async uploadImg (e) {
@@ -205,7 +206,7 @@ export default {
         this.$message.error('图片切换或删除失败')
       }
     },
-    selectCategory (e) {
+    selectCategory () {
       this.currentCategory = {}
       const index = this.selectIndex
       for (const key in this.categories[index]) {
@@ -263,7 +264,6 @@ export default {
       if (this.$refs.Editor.imgList.length > 0) {
         this.$refs.Editor.imgList.forEach((item) => {
           if (this.$refs.Editor.article.indexOf(item) === -1) {
-            console.log(this.articleTitle)
             delImgList.push(item.split('uploads/')[1])
           } else {
             imgList.push(item)
@@ -294,9 +294,12 @@ export default {
       }
       try {
         await this.axios.post('api/posts', body)
-        this.$message.success('文章发布成功')
+        if (state === 1) {
+          this.$message.success('文章发布成功')
+        } else {
+          this.$message.success('以保存至草稿箱,请到(个人中心=>发布=>草稿箱)中查看')
+        }
       } catch (err) {
-        console.log(err)
         this.$message.error('文章发布失败')
       }
       this.$router.push({ name: 'home' })
@@ -323,6 +326,46 @@ export default {
           })
         }
       })
+    }
+    if (this.$route.query.id) {
+      if (this.isLogin) {
+        const { data: res } = await this.axios.get('api/posts/' + this.$route.query.id)
+        console.log(res)
+        if (res.post.author._id === this.userInfo._id) {
+          this.articleTitle = res.post.title
+          this.thumb = res.post.thumbnail
+          this.$refs.Editor.article = res.post.content
+          if (res.post.tag && res.post.tag.length > 0) {
+            res.post.tag.forEach(item => {
+              this.tagList.push(item)
+            })
+          }
+          let category = ''
+          if (!res.post.categoryChilren) {
+            category = res.post.category && res.post.category.title
+          } else {
+            res.post.category.children.forEach((item) => {
+              if (res.post.categoryChilren === item._id) {
+                category = item.childrenTitle && item.childrenTitle
+              }
+            })
+          }
+          for (let i = 0; i < this.categories.length; i++) {
+            if (this.categories[i].parentTitle === category || this.categories[i].childrenTitle === category) {
+              this.selectIndex = i
+              this.selectCategory()
+              break
+            }
+          }
+          this.isEdit = true
+        } else {
+          // 作者与登陆用户不匹配禁止编辑
+          this.$router.push({ name: 'write' })
+        }
+      } else {
+        // 未登录禁止编辑
+        this.$router.push({ name: 'write' })
+      }
     }
   },
   components: {

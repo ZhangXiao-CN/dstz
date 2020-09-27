@@ -1,7 +1,8 @@
 <template>
   <div id="write">
     <Header-View></Header-View>
-    <Write-form></Write-form>
+    <!-- header组件created判断登陆状态后,再加载文章编辑组件 -->
+    <Write-form v-if="headerIsOver"></Write-form>
     <transition name="opacityMask">
       <div class="mask" v-if="loginBox"></div>
     </transition>
@@ -24,7 +25,7 @@ export default {
     'Longin-View': LonginView
   },
   computed: {
-    ...mapState(['loginBox'])
+    ...mapState(['loginBox', 'headerIsOver'])
   }
 }
 </script>>

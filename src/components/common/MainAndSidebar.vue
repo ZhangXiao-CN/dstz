@@ -3,7 +3,7 @@
     <div class="article-wrap">
       <slot></slot>
     </div>
-    <div class="side-bar" id="sideBar" style="top: initial;">
+    <div class="side-bar" id="sideBar" style="top: initial">
       <div class="comment-news">
         <div class="side-bar-title">
           <i class="iconfont icon-xinxiaoxi"></i>
@@ -14,24 +14,31 @@
             <div class="top-info">
               <router-link
                 v-if="item.author"
-                :to="{name: 'user', params: {id: item.author._id}}"
+                :to="{ name: 'user', params: { id: item.author._id } }"
                 class="author"
               >
                 <el-avatar
-                  :src="item.author.avatar ? item.author.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
+                  :src="
+                    item.author.avatar
+                      ? item.author.avatar
+                      : 'http://localhost:3000/assets/img/defaultAvatar.png'
+                  "
                   size="small"
                 ></el-avatar>
-                <p>{{item.author.nickName}}</p>
+                <p>{{ item.author.nickName }}</p>
               </router-link>
-              <div class="create-date">{{item.createAt | filterDate}}</div>
+              <div class="create-date">{{ item.createAt | filterDate }}</div>
             </div>
             <div class="comment-text">
-              <p>{{item.content}}</p>
+              <p v-html="item.content"></p>
             </div>
             <div class="comment-from" v-if="item.post">
               <span class="comment-article">[文章]</span>
-              <router-link :to="{name: 'article', params: {id: item.post._id}}" target="_blank">
-                <p>{{item.post.title}}</p>
+              <router-link
+                :to="{ name: 'article', params: { id: item.post._id } }"
+                target="_blank"
+              >
+                <p>{{ item.post.title }}</p>
               </router-link>
             </div>
           </li>
@@ -47,12 +54,13 @@
             <div class="article-info">
               <div class="article-info-title">
                 <router-link
-                  :to="{name: 'article', params: {id: item._id}}"
+                  :to="{ name: 'article', params: { id: item._id } }"
                   target="_blank"
-                >{{item.title}}</router-link>
+                  >{{ item.title }}</router-link
+                >
               </div>
               <div class="article-info-summary">
-                <div class="summary">{{item.summary}}</div>
+                <div class="summary">{{ item.summary }}</div>
               </div>
               <div class="category-wrap">
                 <div class="category">
@@ -60,7 +68,7 @@
                   <span>{{ item | filterCategory }}</span>
                 </div>
                 <div class="hot-article-date">
-                  <span>{{item.createAt.split('T')[0]}}</span>
+                  <span>{{ item.createAt.split('T')[0] }}</span>
                 </div>
               </div>
             </div>
@@ -268,7 +276,6 @@ export default {
           text-align: left;
           p {
             font-size: 14px;
-            width: 100%;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -278,10 +285,10 @@ export default {
             height: 20px;
             vertical-align: bottom;
             margin-right: 5px;
-            img {
-              width: 100%;
-              height: 100%;
-            }
+            // img {
+            //   width: 100%;
+            //   height: 100%;
+            // }
           }
         }
         .comment-text {
