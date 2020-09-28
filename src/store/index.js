@@ -12,7 +12,11 @@ export default new Vuex.Store({
     categoryNav: [],
     categories: [],
     articleList: [],
-    currentCategory: '最新文章',
+    currentCategoryTitle: '最新文章',
+    currentCategory: '',
+    currentCategoryChilren: '',
+    articleMroe: true,
+    articleListLoading: false,
     headerIsOver: false
   },
   mutations: {
@@ -37,11 +41,23 @@ export default new Vuex.Store({
     changeArticleList (state, data) {
       state.articleList = data
     },
-    changecurrentCategory (state, data) {
-      state.articleList = data
+    changeCurrentCategoryTitle (state, data) {
+      state.currentCategoryTitle = data
     },
     changeHeaderIsOver (state, bool) {
       state.headerIsOver = bool
+    },
+    changeCurrentCategory (state, data) {
+      state.currentCategory = data
+    },
+    changeCurrentCategoryChilren (state, data) {
+      state.currentCategoryChilren = data
+    },
+    changeArticleMroe (state, bool) {
+      state.articleMroe = bool
+    },
+    changeArticleListLoading (state, bool) {
+      state.articleListLoading = bool
     }
   },
   actions: {

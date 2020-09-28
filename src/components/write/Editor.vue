@@ -11,6 +11,7 @@
       :autofocus="false"
       @imgAdd="$imgAdd"
       @imgDel="$imgDel"
+      @save="emitSave"
     ></mavon-editor>
   </div>
 </template>
@@ -88,6 +89,9 @@ export default {
       } catch (err) {
         this.$message.error('删除图片失败')
       }
+    },
+    emitSave () {
+      this.$emit('saveEvent')
     }
   }
 }

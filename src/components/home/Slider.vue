@@ -2,22 +2,35 @@
   <div id="silder">
     <div class="silder-box">
       <swiper :options="swiperOption">
-        <swiper-slide class="swiper-slide" v-for=" item in swiperList" :key="item._id">
-          <router-link :to="{name: 'article', params: {id: item._id}}" target="_blank">
+        <swiper-slide
+          class="swiper-slide"
+          v-for="item in swiperList"
+          :key="item._id"
+        >
+          <router-link
+            :to="{ name: 'article', params: { id: item._id } }"
+            target="_blank"
+          >
             <img :src="item.thumbnail" />
             <div class="silder-article">
               <div class="silder-article-category">
                 <i class="iconfont icon-fenlei"></i>
                 {{ item | filterCategory }}
               </div>
-              <div class="silder-article-title">{{item.title}}</div>
+              <div class="silder-article-title">{{ item.title }}</div>
               <div class="silder-article-author">
                 <el-avatar
-                  :src="item.author.avatar ? item.author.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
+                  :src="
+                    item.author.avatar
+                      ? item.author.avatar
+                      : 'http://localhost:3000/assets/img/defaultAvatar.png'
+                  "
                   size="small"
                 ></el-avatar>
-                <span class="silder-author">{{item.author.nickName}}</span>
-                <span class="silder-date">{{item.createAt.split('T')[0]}}</span>
+                <span class="silder-author">{{ item.author.nickName }}</span>
+                <span class="silder-date">{{
+                  item.updateAt.split('T')[0]
+                }}</span>
               </div>
             </div>
           </router-link>
@@ -27,22 +40,29 @@
       </swiper>
     </div>
     <div class="top-articles">
-      <div class="top-item" v-for=" item in fixList" :key="item._id">
-        <router-link :to="{name: 'article', params: {id: item._id}}" target="_blank">
+      <div class="top-item" v-for="item in fixList" :key="item._id">
+        <router-link
+          :to="{ name: 'article', params: { id: item._id } }"
+          target="_blank"
+        >
           <img :src="item.thumbnail" />
           <div class="silder-article">
             <div class="silder-article-category">
               <i class="iconfont icon-fenlei"></i>
               {{ item | filterCategory }}
             </div>
-            <div class="silder-article-title">{{item.title}}</div>
+            <div class="silder-article-title">{{ item.title }}</div>
             <div class="silder-article-author">
               <el-avatar
-                :src="item.author.avatar ? item.author.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
+                :src="
+                  item.author.avatar
+                    ? item.author.avatar
+                    : 'http://localhost:3000/assets/img/defaultAvatar.png'
+                "
                 size="small"
               ></el-avatar>
-              <span class="silder-author">{{item.author.nickName}}</span>
-              <span class="silder-date">{{item.createAt.split('T')[0]}}</span>
+              <span class="silder-author">{{ item.author.nickName }}</span>
+              <span class="silder-date">{{ item.createAt.split('T')[0] }}</span>
             </div>
           </div>
         </router-link>

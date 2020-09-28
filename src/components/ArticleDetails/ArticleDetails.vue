@@ -7,22 +7,33 @@
       <div class="article-attr">
         <div class="articlecategory">
           <i class="iconfont icon-fenlei"></i>
-          <span to="category">{{article | filterCategory}}</span>
+          <span to="category">{{ article | filterCategory }}</span>
           <i class="iconfont icon-browse_fill viewicon"></i>
-          <span class="viewCount">{{article.meta && article.meta.views}}</span>
-          <span class="article-date">{{article.updateAt && article.updateAt.split('T')[0]}}</span>
+          <span class="viewCount">{{
+            article.meta && article.meta.views
+          }}</span>
+          <span class="article-date">{{
+            article.updateAt && article.updateAt.split('T')[0]
+          }}</span>
         </div>
-        <div class="article-title">{{article.title && article.title}}</div>
+        <div class="article-title">{{ article.title && article.title }}</div>
       </div>
       <div class="article-author">
         <div v-if="article.author">
-          <router-link :to="{name: 'user', params: {id: article.author._id}}" class="author-wrap">
+          <router-link
+            :to="{ name: 'user', params: { id: article.author._id } }"
+            class="author-wrap"
+          >
             <el-avatar
               shape="square"
-              :src="article.author && article.author.avatar ? article.author && article.author.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
+              :src="
+                article.author && article.author.avatar
+                  ? article.author && article.author.avatar
+                  : 'http://localhost:3000/assets/img/defaultAvatar.png'
+              "
               size="medium"
             ></el-avatar>
-            <p>{{article.author && article.author.nickName}}</p>
+            <p>{{ article.author && article.author.nickName }}</p>
           </router-link>
         </div>
         <div v-if="article.author && userInfo._id !== article.author._id">
@@ -32,7 +43,8 @@
             :loading="loading === 0"
             v-if="!isAttention"
             @click="attention('attention')"
-          >关注</el-button>
+            >关注</el-button
+          >
           <el-button
             type="primary"
             size="mini"
@@ -40,10 +52,11 @@
             v-else
             @click="attention('cancelAttention')"
             class="is-attention"
-          >已关注</el-button>
+            >已关注</el-button
+          >
         </div>
         <div class="right-btn" v-else>
-          <router-link :to="{name: 'write'}">
+          <router-link :to="{ name: 'write' }">
             <i class="iconfont icon-mianxingyumaobi"></i>
             <span>写文章</span>
           </router-link>
@@ -53,7 +66,7 @@
         <mavon-editor codeStyle="monokai" v-html="article.html"></mavon-editor>
       </div>
       <div class="like">
-        <div :class="{'is-favorites ': articFavorites}">
+        <div :class="{ 'is-favorites ': articFavorites }">
           <div v-if="articFavorites" @click="favorites('cancelFavorites')">
             <i class="iconfont icon-collection_fill"></i>
             <span>已收藏</span>
@@ -64,19 +77,19 @@
           </div>
         </div>
         <div class="tags-wrap" v-if="article.tag && article.tag.length > 0">
-          <el-tag size="mini" v-for="( item, index ) in article.tag" :key="index">
+          <el-tag size="mini" v-for="(item, index) in article.tag" :key="index">
             <i class="iconfont icon-icontag"></i>
-            {{item}}
+            {{ item }}
           </el-tag>
         </div>
-        <div :class="{'is-like': articleLike}">
+        <div :class="{ 'is-like': articleLike }">
           <div v-if="articleLike" @click="fabulous('cancelFabulous')">
             <i class="iconfont icon-like_fill"></i>
-            <span>{{article.meta && article.meta.likes}}</span>
+            <span>{{ article.meta && article.meta.likes }}</span>
           </div>
           <div v-else @click="fabulous('fabulous')">
             <i class="iconfont icon-like_fill"></i>
-            <span>{{article.meta && article.meta.likes}}</span>
+            <span>{{ article.meta && article.meta.likes }}</span>
           </div>
         </div>
       </div>
@@ -84,13 +97,25 @@
     <div class="article-comment" v-if="commentFlag">
       <div class="article-comment-title">
         全部评论&nbsp;&nbsp;
-        <span>{{article.meta && article.meta.comments}}</span>&nbsp;&nbsp;
+        <span>{{ article.meta && article.meta.comments }}</span
+        >&nbsp;&nbsp;
       </div>
-      <ul class="comment-list" v-if="commentList.records && commentList.records.length > 0">
-        <li v-for=" item in commentList.records" :key="item._id" class="comment-item">
+      <ul
+        class="comment-list"
+        v-if="commentList.records && commentList.records.length > 0"
+      >
+        <li
+          v-for="item in commentList.records"
+          :key="item._id"
+          class="comment-item"
+        >
           <el-avatar
             shape="square"
-            :src="item.author.avatar ? item.author.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
+            :src="
+              item.author.avatar
+                ? item.author.avatar
+                : 'http://localhost:3000/assets/img/defaultAvatar.png'
+            "
             size="medium"
           ></el-avatar>
           <div class="comment-info">
@@ -98,12 +123,17 @@
               <div class="usermeta">
                 <div v-if="item.author && article.author">
                   <router-link
-                    :to="{name: 'user', params: {id: item.author._id}}"
+                    :to="{ name: 'user', params: { id: item.author._id } }"
                     class="username"
-                  >{{item.author.nickName}}</router-link>
-                  <span class="is-author" v-if="item.author._id === article.author._id">作者</span>
+                    >{{ item.author.nickName }}</router-link
+                  >
+                  <span
+                    class="is-author"
+                    v-if="item.author._id === article.author._id"
+                    >作者</span
+                  >
                 </div>
-                <div class="create-date">{{item.createAt | filterDate}}</div>
+                <div class="create-date">{{ item.createAt | filterDate }}</div>
               </div>
               <div class="conmment-content" v-html="item.content"></div>
               <div class="comment-tools">
@@ -113,27 +143,46 @@
                   @click="commentFabulous('cancelFabulous', item._id)"
                 >
                   <i class="iconfont icon-like_fill"></i>
-                  <span>{{item.likeCount}}</span>
+                  <span>{{ item.likeCount }}</span>
                 </button>
                 <button v-else @click="commentFabulous('fabulous', item._id)">
                   <i class="iconfont icon-like_fill"></i>
-                  <span>{{item.likeCount}}</span>
+                  <span>{{ item.likeCount }}</span>
                 </button>
-                <button @click="changereply(item._id)" class="reply-btn" v-if="reply !== item._id">
+                <button
+                  @click="changereply(item._id)"
+                  class="reply-btn"
+                  v-if="reply !== item._id"
+                >
                   <i class="iconfont icon-interactive_fill"></i>
                   <span>回复</span>
                 </button>
-                <button @click="changereply('0')" class="reply-btn" v-if="reply === item._id">
+                <button
+                  @click="changereply('0')"
+                  class="reply-btn"
+                  v-if="reply === item._id"
+                >
                   <i class="iconfont icon-interactive_fill"></i>
                   <span>取消回复</span>
                 </button>
               </div>
             </div>
-            <ul class="comment-list" v-if="item.replies && item.replies.length > 0">
-              <li v-for=" childItem in item.replies" :key="childItem._id" class="comment-item">
+            <ul
+              class="comment-list"
+              v-if="item.replies && item.replies.length > 0"
+            >
+              <li
+                v-for="childItem in item.replies"
+                :key="childItem._id"
+                class="comment-item"
+              >
                 <el-avatar
                   shape="square"
-                  :src="childItem.from_uid.avatar ? childItem.from_uid.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
+                  :src="
+                    childItem.from_uid.avatar
+                      ? childItem.from_uid.avatar
+                      : 'http://localhost:3000/assets/img/defaultAvatar.png'
+                  "
                   size="medium"
                 ></el-avatar>
                 <div class="comment-info">
@@ -142,44 +191,71 @@
                       <div class="reply-users">
                         <div v-if="childItem.from_uid && article.author">
                           <router-link
-                            :to="{name: 'user', params: {id: childItem.from_uid._id}}"
+                            :to="{
+                              name: 'user',
+                              params: { id: childItem.from_uid._id }
+                            }"
                             class="username"
-                          >{{childItem.from_uid.nickName}}</router-link>
+                            >{{ childItem.from_uid.nickName }}</router-link
+                          >
                           <span
                             class="is-author"
                             v-if="childItem.from_uid._id === article.author._id"
-                          >作者</span>
+                            >作者</span
+                          >
                         </div>
                         <div class="to-icon">@</div>
                         <div v-if="childItem.to_uid && article.author">
                           <router-link
-                            :to="{name: 'user', params: {id: childItem.to_uid._id}}"
+                            :to="{
+                              name: 'user',
+                              params: { id: childItem.to_uid._id }
+                            }"
                             class="username"
-                          >{{childItem.to_uid.nickName}}</router-link>
+                            >{{ childItem.to_uid.nickName }}</router-link
+                          >
                           <span
                             class="is-author"
                             v-if="childItem.to_uid._id === article.author._id"
-                          >作者</span>
+                            >作者</span
+                          >
                         </div>
                       </div>
-                      <div class="create-date">{{childItem.createAt | filterDate}}</div>
+                      <div class="create-date">
+                        {{ childItem.createAt | filterDate }}
+                      </div>
                     </div>
-                    <div class="conmment-content" v-html="childItem.content"></div>
+                    <div
+                      class="conmment-content"
+                      v-html="childItem.content"
+                    ></div>
                     <div class="comment-tools">
                       <button
                         class="is-like-reply"
                         v-if="childItem.islike"
-                        @click="replyFabulous('cancelReplyFabulous', item._id, childItem._id)"
+                        @click="
+                          replyFabulous(
+                            'cancelReplyFabulous',
+                            item._id,
+                            childItem._id
+                          )
+                        "
                       >
                         <i class="iconfont icon-like_fill"></i>
-                        <span>{{childItem.likeCount}}</span>
+                        <span>{{ childItem.likeCount }}</span>
                       </button>
                       <button
                         v-else
-                        @click="replyFabulous('replyFabulous', item._id, childItem._id)"
+                        @click="
+                          replyFabulous(
+                            'replyFabulous',
+                            item._id,
+                            childItem._id
+                          )
+                        "
                       >
                         <i class="iconfont icon-like_fill"></i>
-                        <span>{{childItem.likeCount}}</span>
+                        <span>{{ childItem.likeCount }}</span>
                       </button>
                       <button
                         @click="changereply(childItem._id)"
@@ -205,12 +281,19 @@
                         <el-avatar
                           shape="square"
                           :size="35"
-                          :src="userInfo.avatar ? userInfo.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
+                          :src="
+                            userInfo.avatar
+                              ? userInfo.avatar
+                              : 'http://localhost:3000/assets/img/defaultAvatar.png'
+                          "
                           v-cloak
                         ></el-avatar>
                       </div>
                       <div class="text">
-                        <Emoji @comments="getComments" :myComment="myComment"></Emoji>
+                        <Emoji
+                          @comments="getComments"
+                          :myComment="myComment"
+                        ></Emoji>
                       </div>
                     </div>
                     <div class="comment-btn">
@@ -218,9 +301,12 @@
                         type="primary"
                         :size="'mini'"
                         reply
-                        @click="createReply($event, item._id, childItem.from_uid._id)"
+                        @click="
+                          createReply($event, item._id, childItem.from_uid._id)
+                        "
                         :loading="loading === 1"
-                      >提交</el-button>
+                        >提交</el-button
+                      >
                     </div>
                   </div>
                 </div>
@@ -232,7 +318,11 @@
                   <el-avatar
                     shape="square"
                     :size="35"
-                    :src="userInfo.avatar ? userInfo.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
+                    :src="
+                      userInfo.avatar
+                        ? userInfo.avatar
+                        : 'http://localhost:3000/assets/img/defaultAvatar.png'
+                    "
                     v-cloak
                   ></el-avatar>
                 </div>
@@ -247,7 +337,8 @@
                   reply
                   @click="createReply($event, item._id, item.author._id)"
                   :loading="loading === 1"
-                >提交</el-button>
+                  >提交</el-button
+                >
               </div>
             </div>
           </div>
@@ -272,7 +363,11 @@
           <el-avatar
             shape="square"
             :size="35"
-            :src="userInfo.avatar ? userInfo.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'"
+            :src="
+              userInfo.avatar
+                ? userInfo.avatar
+                : 'http://localhost:3000/assets/img/defaultAvatar.png'
+            "
             v-cloak
           ></el-avatar>
         </div>
@@ -281,7 +376,13 @@
         </div>
       </div>
       <div class="comment-btn">
-        <el-button type="primary" :size="'mini'" @click="createComment" :loading="loading === 1">提交</el-button>
+        <el-button
+          type="primary"
+          :size="'mini'"
+          @click="createComment"
+          :loading="loading === 1"
+          >提交</el-button
+        >
       </div>
     </div>
   </div>

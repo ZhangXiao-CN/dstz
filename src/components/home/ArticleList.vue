@@ -1,91 +1,105 @@
 <template>
-  <div class="article-list-wrap" id="articleList">
-    <div class="article-category">{{ currentCategory }}</div>
-    <ul class="article-list">
-      <li class="article-item" v-for="item in articleList" :key="item._id">
-        <div class="article-info">
-          <div class="article-info-title">
-            <router-link
-              :to="{ name: 'article', params: { id: item._id } }"
-              target="_blank"
-              >{{ item.title }}</router-link
-            >
-          </div>
-          <div class="article-info-summary">
-            <div class="summary">{{ item.summary }}</div>
-          </div>
-          <div
-            class="bottom-info"
-            :class="{ 'noarticle-thumbnail': !item.thumbnail }"
-          >
-            <div class="article-info-author">
+  <div
+    class="article-list-wrap"
+    id="articleList"
+    v-loading="articleListLoading"
+  >
+    <div class="article-category">{{ currentCategoryTitle }}</div>
+    <div v-if="articleList.length > 0">
+      <ul class="article-list">
+        <li class="article-item" v-for="item in articleList" :key="item._id">
+          <div class="article-info">
+            <div class="article-info-title">
               <router-link
-                :to="{ name: 'user', params: { id: item.author._id } }"
+                :to="{ name: 'article', params: { id: item._id } }"
+                target="_blank"
+                >{{ item.title }}</router-link
               >
-                <el-avatar
-                  :src="
-                    item.author.avatar
-                      ? item.author.avatar
-                      : 'http://localhost:3000/assets/img/defaultAvatar.png'
-                  "
-                  size="small"
-                ></el-avatar>
-                <div class="silder-author">
-                  <span>{{ item.author.nickName }}</span>
+            </div>
+            <div class="article-info-summary">
+              <div class="summary">{{ item.summary }}</div>
+            </div>
+            <div
+              class="bottom-info"
+              :class="{ 'noarticle-thumbnail': !item.thumbnail }"
+            >
+              <div class="article-info-author">
+                <router-link
+                  :to="{ name: 'user', params: { id: item.author._id } }"
+                >
+                  <el-avatar
+                    :src="
+                      item.author.avatar
+                        ? item.author.avatar
+                        : 'http://localhost:3000/assets/img/defaultAvatar.png'
+                    "
+                    size="small"
+                  ></el-avatar>
+                  <div class="silder-author">
+                    <span>{{ item.author.nickName }}</span>
+                  </div>
+                </router-link>
+              </div>
+              <div class="article-attr">
+                <div class="article-info-category">
+                  <i class="iconfont icon-fenlei"></i>
+                  <span to="category">{{ item | filterCategory }}</span>
                 </div>
-              </router-link>
+              </div>
             </div>
-            <div class="article-attr">
-              <div class="article-info-category">
-                <i class="iconfont icon-fenlei"></i>
-                <span to="category">{{ item | filterCategory }}</span>
+            <div
+              class="count"
+              :class="{ 'noarticle-thumbnail': !item.thumbnail }"
+            >
+              <div class="count-box">
+                <div class="views-count">
+                  <i class="iconfont icon-browse_fill"></i>
+                  <span>{{ item.meta.views }}</span>
+                </div>
+                <div class="comment-count">
+                  <i class="iconfont icon-interactive_fill"></i>
+                  <span>{{ item.meta.comments }}</span>
+                </div>
+                <div class="likes-count">
+                  <i class="iconfont icon-like_fill"></i>
+                  <span>{{ item.meta.likes }}</span>
+                </div>
+              </div>
+              <div class="date">
+                <div>
+                  <span>{{ item.updateAt.split('T')[0] }}</span>
+                </div>
               </div>
             </div>
           </div>
-          <div
-            class="count"
-            :class="{ 'noarticle-thumbnail': !item.thumbnail }"
+          <router-link
+            :to="{ name: 'article', params: { id: item._id } }"
+            class="article-img"
+            v-if="item.thumbnail"
+            target="_blank"
           >
-            <div class="count-box">
-              <div class="views-count">
-                <i class="iconfont icon-browse_fill"></i>
-                <span>{{ item.meta.views }}</span>
-              </div>
-              <div class="comment-count">
-                <i class="iconfont icon-interactive_fill"></i>
-                <span>{{ item.meta.comments }}</span>
-              </div>
-              <div class="likes-count">
-                <i class="iconfont icon-like_fill"></i>
-                <span>{{ item.meta.likes }}</span>
-              </div>
-            </div>
-            <div class="date">
-              <div>
-                <span>{{ item.updateAt.split('T')[0] }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-        <router-link
-          :to="{ name: 'article', params: { id: item._id } }"
-          class="article-img"
-          v-if="item.thumbnail"
-          target="_blank"
-        >
-          <img :src="item.thumbnail" />
-        </router-link>
-      </li>
-    </ul>
-    <a
-      href="javascript:;"
-      class="more"
-      v-loading="loading"
-      @click="getmroe"
-      v-if="isMore"
-      >加载更多</a
-    >
-    <div href="javascript:;" class="more nomore" v-if="!isMore">没有更多了</div>
+            <img :src="item.thumbnail" />
+          </router-link>
+        </li>
+      </ul>
+      <a
+        href="javascript:;"
+        class="more"
+        v-loading="loading"
+        @click="getmroe"
+        v-if="articleMroe"
+        >加载更多</a
+      >
+      <div href="javascript:;" class="more nomore" v-if="!articleMroe">
+        没有更多了
+      </div>
+    </div>
+    <div v-else class="clean">
+      <div>
+        <p>这里很干净</p>
+        <p>什么都没有^_^|||</p>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -96,21 +110,27 @@ export default {
   data () {
     return {
       loading: false,
-      limit: 10,
-      isMore: true
+      limit: 10
     }
   },
   computed: {
-    ...mapState(['articleList', 'currentCategory'])
+    ...mapState(['articleList', 'currentCategoryTitle', 'currentCategory', 'currentCategoryChilren', 'articleMroe', 'articleListLoading'])
   },
   methods: {
     async getmroe () {
       try {
         this.loading = true
         this.limit += 10
-        const { data: res } = await this.axios.get('api/posts/lasted?limit=' + this.limit)
+        let res = ''
+        if (this.currentCategory || this.currentCategoryChilren) {
+          const data = await this.axios.get('api/posts/category?categoryID=' + this.currentCategory + '&categoryChilren=' + this.currentCategoryChilren + '&limit=' + this.limit)
+          res = data.data
+        } else {
+          const data = await this.axios.get('api/posts/lasted?limit=' + this.limit)
+          res = data.data
+        }
         if (res.length === this.articleList.length) {
-          this.isMore = false
+          this.$store.commit('changeArticleMroe', false)
           this.loading = false
         } else {
           this.$store.commit('changeArticleList', res)
@@ -123,12 +143,6 @@ export default {
     }
   },
   async created () {
-    try {
-      const { data: res } = await this.axios.get('api/posts/lasted')
-      this.$store.commit('changeArticleList', res)
-    } catch (err) {
-      this.$message.error('获取文章列表失败')
-    }
   }
 }
 </script>
@@ -330,6 +344,16 @@ export default {
       }
     }
   }
+  .clean {
+    min-height: 300px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #c1c1c1;
+    p {
+      text-align: center;
+    }
+  }
 }
 @media screen and (max-width: 1024px) {
   .article-img {
@@ -362,21 +386,21 @@ export default {
     display: none !important;
   }
   .article-category {
-    font-size: 13px !important;
+    font-size: 15px !important;
   }
   .article-info-title {
-    font-size: 13px !important;
+    font-size: 15px !important;
   }
   .summary {
-    font-size: 11px !important;
+    font-size: 15px !important;
   }
   .bottom-info i,
   .bottom-info span {
-    font-size: 11px !important;
+    font-size: 13px !important;
   }
   .count i,
   .count span {
-    font-size: 11px !important;
+    font-size: 13px !important;
   }
 }
 </style>

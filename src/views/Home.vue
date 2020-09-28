@@ -11,7 +11,7 @@
     </transition>
     <Slider></Slider>
     <Main-And-Sidebar>
-      <Article-List></Article-List>
+      <Article-List v-if="headerIsOver"></Article-List>
     </Main-And-Sidebar>
   </div>
 </template>
@@ -36,7 +36,7 @@ export default {
     'Article-List': ArticleList
   },
   computed: {
-    ...mapState(['loginBox'])
+    ...mapState(['loginBox', 'headerIsOver'])
   }
 }
 </script>

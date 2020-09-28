@@ -137,7 +137,7 @@
           v-model="articleTitle"
         ></el-input>
       </div>
-      <Editor ref="Editor"></Editor>
+      <Editor ref="Editor" @saveEvent="save"></Editor>
     </div>
     <div class="bottom-btn" id="footBtn">
       <div>
@@ -171,7 +171,7 @@ export default {
       tagValue: '',
       tagList: [],
       articleTitle: '',
-      isEdit: false
+      isEditID: ''
     }
   },
   computed: {
@@ -247,8 +247,8 @@ export default {
         })
         return
       }
-      if (this.articleTitle.trim().length === 0) {
-        this.$message.error('请输入标题')
+      if (this.articleTitle.trim().length < 2) {
+        this.$message.error('标题最少两个字符哦')
         return
       }
       if (this.$refs.Editor.article.trim().length === 0) {
@@ -256,13 +256,19 @@ export default {
         return
       }
       const author = this.userInfo._id
+      // html
       const html = this.$refs.Editor.$refs.md.d_render
+      // 纯文本
       const text = html.replace(/<(style|script|iframe)[^>]*?>[\s\S]+?<\/\1\s*>/gi, '').replace(/<[^>]+?>/g, '').replace(/\s+/g, ' ').replace(/ /g, ' ').replace(/>/g, ' ')
+      // 摘要
       const summary = text.substr(0, 70) + '...'
+      // 需要删除的图片列表
       const delImgList = []
+      // 文章中的图片列表
       const imgList = []
       if (this.$refs.Editor.imgList.length > 0) {
         this.$refs.Editor.imgList.forEach((item) => {
+          // 文章中如果查不到该图片,便加入delImgList中删除
           if (this.$refs.Editor.article.indexOf(item) === -1) {
             delImgList.push(item.split('uploads/')[1])
           } else {
@@ -270,6 +276,7 @@ export default {
           }
         })
         if (delImgList.length > 0) {
+          // 删除delImgList中的图片
           try {
             await this.axios.delete('api/deletefile/' + delImgList.join('-', ','))
             this.thumb = ''
@@ -279,37 +286,51 @@ export default {
         }
       }
       const body = {
-        author: author,
-        title: this.articleTitle,
-        state: state,
-        content: this.$refs.Editor.article,
-        text: text,
-        html: state === 1 ? html : null,
-        summary: summary,
-        category: this.currentCategory.parentId,
-        categoryChilren: this.currentCategory.childrenId ? this.currentCategory.childrenId : null,
-        thumbnail: this.thumb ? this.thumb : null,
-        tag: this.tagList.length > 0 ? this.tagList : null,
-        imgList: imgList
+        author: author, // 作者
+        title: this.articleTitle, // 标题
+        state: state, // 状态
+        content: this.$refs.Editor.article, // markdwon
+        text: text, // 纯文本
+        html: state === 1 ? html : null, // html
+        summary: summary, // 摘要
+        category: this.currentCategory.parentId, // 分类
+        categoryChilren: this.currentCategory.childrenId ? this.currentCategory.childrenId : null, // 子分类
+        thumbnail: this.thumb ? this.thumb : null, // 封面
+        tag: this.tagList.length > 0 ? this.tagList : null, // 标签列表
+        imgList: imgList // 文章中的图片列表
       }
       try {
-        await this.axios.post('api/posts', body)
+        let res = ''
+        if (this.isEditID) {
+          const { data } = await this.axios.put('api/posts/' + this.isEditID, body)
+          res = data
+        } else {
+          const { data } = await this.axios.post('api/posts', body)
+          res = data
+        }
         if (state === 1) {
           this.$message.success('文章发布成功')
+          this.$router.push({ name: 'home' })
         } else {
+          this.$message.close()
           this.$message.success('以保存至草稿箱,请到(个人中心=>发布=>草稿箱)中查看')
         }
+        this.isEditID = res._id
       } catch (err) {
         this.$message.error('文章发布失败')
       }
-      this.$router.push({ name: 'home' })
+    },
+    save () {
+      this.publish(0)
     }
   },
   async created () {
+    // 无分类数据,发起请求
     if (this.categoryNav.length === 0) {
       const { data: res } = await this.axios.get('api/categories')
       this.$store.commit('changeCategoryNav', res)
     }
+    // 无分类列表, 创建分类列表
     if (this.categories.length === 0) {
       const that = this
       this.categoryNav.forEach(function (item, index) {
@@ -327,10 +348,10 @@ export default {
         }
       })
     }
+    // 判断是否是编辑状态
     if (this.$route.query.id) {
       if (this.isLogin) {
         const { data: res } = await this.axios.get('api/posts/' + this.$route.query.id)
-        console.log(res)
         if (res.post.author._id === this.userInfo._id) {
           this.articleTitle = res.post.title
           this.thumb = res.post.thumbnail
@@ -357,7 +378,7 @@ export default {
               break
             }
           }
-          this.isEdit = true
+          this.isEditID = this.$route.query.id
         } else {
           // 作者与登陆用户不匹配禁止编辑
           this.$router.push({ name: 'write' })

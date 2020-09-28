@@ -3,7 +3,7 @@
     <div class="article-wrap">
       <slot></slot>
     </div>
-    <div class="side-bar" id="sideBar" style="top: initial">
+    <div class="side-bar" id="sideBar" style="top: 0">
       <div class="comment-news">
         <div class="side-bar-title">
           <i class="iconfont icon-xinxiaoxi"></i>
@@ -68,7 +68,7 @@
                   <span>{{ item | filterCategory }}</span>
                 </div>
                 <div class="hot-article-date">
-                  <span>{{ item.createAt.split('T')[0] }}</span>
+                  <span>{{ item.updateAt.split('T')[0] }}</span>
                 </div>
               </div>
             </div>
@@ -325,7 +325,7 @@ export default {
         .comment-from {
           display: flex;
           justify-content: flex-start;
-          font-size: 12px;
+          font-size: 13px;
           text-align: left;
           a {
             color: #999;
@@ -401,27 +401,27 @@ export default {
     font-size: 13px !important;
   }
   .article-info-title {
-    font-size: 13px !important;
+    font-size: 15px !important;
   }
   .summary {
-    font-size: 11px !important;
+    font-size: 13px !important;
   }
   .bottom-info i,
   .bottom-info span {
-    font-size: 11px !important;
+    font-size: 13px !important;
   }
   .category-wrap i,
   .category-wrap span {
-    font-size: 11px !important;
+    font-size: 13px !important;
   }
   .side-bar-title {
-    font-size: 13px !important;
+    font-size: 14px !important;
     .icon-xinxiaoxi {
-      font-size: 13px !important;
+      font-size: 14px !important;
     }
   }
   .comment-text {
-    font-size: 14px !important;
+    font-size: 15px !important;
   }
 }
 </style>

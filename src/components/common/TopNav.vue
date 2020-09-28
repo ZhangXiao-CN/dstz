@@ -4,14 +4,50 @@
       <nav class="category">
         <ul class="category-list">
           <li class="category-item">
-            <router-link to="/" class="category-link">首页</router-link>
+            <a
+              href="javascript:;"
+              class="category-link"
+              :class="{ currentIndex: currentIndex == 100 }"
+              @click="goHome"
+              >首页</a
+            >
           </li>
-          <li class="category-item" v-for="item in categoryNav" :key="item._id">
-            <router-link to="category" class="category-link">{{item.title}}</router-link>
+          <li
+            class="category-item"
+            v-for="(item, index) in categoryNav"
+            :key="item._id"
+          >
+            <a
+              href="javascript:;"
+              class="category-link"
+              :class="{ currentIndex: currentIndex == index }"
+              @click="
+                getCategoryArticle({
+                  index: index,
+                  categoryID: item._id,
+                  categoryTitle: item.title,
+                  categoryChilren: '',
+                  categoryChilrenTitle: ''
+                })
+              "
+              >{{ item.title }}</a
+            >
             <i class="iconfont icon-unfold" v-if="item.children.length > 0"></i>
             <ul v-if="item.children.length > 0">
-              <li v-for=" child in item.children" :key="child._id">
-                <router-link to="category">{{child.childrenTitle}}</router-link>
+              <li v-for="child in item.children" :key="child._id">
+                <a
+                  href="javascript:;"
+                  @click="
+                    getCategoryArticle({
+                      index: index,
+                      categoryID: '',
+                      categoryTitle: '',
+                      categoryChilren: child._id,
+                      categoryChilrenTitle: child.childrenTitle
+                    })
+                  "
+                  >{{ child.childrenTitle }}</a
+                >
               </li>
             </ul>
           </li>
@@ -33,25 +69,65 @@
     <transition name="slide">
       <div class="sidebar-bar-nav" v-show="sidebarBarNav">
         <div class="sidebar-bar-logo">
-          <router-link to="/" class="category-link">前端社</router-link>
+          <div>前端社</div>
         </div>
         <ul class="sidebar-bar-list">
           <li class="nav-item">
-            <router-link to="/" class="category-link">首页</router-link>
+            <a href="javascript:;" class="category-link" @click="goHome"
+              >首页</a
+            >
           </li>
-          <li class="category-item" v-for=" item in categoryNav" :key="item._id">
-            <router-link to="category" class="category-link">{{item.title}}</router-link>
-            <i class="iconfont icon-unfold" v-if="item.children.length > 0" @click="openChildNav"></i>
-            <ul v-if="item.children.length > 0" style="display:none;">
-              <li v-for=" child in item.children" :key="child._id">
-                <router-link to="category">{{child.childrenTitle}}</router-link>
+          <li
+            class="category-item"
+            v-for="(item, index) in categoryNav"
+            :key="item._id"
+          >
+            <a
+              href="javascript:;"
+              class="category-link"
+              :class="{ currentIndex: currentIndex == index }"
+              @click="
+                getCategoryArticle({
+                  index: index,
+                  categoryID: item._id,
+                  categoryTitle: item.title,
+                  categoryChilren: '',
+                  categoryChilrenTitle: ''
+                })
+              "
+              >{{ item.title }}</a
+            >
+            <i
+              class="iconfont icon-unfold"
+              v-if="item.children.length > 0"
+              @click="openChildNav"
+            ></i>
+            <ul v-if="item.children.length > 0" style="display: none">
+              <li v-for="child in item.children" :key="child._id">
+                <a
+                  href="javascript:;"
+                  @click="
+                    getCategoryArticle({
+                      index: index,
+                      categoryID: '',
+                      categoryTitle: '',
+                      categoryChilren: child._id,
+                      categoryChilrenTitle: child.childrenTitle
+                    })
+                  "
+                  >{{ child.childrenTitle }}</a
+                >
               </li>
             </ul>
           </li>
         </ul>
       </div>
     </transition>
-    <div class="sidebar-bar-mask" v-show="sidebarBarNav" @click.stop="SidebarBarNavShow(false)"></div>
+    <div
+      class="sidebar-bar-mask"
+      v-show="sidebarBarNav"
+      @click.stop="SidebarBarNavShow(false)"
+    ></div>
   </div>
 </template>
 
@@ -61,7 +137,8 @@ export default {
   name: 'TopNav',
   data () {
     return {
-      sidebarBarNav: false
+      sidebarBarNav: false,
+      currentIndex: 100
     }
   },
   methods: {
@@ -75,18 +152,49 @@ export default {
     },
     SidebarBarNavShow (bool) {
       this.sidebarBarNav = bool
+    },
+    async getCategoryArticle (obj) {
+      this.SidebarBarNavShow(false)
+      this.currentIndex = obj.index
+      const moveY = document.getElementById('silder').clientHeight
+      window.scrollTo(0, moveY + 10)
+      this.$store.commit('changeArticleListLoading', true)
+      try {
+        const { data: res } = await this.axios.get('api/posts/category?categoryID=' + obj.categoryID + '&categoryChilren=' + obj.categoryChilren + '&limit=10')
+        if (obj.categoryChilrenTitle) {
+          console.log(obj.categoryChilrenTitle)
+          this.$store.commit('changeCurrentCategoryTitle', obj.categoryChilrenTitle)
+        } else if (obj.categoryTitle) {
+          console.log(obj.categoryTitle)
+          this.$store.commit('changeCurrentCategoryTitle', obj.categoryTitle)
+        }
+        this.$store.commit('changeCurrentCategory', obj.categoryID)
+        this.$store.commit('changeCurrentCategoryChilren', obj.categoryChilren)
+        this.$store.commit('changeArticleList', res)
+        this.$store.commit('changeArticleMroe', true)
+        this.$store.commit('changeArticleListLoading', false)
+      } catch (err) {
+        this.$store.commit('changeArticleListLoading', false)
+      }
+    },
+    goHome () {
+      this.$router.go(0)
     }
   },
   computed: {
-    ...mapState(['categoryNav'])
+    ...mapState(['categoryNav', 'ArticleMroe', 'articleListLoading'])
   },
-  async created () {
+  created () {
+    // 文章列表放在Vuex中方便筛选
+    this.axios.get('api/posts/lasted')
+      .then(res => { this.$store.commit('changeArticleList', res.data) })
+      .catch(() => { this.$message.error('获取文章列表失败') })
     if (this.categoryNav.length > 0) {
       return
     }
-    // const that = this
-    const { data: res } = await this.axios.get('api/categories')
-    this.$store.commit('changeCategoryNav', res)
+    this.axios.get('api/categories')
+      .then(res => { this.$store.commit('changeCategoryNav', res.data) })
+      .catch(() => { this.$message.error('获取分类列表失败') })
   }
 }
 </script>
@@ -121,13 +229,19 @@ export default {
       display: flex;
       justify-content: flex-start;
       .category-item {
+        height: 100%;
         position: relative;
-        border-bottom: 2px solid transparent;
+        padding: 0 20px;
         .category-link {
-          display: inline-block;
-          padding: 13px 20px;
+          display: block;
+          height: 100%;
           font-size: 14px;
           color: #304455;
+          padding: 13px 0;
+          border-bottom: 2px solid transparent;
+        }
+        .currentIndex {
+          border-bottom-color: #409eff;
         }
         i {
           font-size: 10px;

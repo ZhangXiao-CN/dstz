@@ -68,9 +68,8 @@ export default {
       // console.log(footerClientHeight)
     }
   },
-  created () {
+  mounted () {
     this.sideScroll()
-    this.$nextTick(this.sideScroll())
     window.addEventListener('scroll', this.sideScroll)
   }
 }

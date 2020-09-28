@@ -178,7 +178,11 @@
         </ul>
       </div>
       <div class="detauls">
-        <div class="overview-viwe" v-if="tabIndex === 0">
+        <div
+          class="overview-viwe"
+          v-if="tabIndex === 0"
+          v-loading="mainLoading"
+        >
           <ul>
             <li>
               <p>
@@ -216,11 +220,7 @@
             </li>
           </ul>
         </div>
-        <div
-          class="publish-viwe"
-          v-if="tabIndex === 1"
-          v-loading="deleteLoading"
-        >
+        <div class="publish-viwe" v-if="tabIndex === 1" v-loading="mainLoading">
           <div class="top-nav">
             <a
               href="javascript:;"
@@ -238,82 +238,128 @@
             <a
               href="javascript:;"
               :class="{ 'publish-current': publishCurrent === 2 }"
-              @click="checkbox(12)"
+              @click="checkbox(1, false, 2)"
               >评论</a
             >
           </div>
-          <ul v-if="publish && publish.length > 0">
-            <li v-for="item in publish" :key="item._id">
+          <div v-if="publishCurrent !== 2" class="publish-article">
+            <ul v-if="publish.res && publish.res.length > 0">
+              <li v-for="item in publish.res" :key="item._id">
+                <div>
+                  <router-link
+                    target="_blank"
+                    :to="{ name: 'article', params: { id: item._id } }"
+                  >
+                    <p>{{ item.title }}</p>
+                  </router-link>
+                  <div
+                    data-v-5cc3ab68
+                    class="count"
+                    v-if="publishCurrent === 0"
+                  >
+                    <div data-v-5cc3ab68 class="comment-count">
+                      <i
+                        data-v-5cc3ab68
+                        class="iconfont icon-interactive_fill"
+                      ></i>
+                      <span data-v-5cc3ab68>{{
+                        item.meta && item.meta.comments
+                      }}</span>
+                    </div>
+                    <div data-v-5cc3ab68 class="views-count">
+                      <i data-v-5cc3ab68 class="iconfont icon-browse_fill"></i>
+                      <span data-v-5cc3ab68>{{
+                        item.meta && item.meta.views
+                      }}</span>
+                    </div>
+                    <div data-v-5cc3ab68 class="likes-count">
+                      <i data-v-5cc3ab68 class="iconfont icon-like_fill"></i>
+                      <span data-v-5cc3ab68>{{
+                        item.meta && item.meta.likes
+                      }}</span>
+                    </div>
+                  </div>
+                  <div class="summary" v-if="publishCurrent === 1">
+                    {{ item.summary }}
+                  </div>
+                </div>
+                <div class="btn-wrap" v-if="userSelf">
+                  <el-button
+                    type="primary"
+                    :size="'mini'"
+                    @click="editArticle(item._id)"
+                    v-if="publishCurrent === 1"
+                    >编辑</el-button
+                  >
+                  <el-button
+                    type="danger"
+                    :size="'mini'"
+                    @click="deleteArticle(item._id)"
+                    >删除</el-button
+                  >
+                </div>
+              </li>
+              <a
+                href="javascript:;"
+                class="more"
+                v-loading="moreLoading"
+                @click="getmroe(1)"
+                v-if="isMore"
+                >加载更多</a
+              >
+              <div href="javascript:;" class="more nomore" v-if="!isMore">
+                没有更多了
+              </div>
+            </ul>
+            <div v-else class="clean">
               <div>
-                <router-link
-                  target="_blank"
-                  :to="{ name: 'article', params: { id: item._id } }"
-                >
-                  <p>{{ item.title }}</p>
-                </router-link>
-                <div data-v-5cc3ab68 class="count" v-if="publishCurrent === 0">
-                  <div data-v-5cc3ab68 class="comment-count">
-                    <i
-                      data-v-5cc3ab68
-                      class="iconfont icon-interactive_fill"
-                    ></i>
-                    <span data-v-5cc3ab68>{{
-                      item.meta && item.meta.comments
-                    }}</span>
-                  </div>
-                  <div data-v-5cc3ab68 class="views-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-browse_fill"></i>
-                    <span data-v-5cc3ab68>{{
-                      item.meta && item.meta.views
-                    }}</span>
-                  </div>
-                  <div data-v-5cc3ab68 class="likes-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-like_fill"></i>
-                    <span data-v-5cc3ab68>{{
-                      item.meta && item.meta.likes
-                    }}</span>
-                  </div>
-                </div>
-                <div class="summary" v-if="publishCurrent === 1">
-                  {{ item.summary }}
-                </div>
+                <p>这里很干净</p>
+                <p>什么都没有^_^|||</p>
               </div>
-              <div class="btn-wrap" v-if="userSelf">
-                <el-button
-                  type="primary"
-                  :size="'mini'"
-                  @click="editArticle(item._id)"
-                  v-if="publishCurrent === 1"
-                  >编辑</el-button
-                >
-                <el-button
-                  type="danger"
-                  :size="'mini'"
-                  @click="deleteArticle(item._id)"
-                  >删除</el-button
-                >
-              </div>
-            </li>
-            <a
-              href="javascript:;"
-              class="more"
-              v-loading="moreLoading"
-              @click="getmroe(1)"
-              v-if="isMore"
-              >加载更多</a
-            >
-            <div href="javascript:;" class="more nomore" v-if="!isMore">
-              没有更多了
             </div>
-          </ul>
-          <div v-else class="clean">
-            <div>
-              <p>这里很干净</p>
-              <p>什么都没有^_^|||</p>
+          </div>
+          <div v-else class="publish-comment">
+            <ul v-if="comments && comments.length > 0">
+              <li v-for="(item, index) in comments" :key="index">
+                <div class="comment-date">{{ item.createAt | filterDate }}</div>
+                <div class="comment-text">
+                  <p v-html="item.content"></p>
+                </div>
+                <div class="comment-from">
+                  <span class="comment-article">[文章]</span>
+                  <router-link
+                    :to="{ name: 'article', params: { id: item.postID } }"
+                    target="_blank"
+                  >
+                    <p>{{ item.postTitle }}</p>
+                  </router-link>
+                </div>
+              </li>
+              <a
+                href="javascript:;"
+                class="more"
+                v-loading="moreLoading"
+                @click="getmroe(1)"
+                v-if="isMore"
+                >加载更多</a
+              >
+              <div href="javascript:;" class="more nomore" v-if="!isMore">
+                没有更多了
+              </div>
+            </ul>
+            <div v-else class="clean">
+              <div>
+                <p>这里很干净</p>
+                <p>什么都没有^_^|||</p>
+              </div>
             </div>
           </div>
         </div>
-        <div class="favorites-viwe" v-if="tabIndex === 2">
+        <div
+          class="favorites-viwe"
+          v-if="tabIndex === 2"
+          v-loading="mainLoading"
+        >
           <ul v-if="favorites && favorites.length > 0">
             <li v-for="item in favorites" :key="item._id">
               <div>
@@ -367,7 +413,11 @@
             </div>
           </div>
         </div>
-        <div class="attention-viwe" v-if="tabIndex === 3">
+        <div
+          class="attention-viwe"
+          v-if="tabIndex === 3"
+          v-loading="mainLoading"
+        >
           <ul v-if="attentions && attentions.length > 0">
             <li v-for="item in attentions" :key="item._id">
               <div class="attention-wrap">
@@ -425,7 +475,7 @@
             </div>
           </div>
         </div>
-        <div class="fans-viwe" v-if="tabIndex === 4">
+        <div class="fans-viwe" v-if="tabIndex === 4" v-loading="mainLoading">
           <ul v-if="fans && fans.length > 0">
             <li v-for="item in fans" :key="item._id">
               <router-link :to="{ name: 'user', params: { id: item._id } }">
@@ -473,7 +523,7 @@
             </div>
           </div>
         </div>
-        <div class="userset-viwe" v-if="tabIndex === 5">
+        <div class="userset-viwe" v-if="tabIndex === 5" v-loading="mainLoading">
           <ul>
             <li>
               <div class="input-wrap">
@@ -485,7 +535,7 @@
               <el-button
                 type="primary"
                 :size="'mini'"
-                @click="saveEdit(0)"
+                @click="saveEdit($event, 0)"
                 :loading="loading === 0"
                 >保存</el-button
               >
@@ -500,7 +550,7 @@
               <el-button
                 type="primary"
                 :size="'mini'"
-                @click="saveEdit(1)"
+                @click="saveEdit($event, 1)"
                 :loading="loading === 1"
                 >保存</el-button
               >
@@ -537,7 +587,7 @@
               <el-button
                 type="primary"
                 :size="'mini'"
-                @click="saveEdit(2)"
+                @click="saveEdit($event, 2)"
                 :loading="loading === 2"
                 >保存</el-button
               >
@@ -552,7 +602,7 @@
               <el-button
                 type="primary"
                 :size="'mini'"
-                @click="saveEdit(3)"
+                @click="saveEdit($event, 3)"
                 :loading="loading === 3"
                 >保存</el-button
               >
@@ -567,7 +617,7 @@
               <el-button
                 type="primary"
                 :size="'mini'"
-                @click="saveEdit(4)"
+                @click="saveEdit($event, 4)"
                 :loading="loading === 4"
                 >保存</el-button
               >
@@ -596,7 +646,7 @@
               <el-button
                 type="primary"
                 :size="'mini'"
-                @click="savePsaaword(5)"
+                @click="savePsaaword($event, 5)"
                 :loading="loading === 5"
                 >保存</el-button
               >
@@ -632,6 +682,7 @@ export default {
       author: {},
       loading: '',
       publish: '', // 发布
+      comments: '',
       favorites: '', // 收藏
       attentions: '', // 关注
       fans: '', // 粉丝
@@ -640,11 +691,12 @@ export default {
       favoritesLimit: 5,
       attentionsLimit: 5,
       fansLimit: 5,
+      commentLimit: 5,
       isMore: true,
       moreLoading: false,
       isAttention: false, // 是否关注
       isAttentionLoading: false, // 关注loading
-      deleteLoading: false, // 删除loading
+      mainLoading: false, // 内容loading
       leftBarIndex: 0, // 侧边栏导航索引
       publishCurrent: 0 // 发布栏头部导航索引
     }
@@ -704,17 +756,40 @@ export default {
     // 切换选项卡
     async checkbox (index, flag, state) {
       this.leftBarIndex = index
+      // flag为true代表点击的是加载更多, 为false代表点击tab栏
       if (flag) {
         this.moreLoading = true
+      } else {
+        this.mainLoading = true
       }
       this.isMore = true
       if (index === 1) {
-        this.publishCurrent = state === 1 ? 0 : 1
-        const { data: res } = await this.axios.get('api/posts/findAuthor/' + this.author._id + '?limit=' + (state === 1 ? this.publishLimit : this.draftLimit) + '&state=' + state)
-        this.publish = res
-        if (res.length === this.publish.length) {
-          if (flag) {
-            this.isMore = false
+        // 不是评论
+        if (state !== 2) {
+          this.publishCurrent = state === 1 ? 0 : 1
+          const { data: res } = await this.axios.get('api/posts/findAuthor/' + this.author._id + '?limit=' + (state === 1 ? this.publishLimit : this.draftLimit) + '&state=' + state)
+          // 给响应数据加入 state 以判断是发布文章还是草稿箱
+          const newData = { res: res, state: state }
+          // 响应数据的state, length 与已有数据 均相等, 那么说明已经没有更多数据了
+          if (newData.state === this.publish.state && newData.res.length === this.publish.res.length) {
+            if (flag) {
+              this.isMore = false
+            }
+          } else {
+            // 如果不相等, 替换已有数据
+            this.publish = newData
+          }
+        } else {
+          // 是评论
+          this.publishCurrent = state
+          const { data: res } = await this.axios.get('api/comments/find/user/' + this.author._id + '?limit=' + this.commentLimit)
+          const newData = this.filterComments(res).sort(function (a, b) { return b.createAt < a.createAt ? -1 : 1 })
+          if (newData.length === this.comments.length) {
+            if (flag) {
+              this.isMore = false
+            }
+          } else {
+            this.comments = newData
           }
         }
       }
@@ -750,6 +825,7 @@ export default {
       }
       this.tabIndex = index
       this.moreLoading = false
+      this.mainLoading = false
     },
     // 加载更多
     getmroe (index) {
@@ -761,6 +837,9 @@ export default {
         } else if (this.publishCurrent === 1) {
           this.draftLimit += 5
           state = 0
+        } else if (this.publishCurrent === 2) {
+          this.commentLimit += 5
+          state = 2
         }
       }
       if (index === 2) {
@@ -774,6 +853,30 @@ export default {
       }
       this.checkbox(index, true, state)
     },
+    filterComments (data) {
+      const newData = []
+      if (data.comment && data.comment.length > 0) {
+        data.comment.forEach(item => {
+          newData.push({
+            content: item.content,
+            createAt: item.createAt,
+            postTitle: item.post.title,
+            postID: item.post._id
+          })
+        })
+      }
+      if (data.replies && data.replies.length > 0) {
+        data.replies.forEach(item => {
+          newData.push({
+            content: item.replies.content,
+            createAt: item.replies.createAt,
+            postTitle: item.post[0].title,
+            postID: item.post[0]._id
+          })
+        })
+      }
+      return newData
+    },
     deleteArticle (id) {
       this.$messageBox.confirm('此操作将永久删除该文章, 是否继续?', '提示', {
         showClose: false,
@@ -781,12 +884,12 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(async () => {
-        this.deleteLoading = true
+        this.mainLoading = true
         try {
           await this.axios.delete('api/posts/' + id)
           const { data: res } = await this.axios.get('api/posts/findAuthor/' + this.author._id + '?limit=' + this.publishLimit)
           this.publish = res
-          this.deleteLoading = false
+          this.mainLoading = false
           this.$message({
             type: 'success',
             message: '删除成功!'
@@ -797,7 +900,7 @@ export default {
             this.checkbox(1, false, 0)
           }
         } catch (err) {
-          this.deleteLoading = false
+          this.mainLoading = false
           this.$message({
             type: 'error',
             message: '删除失败!'
@@ -878,7 +981,9 @@ export default {
         this.$message.error(err.message)
       }
     },
-    async saveEdit (index) {
+    async saveEdit (e, index) {
+      const span = e.target.getElementsByTagName('span')
+      span[0].innerHTML = ''
       this.loading = index
       try {
         const newUserForm = await this.updateUser(this.userEdit)
@@ -889,19 +994,25 @@ export default {
         this.userEdit.autograph = newUserForm.autograph
         this.$message.success('保存信息成功')
         this.loading = ''
+        span[0].innerHTML = '保存'
       } catch (error) {
         this.loading = ''
+        span[0].innerHTML = '保存'
       }
     },
-    async savePsaaword (obj, index) {
+    async savePsaaword (e, index) {
+      const span = e.target.getElementsByTagName('span')
+      span[0].innerHTML = ''
       this.loading = index
       try {
         // const newUserForm = await this.updateUser(obj)
 
         this.$message.success('保存信息成功')
         this.loading = ''
+        span[0].innerHTML = '保存'
       } catch (error) {
         this.loading = ''
+        span[0].innerHTML = '保存'
       }
     }
   },
@@ -1107,6 +1218,60 @@ export default {
         a:hover {
           text-decoration: none;
           border-bottom: 2px solid #fc3c2d;
+        }
+      }
+      .publish-comment {
+        li {
+          display: block;
+          div {
+            width: initial !important;
+          }
+          .comment-from {
+            display: flex;
+            justify-content: flex-start;
+            font-size: 12px;
+            text-align: left;
+            align-items: center;
+            padding-left: 8px;
+            a {
+              color: #999;
+              overflow: hidden;
+              p {
+                display: block;
+                width: 100%;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                -webkit-line-clamp: initial;
+                -webkit-box-orient: initial;
+              }
+            }
+            .comment-article {
+              white-space: nowrap;
+              color: #409eff;
+              margin-right: 1px;
+            }
+          }
+          .comment-text {
+            text-align: left;
+            position: relative;
+            font-size: 15px;
+            padding: 8px 5px;
+            background-color: #f5f5f5;
+            border-radius: 8px;
+            margin: 8 / 40rem;
+            margin-left: 5px;
+            margin-right: 5px;
+            p {
+              // margin: 0 5px;
+              width: 100%;
+            }
+          }
+          .comment-date {
+            font-size: 12px;
+            color: #c1c1c1;
+            padding-left: 8px;
+          }
         }
       }
     }
@@ -1375,13 +1540,6 @@ export default {
       margin: 5px 0 0 0;
       .publish-viwe,
       .favorites-viwe {
-        a {
-          overflow: hidden;
-          text-overflow: ellipsis;
-          display: -webkit-box;
-          -webkit-line-clamp: 2;
-          -webkit-box-orient: vertical;
-        }
         .btn-wrap {
           display: flex;
           flex-direction: column;
