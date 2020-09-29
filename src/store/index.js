@@ -12,11 +12,14 @@ export default new Vuex.Store({
     categoryNav: [],
     categories: [],
     articleList: [],
-    currentCategoryTitle: '最新文章',
+    currentCategoryTitle: '<i class="iconfont icon-zuixin"></i>最新文章',
     currentCategory: '',
     currentCategoryChilren: '',
     articleMroe: true,
     articleListLoading: false,
+    articleSearch: '',
+    articleLimit: 10,
+    backShow: false,
     headerIsOver: false
   },
   mutations: {
@@ -58,6 +61,15 @@ export default new Vuex.Store({
     },
     changeArticleListLoading (state, bool) {
       state.articleListLoading = bool
+    },
+    changeArticleSearch (state, data) {
+      state.articleSearch = data
+    },
+    changeArticleLimit (state, data) {
+      state.articleLimit = data
+    },
+    changeBackShow (state, bool) {
+      state.backShow = bool
     }
   },
   actions: {

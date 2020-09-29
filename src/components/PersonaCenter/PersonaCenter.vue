@@ -982,8 +982,6 @@ export default {
       }
     },
     async saveEdit (e, index) {
-      const span = e.target.getElementsByTagName('span')
-      span[0].innerHTML = ''
       this.loading = index
       try {
         const newUserForm = await this.updateUser(this.userEdit)
@@ -994,25 +992,35 @@ export default {
         this.userEdit.autograph = newUserForm.autograph
         this.$message.success('保存信息成功')
         this.loading = ''
-        span[0].innerHTML = '保存'
       } catch (error) {
         this.loading = ''
-        span[0].innerHTML = '保存'
       }
     },
     async savePsaaword (e, index) {
-      const span = e.target.getElementsByTagName('span')
-      span[0].innerHTML = ''
       this.loading = index
       try {
-        // const newUserForm = await this.updateUser(obj)
-
-        this.$message.success('保存信息成功')
+        const { data: res } = await this.axios.put('api/users/password', {
+          userPass: this.oldPassword,
+          newPass: this.newPassword,
+          confirmPass: this.repeatPassword
+        })
+        if (res.state) {
+          this.$message.success('密码修改成功')
+          this.loading = ''
+          await this.axios.post('api/logout')
+          this.$message.success('请重新登录')
+          this.$store.commit('changeIsLogin', false)
+          this.$store.commit('changeuserInfo', {})
+          this.userSelf = false
+          this.tabIndex = 0
+          this.oldPassword = ''
+          this.newPassword = ''
+          this.repeatPassword = ''
+          this.$store.commit('changeLoginBox', true)
+        }
+      } catch (err) {
+        this.$message.error(err.message)
         this.loading = ''
-        span[0].innerHTML = '保存'
-      } catch (error) {
-        this.loading = ''
-        span[0].innerHTML = '保存'
       }
     }
   },

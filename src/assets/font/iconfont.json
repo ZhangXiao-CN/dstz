@@ -433,6 +433,13 @@
       "unicode_decimal": 58912
     },
     {
+      "icon_id": "13280766",
+      "name": "最新",
+      "font_class": "zuixin",
+      "unicode": "e849",
+      "unicode_decimal": 59465
+    },
+    {
       "icon_id": "16367924",
       "name": "面性羽毛笔",
       "font_class": "mianxingyumaobi",

@@ -159,18 +159,18 @@ export default {
       const moveY = document.getElementById('silder').clientHeight
       window.scrollTo(0, moveY + 10)
       this.$store.commit('changeArticleListLoading', true)
+      this.$store.commit('changeArticleLimit', 10)
       try {
-        const { data: res } = await this.axios.get('api/posts/category?categoryID=' + obj.categoryID + '&categoryChilren=' + obj.categoryChilren + '&limit=10')
+        const { data: res } = await this.axios.get('api/posts/category?categoryID=' + obj.categoryID + '&categoryChilren=' + obj.categoryChilren + '&limit=' + this.articleLimit)
         if (obj.categoryChilrenTitle) {
-          console.log(obj.categoryChilrenTitle)
-          this.$store.commit('changeCurrentCategoryTitle', obj.categoryChilrenTitle)
+          this.$store.commit('changeCurrentCategoryTitle', '<i class="iconfont icon-fenlei"></i>' + obj.categoryChilrenTitle)
         } else if (obj.categoryTitle) {
-          console.log(obj.categoryTitle)
-          this.$store.commit('changeCurrentCategoryTitle', obj.categoryTitle)
+          this.$store.commit('changeCurrentCategoryTitle', '<i class="iconfont icon-fenlei"></i>' + obj.categoryTitle)
         }
         this.$store.commit('changeCurrentCategory', obj.categoryID)
         this.$store.commit('changeCurrentCategoryChilren', obj.categoryChilren)
         this.$store.commit('changeArticleList', res)
+        this.$store.commit('changeBackShow', true)
         this.$store.commit('changeArticleMroe', true)
         this.$store.commit('changeArticleListLoading', false)
       } catch (err) {
@@ -182,13 +182,9 @@ export default {
     }
   },
   computed: {
-    ...mapState(['categoryNav', 'ArticleMroe', 'articleListLoading'])
+    ...mapState(['categoryNav', 'ArticleMroe', 'articleListLoading', 'articleLimit'])
   },
   created () {
-    // 文章列表放在Vuex中方便筛选
-    this.axios.get('api/posts/lasted')
-      .then(res => { this.$store.commit('changeArticleList', res.data) })
-      .catch(() => { this.$message.error('获取文章列表失败') })
     if (this.categoryNav.length > 0) {
       return
     }

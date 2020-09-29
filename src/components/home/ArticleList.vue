@@ -4,7 +4,19 @@
     id="articleList"
     v-loading="articleListLoading"
   >
-    <div class="article-category">{{ currentCategoryTitle }}</div>
+    <div class="article-category-box">
+      <div class="article-category" v-html="currentCategoryTitle"></div>
+      <div>
+        <el-button
+          type="primary"
+          size="small"
+          plain
+          v-if="backShow"
+          @click="goBack"
+          >返回</el-button
+        >
+      </div>
+    </div>
     <div v-if="articleList.length > 0">
       <ul class="article-list">
         <li class="article-item" v-for="item in articleList" :key="item._id">
@@ -109,24 +121,39 @@ export default {
   name: 'ArticleList',
   data () {
     return {
-      loading: false,
-      limit: 10
+      loading: false
     }
   },
   computed: {
-    ...mapState(['articleList', 'currentCategoryTitle', 'currentCategory', 'currentCategoryChilren', 'articleMroe', 'articleListLoading'])
+    ...mapState([
+      'articleList',
+      'currentCategoryTitle',
+      'currentCategory',
+      'currentCategoryChilren',
+      'articleMroe',
+      'articleListLoading',
+      'articleSearch',
+      'articleLimit',
+      'backShow'
+    ])
   },
   methods: {
     async getmroe () {
       try {
         this.loading = true
-        this.limit += 10
+        this.$store.commit('changeArticleLimit', this.articleLimit + 10)
         let res = ''
+        // 是分类
         if (this.currentCategory || this.currentCategoryChilren) {
-          const data = await this.axios.get('api/posts/category?categoryID=' + this.currentCategory + '&categoryChilren=' + this.currentCategoryChilren + '&limit=' + this.limit)
+          const data = await this.axios.get('api/posts/category?categoryID=' + this.currentCategory + '&categoryChilren=' + this.currentCategoryChilren + '&limit=' + this.articleLimit)
           res = data.data
+          // 是搜索
+        } else if (this.articleSearch) {
+          const data = await this.axios.get('api/posts/search/' + this.articleSearch + '?limit=' + this.articleLimit)
+          res = data.data
+          // 都不是就是最新文章
         } else {
-          const data = await this.axios.get('api/posts/lasted?limit=' + this.limit)
+          const data = await this.axios.get('api/posts/lasted?limit=' + this.articleLimit)
           res = data.data
         }
         if (res.length === this.articleList.length) {
@@ -140,14 +167,37 @@ export default {
         this.$message.error(err)
         this.loading = false
       }
+    },
+    async goBack () {
+      try {
+        const moveY = document.getElementById('silder').clientHeight
+        // 滚动到主页面
+        window.scrollTo(0, moveY + 10)
+        this.$store.commit('changeArticleListLoading', true)
+        this.$store.commit('changeArticleLimit', 10)
+        const { data: res } = await this.axios.get('api/posts/lasted?limit=' + this.articleLimit)
+        this.$store.commit('changeCurrentCategory', '')
+        this.$store.commit('changeCurrentCategoryChilren', '')
+        this.$store.commit('changeCurrentCategoryTitle', '<i class="iconfont icon-zuixin"></i>最新文章')
+        this.$store.commit('changeArticleList', res)
+        this.$store.commit('changeBackShow', false)
+        this.$store.commit('changeArticleListLoading', false)
+        this.$store.commit('changeArticleMroe', true)
+      } catch (err) {
+        this.$message('获取文章失败')
+        this.$store.commit('changeArticleListLoading', false)
+      }
     }
-  },
-  async created () {
   }
 }
 </script>
 
 <style lang="less" scoped>
+.article-category-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 .more {
   display: block;
   text-align: center;
@@ -164,10 +214,15 @@ export default {
   border-radius: 8px;
   padding: 15 / 40rem 20 / 40rem 0 20 / 40rem;
   .article-category {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: #ecad9e;
     text-align: left;
-    font-size: 18 / 40rem;
+    font-size: 20 / 40rem;
     border-bottom: 1px solid #f3f3f3;
     padding-bottom: 15 / 40rem;
+    padding-right: 10px;
   }
   .article-list {
     text-align: left;
@@ -386,7 +441,7 @@ export default {
     display: none !important;
   }
   .article-category {
-    font-size: 15px !important;
+    font-size: 17px !important;
   }
   .article-info-title {
     font-size: 15px !important;

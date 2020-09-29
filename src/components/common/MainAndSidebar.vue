@@ -235,6 +235,7 @@ export default {
       .iconfont {
         margin-right: 5px;
         font-size: 16 / 40rem;
+        color: #a2e1d4;
       }
     }
     .hot-article {

@@ -29,8 +29,13 @@
             v-model="searchText"
             class="search"
             size="mini"
+            @keyup.native.enter="searchArticle"
           >
-            <i slot="prefix" class="iconfont icon-search"></i>
+            <i
+              slot="prefix"
+              class="iconfont icon-search"
+              @click="searchArticle"
+            ></i>
           </el-input>
           <div class="login-btn-wrap" v-if="!isLogin">
             <button class="login-btn" @click="popUpLoginBox(false)">
@@ -180,10 +185,42 @@ export default {
     },
     goWrite () {
       this.$router.push({ name: 'write' })
+    },
+    async searchArticle () {
+      if (this.searchText.trim().length === 0) {
+        this.$message.error('搜索关键词不能为空哦')
+        return
+      }
+      if (this.$route.name !== 'home') {
+        const routeData = this.$router.resolve({
+          name: 'home',
+          query: { search: this.searchText }
+        })
+        window.open(routeData.href, '_blank')
+      }
+      try {
+        const moveY = document.getElementById('silder').clientHeight
+        // 滚动到主页面
+        window.scrollTo(0, moveY + 10)
+        this.$store.commit('changeArticleListLoading', true)
+        this.$store.commit('changeArticleLimit', 10)
+        const { data: res } = await this.axios.get('api/posts/search/' + this.searchText + '?limit=' + this.articleLimit)
+        this.$store.commit('changeCurrentCategory', '')
+        this.$store.commit('changeCurrentCategoryChilren', '')
+        this.$store.commit('changeArticleSearch', this.searchText)
+        this.$store.commit('changeCurrentCategoryTitle', '<i class="iconfont icon-sousuo"></i>' + this.searchText)
+        this.$store.commit('changeArticleList', res)
+        this.$store.commit('changeBackShow', true)
+        this.$store.commit('changeArticleListLoading', false)
+        this.$store.commit('changeArticleMroe', true)
+      } catch (err) {
+        this.$message('搜索失败!')
+        this.$store.commit('changeArticleListLoading', false)
+      }
     }
   },
   computed: {
-    ...mapState(['isLogin', 'userInfo'])
+    ...mapState(['isLogin', 'userInfo', 'articleLimit'])
   },
   async created () {
     try {
@@ -200,6 +237,17 @@ export default {
       this.$message.error('无法判断是否登录')
     }
     this.$store.commit('changeHeaderIsOver', true)
+    if (this.$route.name === 'home') {
+      if (this.$route.query.search && this.$route.query.search.trim().length > 0) {
+        this.searchText = this.$route.query.search
+        this.searchArticle()
+      } else {
+        // 文章列表放在Vuex中方便筛选
+        this.axios.get('api/posts/lasted?limit=' + this.articleLimit)
+          .then(res => { this.$store.commit('changeArticleList', res.data) })
+          .catch(() => { this.$message.error('获取文章列表失败') })
+      }
+    }
   }
 }
 </script>>
