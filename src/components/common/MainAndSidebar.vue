@@ -1,79 +1,82 @@
 <template>
-  <div id="mainAndSidebar" class="clearfix">
+  <!-- class="clearfix" -->
+  <div id="mainAndSidebar" style="height: initial">
     <div class="article-wrap">
       <slot></slot>
     </div>
-    <div class="side-bar" id="sideBar" style="top: 0">
-      <div class="comment-news">
-        <div class="side-bar-title">
-          <i class="iconfont icon-xinxiaoxi"></i>
-          <span>最新评论</span>
-        </div>
-        <ul v-if="latestedComment && latestedComment.length > 0">
-          <li v-for="item in latestedComment" :key="item._id">
-            <div class="top-info">
-              <router-link
-                v-if="item.author"
-                :to="{ name: 'user', params: { id: item.author._id } }"
-                class="author"
-              >
-                <el-avatar
-                  :src="
-                    item.author.avatar
-                      ? item.author.avatar
-                      : 'http://localhost:3000/assets/img/defaultAvatar.png'
-                  "
-                  size="small"
-                ></el-avatar>
-                <p>{{ item.author.nickName }}</p>
-              </router-link>
-              <div class="create-date">{{ item.createAt | filterDate }}</div>
-            </div>
-            <div class="comment-text">
-              <p v-html="item.content"></p>
-            </div>
-            <div class="comment-from" v-if="item.post">
-              <span class="comment-article">[文章]</span>
-              <router-link
-                :to="{ name: 'article', params: { id: item.post._id } }"
-                target="_blank"
-              >
-                <p>{{ item.post.title }}</p>
-              </router-link>
-            </div>
-          </li>
-        </ul>
-      </div>
-      <div class="hot-article">
-        <div class="side-bar-title">
-          <i class="iconfont icon-praise"></i>
-          <span>热门文章</span>
-        </div>
-        <ul v-if="hotArticles && hotArticles.length > 0">
-          <li v-for="item in hotArticles" :key="item.id">
-            <div class="article-info">
-              <div class="article-info-title">
+    <div class="side-bar-wrap" id="sideBarWrap">
+      <div class="side-bar" id="sideBar" style="margin-top: 0">
+        <div class="comment-news">
+          <div class="side-bar-title">
+            <i class="iconfont icon-xinxiaoxi"></i>
+            <span>最新评论</span>
+          </div>
+          <ul v-if="latestedComment && latestedComment.length > 0">
+            <li v-for="item in latestedComment" :key="item._id">
+              <div class="top-info">
                 <router-link
-                  :to="{ name: 'article', params: { id: item._id } }"
-                  target="_blank"
-                  >{{ item.title }}</router-link
+                  v-if="item.author"
+                  :to="{ name: 'user', params: { id: item.author._id } }"
+                  class="author"
                 >
+                  <el-avatar
+                    :src="
+                      item.author.avatar
+                        ? item.author.avatar
+                        : 'http://localhost:3000/assets/img/defaultAvatar.png'
+                    "
+                    size="small"
+                  ></el-avatar>
+                  <p>{{ item.author.nickName }}</p>
+                </router-link>
+                <div class="create-date">{{ item.createAt | filterDate }}</div>
               </div>
-              <div class="article-info-summary">
-                <div class="summary">{{ item.summary }}</div>
+              <div class="comment-text">
+                <p v-html="item.content"></p>
               </div>
-              <div class="category-wrap">
-                <div class="category">
-                  <i class="iconfont icon-fenlei"></i>
-                  <span>{{ item | filterCategory }}</span>
+              <div class="comment-from" v-if="item.post">
+                <span class="comment-article">[文章]</span>
+                <router-link
+                  :to="{ name: 'article', params: { id: item.post._id } }"
+                  target="_blank"
+                >
+                  <p>{{ item.post.title }}</p>
+                </router-link>
+              </div>
+            </li>
+          </ul>
+        </div>
+        <div class="hot-article">
+          <div class="side-bar-title">
+            <i class="iconfont icon-praise"></i>
+            <span>热门文章</span>
+          </div>
+          <ul v-if="hotArticles && hotArticles.length > 0">
+            <li v-for="item in hotArticles" :key="item.id">
+              <div class="article-info">
+                <div class="article-info-title">
+                  <router-link
+                    :to="{ name: 'article', params: { id: item._id } }"
+                    target="_blank"
+                    >{{ item.title }}</router-link
+                  >
                 </div>
-                <div class="hot-article-date">
-                  <span>{{ item.updateAt.split('T')[0] }}</span>
+                <div class="article-info-summary">
+                  <div class="summary">{{ item.summary }}</div>
+                </div>
+                <div class="category-wrap">
+                  <div class="category">
+                    <i class="iconfont icon-fenlei"></i>
+                    <span>{{ item | filterCategory }}</span>
+                  </div>
+                  <div class="hot-article-date">
+                    <span>{{ item.updateAt.split('T')[0] }}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </li>
-        </ul>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>
@@ -81,6 +84,7 @@
 
 <script>
 export default {
+  inject: ['sideScroll'],
   name: 'MainAndSidebar',
   data () {
     return {
@@ -93,25 +97,43 @@ export default {
   created () {
     this.axios.get('api/comments/find/lasted').then(res => {
       this.latestedComment = res.data
-    }).catch(() => {
+    }).catch((err) => {
       this.$message.error('获取最新评论失败! 请刷新后重试, 或联系站长')
+      return err
     })
     this.axios.get('api/posts/recommend').then(res => {
       this.hotArticles = res.data
-    }).catch(() => {
+    }).catch((err) => {
       this.$message.error('获取热门文章失败! 请刷新后重试, 或联系站长')
+      return err
     })
+  },
+  mounted () {
+    // // this.sideScroll()
+    // this.$nextTick(() => {
+    //   // this.sideScroll()
+    //   const sideBar = document.getElementById('sideBar')
+    //   const mainAndSidebar = document.getElementById('mainAndSidebar') // 父盒子
+    //   const mainAndSidebarHeigth = mainAndSidebar.offsetHeight // 父盒子高度
+    //   const sidBarHeigth = sideBar.offsetHeight // 子盒子的高度
+    //   console.log(mainAndSidebarHeigth)
+    //   console.log(sidBarHeigth)
+    //   if (mainAndSidebarHeigth < sidBarHeigth) {
+    //     mainAndSidebar.style.height = sidBarHeigth + 'px'
+    //   }
+    // })
   }
 }
 </script>
 
 <style lang="less" scoped>
 #mainAndSidebar {
-  // display: flex;
-  // justify-content: flex-start;
+  display: flex;
+  justify-content: flex-start;
+  // align-items: center;
   max-width: 1440px;
   margin: 0 auto;
-  position: relative;
+  // position: relative;
   margin-top: 10px;
   .top-info {
     display: flex;
@@ -122,10 +144,10 @@ export default {
     }
   }
   .article-wrap {
-    float: left;
+    // float: left;
     width: 69.7%;
     // flex: 7;
-    margin-right: 30%;
+    // margin-right: 30%;
   }
   .article-info {
     a {
@@ -219,13 +241,15 @@ export default {
     }
   }
 
-  .side-bar {
+  .side-bar-wrap {
     // flex: 3;
     width: 29.6%;
     margin-left: 10px;
-    position: absolute;
-    float: right;
-    right: 0;
+    position: relative;
+    // float: right;
+    .side-bar {
+      // position: absolute;
+    }
     .side-bar-title {
       text-align: left;
       border-bottom: 1px solid #f5f5f5;
@@ -248,12 +272,12 @@ export default {
         border-bottom: 1px solid #f5f5f5;
       }
       .article-info-title {
-        font-size: 14px;
+        font-size: 14.5px;
         text-align: left;
         font-weight: 400;
       }
       .article-info-summary {
-        font-size: 12px;
+        font-size: 13px;
         margin: 0;
         text-align: left;
       }
@@ -295,7 +319,7 @@ export default {
         .comment-text {
           text-align: left;
           position: relative;
-          font-size: 15 / 40rem;
+          font-size: 14.5px;
           padding: 8px 3px;
           background-color: #f5f5f5;
           border-radius: 8px;
@@ -377,7 +401,7 @@ export default {
     flex: initial !important;
     width: initial !important;
   }
-  .side-bar {
+  .side-bar-wrap {
     float: none !important;
     position: relative !important;
     bottom: initial !important;

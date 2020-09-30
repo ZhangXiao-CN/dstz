@@ -651,16 +651,19 @@ export default {
       if (this.isLogin) {
         this.axios.get('api/users/isAttention/' + this.article.author._id).then(res => {
           this.isAttention = res.data.isAttention
-        }).catch(() => {
+        }).catch((err) => {
+          return err
         })
       }
-    }).catch(() => {
+    }).catch((err) => {
       this.$message.error('获取文章失败! 请刷新后重试, 或联系站长')
+      return err
     })
     this.axios.get('api/comments/' + this.$route.params.id).then(res => {
       this.commentList = res.data.records.length > 0 ? res.data : ''
-    }).catch(() => {
+    }).catch((err) => {
       this.$message.error('获取评论列表失败! 请刷新后重试, 或联系站长')
+      return err
     })
   }
 }

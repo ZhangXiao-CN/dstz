@@ -38,37 +38,38 @@ export default {
       if (!sideBar) {
         return
       }
-      const mainAndSidebar = document.getElementById('mainAndSidebar') // 父盒子
-      const mainAndSidebarHeigth = mainAndSidebar.offsetHeight // 父盒子高度
+      const sideBarWrap = document.getElementById('sideBarWrap') // 父盒子
+      const sideBarWrapHeigth = sideBarWrap.offsetHeight // 父盒子高度
       const sidBarHeigth = sideBar.offsetHeight // 子盒子的高度
-      if (mainAndSidebarHeigth < sidBarHeigth) {
-        mainAndSidebar.style.height = sidBarHeigth + 'px'
-      }
-      const mainAndSidebarOffsetTop = mainAndSidebar.offsetTop // 盒子距顶部
+      // if (sideBarWrapHeigth < sidBarHeigth) {
+      //   sideBarWrap.style.height = sidBarHeigth + 'px'
+      // }
+      const sideBarWrapOffsetTop = sideBarWrap.offsetTop // 盒子距顶部
       const scrollTop = document.body.scrollTop + document.documentElement.scrollTop // 卷去高度
       const clientHeight = document.documentElement.clientHeight // 可视区高度
       // 距离顶部的高度 + 自身的高度 - 可视区的高度 = 需要被卷去的距离
-      const moveY = mainAndSidebarOffsetTop + sidBarHeigth - clientHeight // 需要被卷去的距离
+      const moveY = sideBarWrapOffsetTop + sidBarHeigth - clientHeight // 需要被卷去的距离
+      console.log(moveY)
+      console.log(scrollTop)
       const footer = document.getElementById('footer')
       const footerClientHeight = footer.offsetTop - scrollTop // footer距顶部
       if (scrollTop > moveY) {
-        // console.log(sideBar.style.top)
-        // footer 距窗口高度大于可视区时,移动盒子
+        console.log(1)
         if (footerClientHeight > clientHeight) {
-          sideBar.style.top = scrollTop - moveY + 'px' // 记得加单位
+          console.log(2)
+          sideBar.style.marginTop = scrollTop - moveY + 'px' // 记得加单位
         } else {
           // 否则定位到最底部
-          if (mainAndSidebarHeigth > sidBarHeigth) {
-            sideBar.style.top = mainAndSidebar.offsetHeight - sidBarHeigth + 'px' // 记得加单位
+          if (sideBarWrapHeigth > sidBarHeigth) {
+            sideBar.style.marginTop = sideBarWrap.offsetHeight - sidBarHeigth + 'px' // 记得加单位
           }
         }
       } else {
-        sideBar.style.top = 0
+        sideBar.style.marginTop = 0
       }
-      // console.log(footerClientHeight)
     }
   },
-  created () {
+  mounted () {
     this.sideScroll()
     // this.$nextTick(() => {
     //   this.sideScroll()

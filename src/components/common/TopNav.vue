@@ -170,6 +170,7 @@ export default {
         this.$store.commit('changeCurrentCategory', obj.categoryID)
         this.$store.commit('changeCurrentCategoryChilren', obj.categoryChilren)
         this.$store.commit('changeArticleList', res)
+        this.$store.commit('changeIsSearch', false)
         this.$store.commit('changeBackShow', true)
         this.$store.commit('changeArticleMroe', true)
         this.$store.commit('changeArticleListLoading', false)
@@ -178,7 +179,7 @@ export default {
       }
     },
     goHome () {
-      this.$router.go(0)
+      this.$router.push({ name: 'home' })
     }
   },
   computed: {
@@ -190,7 +191,10 @@ export default {
     }
     this.axios.get('api/categories')
       .then(res => { this.$store.commit('changeCategoryNav', res.data) })
-      .catch(() => { this.$message.error('获取分类列表失败') })
+      .catch((err) => {
+        this.$message.error('获取分类列表失败')
+        return err
+      })
   }
 }
 </script>

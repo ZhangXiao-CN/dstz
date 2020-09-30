@@ -20,6 +20,7 @@ export default new Vuex.Store({
     articleSearch: '',
     articleLimit: 10,
     backShow: false,
+    isSearch: false,
     headerIsOver: false
   },
   mutations: {
@@ -70,6 +71,9 @@ export default new Vuex.Store({
     },
     changeBackShow (state, bool) {
       state.backShow = bool
+    },
+    changeIsSearch (state, bool) {
+      state.isSearch = bool
     }
   },
   actions: {

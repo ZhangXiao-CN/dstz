@@ -907,11 +907,12 @@ export default {
           })
           this.checkbox(1, false)
         }
-      }).catch(() => {
+      }).catch((err) => {
         this.$message({
           type: 'info',
           message: '已取消删除'
         })
+        return err
       })
     },
     editArticle (id) {

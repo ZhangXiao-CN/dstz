@@ -180,6 +180,7 @@ export default {
         this.$store.commit('changeCurrentCategoryChilren', '')
         this.$store.commit('changeCurrentCategoryTitle', '<i class="iconfont icon-zuixin"></i>最新文章')
         this.$store.commit('changeArticleList', res)
+        this.$store.commit('changeIsSearch', false)
         this.$store.commit('changeBackShow', false)
         this.$store.commit('changeArticleListLoading', false)
         this.$store.commit('changeArticleMroe', true)

@@ -4,33 +4,43 @@ import router from './router'
 import store from './store'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
-import './plugins/element.js'
+// import './plugins/element.js'
 import './assets/css/global.less'
 import './assets/font/iconfont.css'
 // 引入 MarkDown 编辑器
-import mavonEditor from 'mavon-editor'
+import MavonEditor from 'mavon-editor'
 // 引入 MarkDown 编辑器 样式
-import 'mavon-editor/dist/css/index.css'
+// import 'mavon-editor/dist/css/index.css'
 // 引入vue-awesome-swiper
-import vueSwiper from 'vue-awesome-swiper'
+import VueAwesomeSwiper from 'vue-awesome-swiper'
 // 引入swiper样式
-import 'swiper/css/swiper.css'
+// import 'swiper/css/swiper.css'
 // import 'swiper/swiper-bundle.css'
+// 引入顶部进度条
+import NProgress from 'nprogress'
+// import 'nprogress/nprogress.css'
+
 Vue.config.productionTip = false
 // 定义axios默认地址
 axios.defaults.baseURL = 'http://localhost:3000/'
 // 设置带上Cookie 需配合后端设置
 axios.defaults.withCredentials = true
+axios.interceptors.request.use(function (req) {
+  NProgress.start()
+  return req
+})
 // 利用拦截器捕获axios错误或异常
 axios.interceptors.response.use(function (res) {
+  NProgress.done()
   return res
 }, function (err) {
+  NProgress.done()
   return Promise.reject(err.response.data)
 })
 
 Vue.use(VueAxios, axios)
-Vue.use(mavonEditor)
-Vue.use(vueSwiper)
+Vue.use(MavonEditor)
+Vue.use(VueAwesomeSwiper)
 
 Vue.filter('filterCategory', (article) => {
   let category = ''

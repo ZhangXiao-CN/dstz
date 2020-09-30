@@ -4,12 +4,12 @@
       <div class="header-top-wrap">
         <div class="top-left">
           <div class="logo">
-            <router-link to="/" @click.native="reloadSelf">
+            <a href="javascript:;" @click="reloadSelf">
               <img class="logon-img" src="../../assets/images/logo.png" />
-            </router-link>
+            </a>
           </div>
           <div class="samll-logo">
-            <router-link to="/" @click.native="reloadSelf">前端社</router-link>
+            <a href="javascript:;" @click="reloadSelf">前端社</a>
           </div>
           <div class="header-link">
             <div>
@@ -108,7 +108,7 @@
                     </router-link>
                   </li>
                   <li>
-                    <router-link to="news">
+                    <router-link to="write">
                       <div>
                         <i class="iconfont icon-remind"></i>
                       </div>
@@ -163,7 +163,12 @@ export default {
   },
   methods: {
     reloadSelf () {
-      this.$router.go(0)
+      console.log(this.$route.query.search)
+      if (this.$route.query.search) {
+        this.$router.push({ path: '/', query: {} })
+      } else {
+        this.$router.go(0)
+      }
     },
     popUpLoginBox (bool) {
       this.$store.commit('changeRegShow', bool)
@@ -187,6 +192,7 @@ export default {
       this.$router.push({ name: 'write' })
     },
     async searchArticle () {
+      this.$store.commit('changeIsSearch', true)
       if (this.searchText.trim().length === 0) {
         this.$message.error('搜索关键词不能为空哦')
         return
@@ -220,7 +226,29 @@ export default {
     }
   },
   computed: {
-    ...mapState(['isLogin', 'userInfo', 'articleLimit'])
+    ...mapState(['isLogin', 'userInfo', 'articleLimit', 'isSearch'])
+  },
+  watch: {
+    isSearch () {
+      if (!this.isSearch) {
+        this.searchText = ''
+      }
+    },
+    $route (to, from) {
+      if (this.$route.name === 'home') {
+        if (to.query.search) {
+          if (to.query !== from.query) {
+            this.searchText = to.query.search
+            this.searchArticle()
+          }
+        } else {
+          if (to.query !== from.query) {
+            this.searchText = to.query.search
+            this.$router.go(0)
+          }
+        }
+      }
+    }
   },
   async created () {
     try {
@@ -245,7 +273,10 @@ export default {
         // 文章列表放在Vuex中方便筛选
         this.axios.get('api/posts/lasted?limit=' + this.articleLimit)
           .then(res => { this.$store.commit('changeArticleList', res.data) })
-          .catch(() => { this.$message.error('获取文章列表失败') })
+          .catch((err) => {
+            this.$message.error('获取文章列表失败')
+            return err
+          })
       }
     }
   }

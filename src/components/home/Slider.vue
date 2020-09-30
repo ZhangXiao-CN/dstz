@@ -99,13 +99,15 @@ export default {
   created () {
     this.axios.get('api/slides').then(res => {
       this.swiperList = res.data
-    }).catch(() => {
+    }).catch((err) => {
       this.$message.error('获取轮播图失败!')
+      return err
     })
     this.axios.get('api/slides/fix').then(res => {
       this.fixList = res.data
-    }).catch(() => {
+    }).catch((err) => {
       this.$message.error('获取轮播图失败!')
+      return err
     })
   }
 }
