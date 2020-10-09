@@ -32,7 +32,7 @@
                 <div class="create-date">{{ item.createAt | filterDate }}</div>
               </div>
               <div class="comment-text">
-                <p v-html="item.content"></p>
+                <p v-html="$xss(item.content)"></p>
               </div>
               <div class="comment-from" v-if="item.post">
                 <span class="comment-article">[文章]</span>
@@ -332,6 +332,8 @@ export default {
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            height: 20px;
+            overflow: hidden;
           }
         }
         .comment-text::before {

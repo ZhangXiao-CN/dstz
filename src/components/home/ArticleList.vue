@@ -5,7 +5,7 @@
     v-loading="articleListLoading"
   >
     <div class="article-category-box">
-      <div class="article-category" v-html="currentCategoryTitle"></div>
+      <div class="article-category" v-html="$xss(currentCategoryTitle)"></div>
       <div>
         <el-button
           type="primary"

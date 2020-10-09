@@ -323,7 +323,7 @@
               <li v-for="(item, index) in comments" :key="index">
                 <div class="comment-date">{{ item.createAt | filterDate }}</div>
                 <div class="comment-text">
-                  <p v-html="item.content"></p>
+                  <p v-html="$xss(item.content)"></p>
                 </div>
                 <div class="comment-from">
                   <span class="comment-article">[文章]</span>

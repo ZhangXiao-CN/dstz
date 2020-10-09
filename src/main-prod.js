@@ -21,6 +21,36 @@ import NProgress from 'nprogress'
 // import 'nprogress/nprogress.css'
 import VueLazyload from 'vue-lazyload'
 
+// 引入防xss攻击库
+import xss from 'xss'
+// 给xss添加白名单,使文章详情与作者编辑的尽量一致
+// xss.whiteList.input = ['type', 'src', 'disabled', 'checked', 'class']
+xss.whiteList.img = ['src', 'alt', 'title', 'style', 'data-src']
+xss.whiteList.hr = ['style', 'class']
+xss.whiteList.br = ['style', 'class']
+xss.whiteList.span = ['class', 'style']
+xss.whiteList.i = ['class', 'style']
+xss.whiteList.b = ['class', 'style']
+xss.whiteList.strong = ['class', 'style']
+// xss.whiteList.pre = ['class', 'style']
+// xss.whiteList.code = ['style', 'class']
+xss.whiteList.ul = ['style', 'class']
+xss.whiteList.li = ['style', 'class']
+xss.whiteList.ol = ['style', 'class']
+xss.whiteList.dl = ['style', 'class']
+xss.whiteList.dt = ['style', 'class']
+xss.whiteList.p = ['style', 'class']
+xss.whiteList.div = ['style', 'class']
+xss.whiteList.table = ['style', 'class']
+xss.whiteList.tbody = ['style', 'class']
+xss.whiteList.tr = ['style', 'class']
+xss.whiteList.td = ['style', 'class']
+xss.whiteList.th = ['style', 'class']
+xss.whiteList.em = ['style', 'class']
+xss.whiteList.a = ['style', 'class', 'id', 'target', 'href', 'title']
+xss.stripIgnoreTag = true
+Vue.prototype.$xss = xss
+
 Vue.config.productionTip = false
 // 定义axios默认地址
 axios.defaults.baseURL = 'http://localhost:3000/'

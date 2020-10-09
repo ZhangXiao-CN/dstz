@@ -66,7 +66,7 @@
         <mavon-editor
           codeStyle="monokai"
           v-if="article.html"
-          v-html="replaceAllImg(article.html)"
+          v-html="$xss(replaceAllImg(article.html))"
           v-lazy-container="{ selector: 'img' }"
         ></mavon-editor>
       </div>
@@ -140,7 +140,7 @@
                 </div>
                 <div class="create-date">{{ item.createAt | filterDate }}</div>
               </div>
-              <div class="conmment-content" v-html="item.content"></div>
+              <div class="conmment-content" v-html="$xss(item.content)"></div>
               <div class="comment-tools">
                 <button
                   class="is-like"
@@ -232,7 +232,7 @@
                     </div>
                     <div
                       class="conmment-content"
-                      v-html="childItem.content"
+                      v-html="$xss(childItem.content)"
                     ></div>
                     <div class="comment-tools">
                       <button
