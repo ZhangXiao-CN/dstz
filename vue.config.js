@@ -10,7 +10,8 @@ module.exports = {
         nprogress: 'NProgress',
         'mavon-editor': 'MavonEditor',
         'vue-awesome-swiper': 'VueAwesomeSwiper',
-        vuex: 'Vuex'
+        vuex: 'Vuex',
+        'vue-lazyload': 'VueLazyload'
       })
 
       config.plugin('html').tap(args => {
@@ -30,5 +31,6 @@ module.exports = {
   },
 
   assetsDir: './',
+  // 禁止生成map文件、定位源码
   productionSourceMap: false
 }

@@ -19,6 +19,7 @@ import VueAwesomeSwiper from 'vue-awesome-swiper'
 // 引入顶部进度条
 import NProgress from 'nprogress'
 // import 'nprogress/nprogress.css'
+import VueLazyload from 'vue-lazyload'
 
 Vue.config.productionTip = false
 // 定义axios默认地址
@@ -39,6 +40,11 @@ axios.interceptors.response.use(function (res) {
 })
 
 Vue.use(VueAxios, axios)
+Vue.use(VueLazyload, {
+  preLoad: 1.3,
+  loading: require('./assets/images/imgLoading.svg'), // 加载中图片，一定要有，不然会一直重复加载占位图
+  error: require('./assets/images/imgErr.jpg') // 加载失败图片
+})
 Vue.use(MavonEditor)
 Vue.use(VueAwesomeSwiper)
 

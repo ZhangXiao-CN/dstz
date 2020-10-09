@@ -1,7 +1,7 @@
 <template>
   <div id="silder">
     <div class="silder-box">
-      <swiper :options="swiperOption">
+      <swiper :options="swiperOption" v-if="swiperList.length > 0">
         <swiper-slide
           class="swiper-slide"
           v-for="item in swiperList"
@@ -11,7 +11,12 @@
             :to="{ name: 'article', params: { id: item._id } }"
             target="_blank"
           >
-            <img :src="item.thumbnail" />
+            <img
+              :src="item.thumbnail"
+              :key="item.thumbnail"
+              class="imgLoaded"
+            />
+            <img src="../../assets/images/imgLoading.svg" class="imgLoading" />
             <div class="silder-article">
               <div class="silder-article-category">
                 <i class="iconfont icon-fenlei"></i>
@@ -45,7 +50,7 @@
           :to="{ name: 'article', params: { id: item._id } }"
           target="_blank"
         >
-          <img :src="item.thumbnail" />
+          <img v-lazy="item.thumbnail" :key="item.thumbnail" />
           <div class="silder-article">
             <div class="silder-article-category">
               <i class="iconfont icon-fenlei"></i>
@@ -92,7 +97,29 @@ export default {
         },
         // 开启循环模式
         loop: true,
-        speed: 700
+        speed: 700,
+        on: {
+          init: function () {
+            // 原版懒加载太丑, 手动实现懒加载
+            const imgs = document.querySelectorAll('.imgLoaded')
+            console.log(imgs)
+            for (let i = 0; i < imgs.length; i++) {
+              imgs[i].onload = function (e) {
+                e.stopPropagation()
+                imgs[i].nextElementSibling.style.display = 'none'
+                imgs[i].style.display = 'block'
+                if (i === imgs.length - 2) {
+                  imgs[0].nextElementSibling.style.display = 'none'
+                  imgs[0].style.display = 'block'
+                }
+                if (i === 1) {
+                  imgs[imgs.length - 1].nextElementSibling.style.display = 'none'
+                  imgs[imgs.length - 1].style.display = 'block'
+                }
+              }
+            }
+          }
+        }
       }
     }
   },
@@ -145,6 +172,9 @@ export default {
               border-radius: 10px;
             }
           }
+          .imgLoaded {
+            display: none;
+          }
         }
       }
     }
@@ -177,12 +207,17 @@ export default {
     align-items: center;
     .top-item {
       position: relative;
-      height: 100%;
+      width: 100%;
       overflow: hidden;
       border: 2px solid #fff;
       border-radius: 10px;
       box-sizing: border-box;
       flex: 1;
+      a {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
       .silder-article {
         padding: 10 / 40rem 20 / 40rem;
       }

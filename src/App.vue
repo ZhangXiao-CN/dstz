@@ -49,14 +49,10 @@ export default {
       const clientHeight = document.documentElement.clientHeight // 可视区高度
       // 距离顶部的高度 + 自身的高度 - 可视区的高度 = 需要被卷去的距离
       const moveY = sideBarWrapOffsetTop + sidBarHeigth - clientHeight // 需要被卷去的距离
-      console.log(moveY)
-      console.log(scrollTop)
       const footer = document.getElementById('footer')
       const footerClientHeight = footer.offsetTop - scrollTop // footer距顶部
       if (scrollTop > moveY) {
-        console.log(1)
         if (footerClientHeight > clientHeight) {
-          console.log(2)
           sideBar.style.marginTop = scrollTop - moveY + 'px' // 记得加单位
         } else {
           // 否则定位到最底部

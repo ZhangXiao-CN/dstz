@@ -17,11 +17,11 @@
 </template>
 
 <script>
-import LonginView from '../components/common/Login'
 import HeaderView from '../components/common/Header'
+import LonginView from '../components/common/Login'
+import MainAndSidebar from '../components/common/MainAndSidebar'
 import TopNavView from '../components/common/TopNav'
 import Slider from '../components/home/Slider'
-import MainAndSidebar from '../components/common/MainAndSidebar'
 import ArticleList from '../components/home/ArticleList'
 
 import { mapState } from 'vuex'

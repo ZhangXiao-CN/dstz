@@ -179,7 +179,13 @@ export default {
       }
     },
     goHome () {
-      this.$router.push({ name: 'home' })
+      if (this.$route.query.search) {
+        this.$router.push({ path: '/', query: {} })
+        // 故意让路由参数变化而不刷新页面,所以此处强制刷新一下
+        this.$router.go(0)
+      } else {
+        this.$router.go(0)
+      }
     }
   },
   computed: {

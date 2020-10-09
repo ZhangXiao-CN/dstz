@@ -29,13 +29,9 @@
             v-model="searchText"
             class="search"
             size="mini"
-            @keyup.native.enter="searchArticle"
+            @keyup.native.enter="goSearch"
           >
-            <i
-              slot="prefix"
-              class="iconfont icon-search"
-              @click="searchArticle"
-            ></i>
+            <i slot="prefix" class="iconfont icon-search" @click="goSearch"></i>
           </el-input>
           <div class="login-btn-wrap" v-if="!isLogin">
             <button class="login-btn" @click="popUpLoginBox(false)">
@@ -163,11 +159,16 @@ export default {
   },
   methods: {
     reloadSelf () {
-      console.log(this.$route.query.search)
-      if (this.$route.query.search) {
-        this.$router.push({ path: '/', query: {} })
+      if (this.$route.name === 'home') {
+        if (this.$route.query.search) {
+          this.$router.push({ path: '/', query: {} })
+          // 故意让路由参数变化而不刷新页面,所以此处强制刷新一下
+          this.$router.go(0)
+        } else {
+          this.$router.go(0)
+        }
       } else {
-        this.$router.go(0)
+        this.$router.push({ name: 'home' })
       }
     },
     popUpLoginBox (bool) {
@@ -193,17 +194,6 @@ export default {
     },
     async searchArticle () {
       this.$store.commit('changeIsSearch', true)
-      if (this.searchText.trim().length === 0) {
-        this.$message.error('搜索关键词不能为空哦')
-        return
-      }
-      if (this.$route.name !== 'home') {
-        const routeData = this.$router.resolve({
-          name: 'home',
-          query: { search: this.searchText }
-        })
-        window.open(routeData.href, '_blank')
-      }
       try {
         const moveY = document.getElementById('silder').clientHeight
         // 滚动到主页面
@@ -223,6 +213,22 @@ export default {
         this.$message('搜索失败!')
         this.$store.commit('changeArticleListLoading', false)
       }
+    },
+    goSearch () {
+      // 让url的查询参数与搜索关键词一致
+      if (this.searchText.trim().length === 0) {
+        this.$message.error('搜索关键词不能为空哦')
+        return
+      }
+      if (this.$route.name !== 'home') {
+        const routeData = this.$router.resolve({
+          name: 'home',
+          query: { search: this.searchText }
+        })
+        window.open(routeData.href, '_blank')
+      } else {
+        this.$router.push({ name: 'home', query: { search: this.searchText } })
+      }
     }
   },
   computed: {
@@ -237,14 +243,9 @@ export default {
     $route (to, from) {
       if (this.$route.name === 'home') {
         if (to.query.search) {
-          if (to.query !== from.query) {
+          if (to.query.search !== from.query.search) {
             this.searchText = to.query.search
             this.searchArticle()
-          }
-        } else {
-          if (to.query !== from.query) {
-            this.searchText = to.query.search
-            this.$router.go(0)
           }
         }
       }

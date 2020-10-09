@@ -2,7 +2,7 @@
   <div id="articleDetails">
     <div class="article-details-wrap">
       <div class="thumbnail-img">
-        <img :src="article.thumbnail" />
+        <img v-if="article.thumbnail" v-lazy="article.thumbnail" />
       </div>
       <div class="article-attr">
         <div class="articlecategory">
@@ -63,7 +63,12 @@
         </div>
       </div>
       <div class="article-view">
-        <mavon-editor codeStyle="monokai" v-html="article.html"></mavon-editor>
+        <mavon-editor
+          codeStyle="monokai"
+          v-if="article.html"
+          v-html="replaceAllImg(article.html)"
+          v-lazy-container="{ selector: 'img' }"
+        ></mavon-editor>
       </div>
       <div class="like">
         <div :class="{ 'is-favorites ': articFavorites }">
@@ -640,6 +645,10 @@ export default {
         this.$message.error('操作失败!--! 请刷新后重试, 或联系站长')
         this.likeFlag = true
       }
+    },
+    // 替换文章中的src属性为data-src 实现懒加载
+    replaceAllImg (html) {
+      return html.replace(/<img src="/g, '<img data-src="')
     }
   },
   created () {

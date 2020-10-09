@@ -90,7 +90,7 @@
             v-if="item.thumbnail"
             target="_blank"
           >
-            <img :src="item.thumbnail" />
+            <img v-lazy="item.thumbnail" :key="item.thumbnail" />
           </router-link>
         </li>
       </ul>
@@ -134,7 +134,8 @@ export default {
       'articleListLoading',
       'articleSearch',
       'articleLimit',
-      'backShow'
+      'backShow',
+      'isSearch'
     ])
   },
   methods: {
@@ -148,7 +149,7 @@ export default {
           const data = await this.axios.get('api/posts/category?categoryID=' + this.currentCategory + '&categoryChilren=' + this.currentCategoryChilren + '&limit=' + this.articleLimit)
           res = data.data
           // 是搜索
-        } else if (this.articleSearch) {
+        } else if (this.isSearch) {
           const data = await this.axios.get('api/posts/search/' + this.articleSearch + '?limit=' + this.articleLimit)
           res = data.data
           // 都不是就是最新文章
@@ -173,6 +174,9 @@ export default {
         const moveY = document.getElementById('silder').clientHeight
         // 滚动到主页面
         window.scrollTo(0, moveY + 10)
+        // 利用vue路由参数变化页面不刷新的原理,让url查询参数与搜索关键词一致
+        // 并且不刷新页面,利用axios获取最新文章达到返回的目的提升用户体验
+        this.$router.push({ path: '/', query: {} })
         this.$store.commit('changeArticleListLoading', true)
         this.$store.commit('changeArticleLimit', 10)
         const { data: res } = await this.axios.get('api/posts/lasted?limit=' + this.articleLimit)
@@ -180,6 +184,7 @@ export default {
         this.$store.commit('changeCurrentCategoryChilren', '')
         this.$store.commit('changeCurrentCategoryTitle', '<i class="iconfont icon-zuixin"></i>最新文章')
         this.$store.commit('changeArticleList', res)
+        this.$store.commit('changeArticleSearch', '')
         this.$store.commit('changeIsSearch', false)
         this.$store.commit('changeBackShow', false)
         this.$store.commit('changeArticleListLoading', false)
@@ -236,6 +241,9 @@ export default {
       max-height: 130px;
       // align-items: center;
       .article-img {
+        display: flex;
+        justify-content: center;
+        align-items: center;
         flex: 3;
         height: 150 / 40rem;
         width: 35%;
