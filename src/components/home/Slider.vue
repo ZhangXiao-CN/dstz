@@ -1,5 +1,5 @@
 <template>
-  <div id="silder">
+  <div id="silder" v-loading="swiperLoading">
     <div class="silder-box">
       <swiper :options="swiperOption" v-if="swiperList.length > 0">
         <swiper-slide
@@ -25,11 +25,7 @@
               <div class="silder-article-title">{{ item.title }}</div>
               <div class="silder-article-author">
                 <el-avatar
-                  :src="
-                    item.author.avatar
-                      ? item.author.avatar
-                      : 'http://localhost:3000/assets/img/defaultAvatar.png'
-                  "
+                  :src="item.author.avatar ? item.author.avatar : defaultAvatar"
                   size="small"
                 ></el-avatar>
                 <span class="silder-author">{{ item.author.nickName }}</span>
@@ -59,11 +55,7 @@
             <div class="silder-article-title">{{ item.title }}</div>
             <div class="silder-article-author">
               <el-avatar
-                :src="
-                  item.author.avatar
-                    ? item.author.avatar
-                    : 'http://localhost:3000/assets/img/defaultAvatar.png'
-                "
+                :src="item.author.avatar ? item.author.avatar : defaultAvatar"
                 size="small"
               ></el-avatar>
               <span class="silder-author">{{ item.author.nickName }}</span>
@@ -75,12 +67,16 @@
     </div>
   </div>
 </template>
-
 <script>
+import { mapState } from 'vuex'
 export default {
   name: 'Silder',
+  computed: {
+    ...mapState(['defaultAvatar'])
+  },
   data () {
     return {
+      swiperLoading: true,
       swiperList: [],
       fixList: [],
       swiperOption: {
@@ -98,11 +94,21 @@ export default {
         // 开启循环模式
         loop: true,
         speed: 700,
+        preloadImages: false,
+        updateOnImagesReady: false,
         on: {
           init: function () {
             // 原版懒加载太丑, 手动实现懒加载
             const imgs = document.querySelectorAll('.imgLoaded')
-            console.log(imgs)
+            const loadingImg = document.querySelector('.imgLoading')
+            // swiper 在图片加载完成后才init,
+            // 监听懒加载图片加载完成事件,取消swiperLoading状态
+            loadingImg.onload = function () {
+              this.swiperLoading = false
+            }.bind(this)
+            // 监听真正的轮播图是否加载完成
+            // 加载完成后隐藏懒加载图片,显示正在的轮播图
+            // 由于开启循环轮播,还要出额外处理多复制出来的两张图片
             for (let i = 0; i < imgs.length; i++) {
               imgs[i].onload = function (e) {
                 e.stopPropagation()
@@ -118,7 +124,10 @@ export default {
                 }
               }
             }
-          }
+          }.bind(this)
+          // imagesReady: function () {
+          //   this.swiperLoading = false
+          // }.bind(this)
         }
       }
     }
@@ -137,15 +146,18 @@ export default {
       return err
     })
   }
+  // mounted () {
+  //   this.swiperLoading = false
+  // }
 }
 </script>
-
 <style lang="less">
 #silder {
   display: flex;
   justify-content: flex-start;
   max-width: 1440px;
   max-height: 500 / 40rem;
+  min-height: 150px;
   margin: 10 / 40rem auto;
   .silder-box {
     position: relative;

@@ -9,6 +9,7 @@ const Write = () => import(/* webpackChunkName: "group-Write" */ '../views/Write
 const Article = () => import(/* webpackChunkName: "group-Article" */ '../views/Article.vue')
 // import User from '../views//User.vue'
 const User = () => import(/* webpackChunkName: "group-User" */ '../views//User.vue')
+const Message = () => import(/* webpackChunkName: "group-Message" */ '../views//Message.vue')
 
 Vue.use(VueRouter)
 
@@ -38,6 +39,11 @@ const routes = [
     path: '/user/:id',
     name: 'user',
     component: User
+  },
+  {
+    path: '/message/',
+    name: 'message',
+    component: Message
   }
 ]
 

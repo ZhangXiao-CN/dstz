@@ -41,9 +41,7 @@
                 >
                   <el-avatar
                     :src="
-                      item.author.avatar
-                        ? item.author.avatar
-                        : 'http://localhost:3000/assets/img/defaultAvatar.png'
+                      item.author.avatar ? item.author.avatar : defaultAvatar
                     "
                     size="small"
                   ></el-avatar>
@@ -65,11 +63,11 @@
             >
               <div class="count-box">
                 <div class="views-count">
-                  <i class="iconfont icon-browse_fill"></i>
+                  <i class="iconfont icon-browse-fill"></i>
                   <span>{{ item.meta.views }}</span>
                 </div>
                 <div class="comment-count">
-                  <i class="iconfont icon-interactive_fill"></i>
+                  <i class="iconfont icon-pinglun"></i>
                   <span>{{ item.meta.comments }}</span>
                 </div>
                 <div class="likes-count">
@@ -106,7 +104,7 @@
         没有更多了
       </div>
     </div>
-    <div v-else class="clean">
+    <div v-if="clearShow" class="clean">
       <div>
         <p>这里很干净</p>
         <p>什么都没有^_^|||</p>
@@ -118,10 +116,22 @@
 <script>
 import { mapState } from 'vuex'
 export default {
+  inject: ['sideScroll'],
   name: 'ArticleList',
   data () {
     return {
-      loading: false
+      loading: false,
+      clearShow: false
+    }
+  },
+  watch: {
+    articleList () {
+      if (this.articleList.length > 0) {
+        this.clearShow = false
+        this.$store.commit('changeArticleListLoading', false)
+      } else {
+        this.clearShow = true
+      }
     }
   },
   computed: {
@@ -135,7 +145,8 @@ export default {
       'articleSearch',
       'articleLimit',
       'backShow',
-      'isSearch'
+      'isSearch',
+      'defaultAvatar'
     ])
   },
   methods: {
@@ -155,6 +166,7 @@ export default {
           // 都不是就是最新文章
         } else {
           const data = await this.axios.get('api/posts/lasted?limit=' + this.articleLimit)
+          console.log(data.data)
           res = data.data
         }
         if (res.length === this.articleList.length) {
@@ -164,6 +176,9 @@ export default {
           this.$store.commit('changeArticleList', res)
           this.loading = false
         }
+        this.$nextTick(() => {
+          this.sideScroll()
+        })
       } catch (err) {
         this.$message.error(err)
         this.loading = false
@@ -219,6 +234,7 @@ export default {
   box-shadow: 0 1px 3px rgba(26, 26, 26, 0.1);
   border-radius: 8px;
   padding: 15 / 40rem 20 / 40rem 0 20 / 40rem;
+  min-height: 200px;
   .article-category {
     white-space: nowrap;
     overflow: hidden;
@@ -287,6 +303,10 @@ export default {
     }
     .count {
       display: flex;
+      .iconfont {
+        position: relative;
+        top: 1px;
+      }
       .count-box,
       .date {
         flex: 1;

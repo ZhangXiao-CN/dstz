@@ -6,9 +6,9 @@
     </div>
     <div class="side-bar-wrap" id="sideBarWrap">
       <div class="side-bar" id="sideBar" style="margin-top: 0">
-        <div class="comment-news">
+        <div class="comment-news" v-loading="lastCommentLoading">
           <div class="side-bar-title">
-            <i class="iconfont icon-xinxiaoxi"></i>
+            <i class="iconfont icon-tiezixiangqing-zuixinpingluncopy"></i>
             <span>最新评论</span>
           </div>
           <ul v-if="latestedComment && latestedComment.length > 0">
@@ -21,9 +21,7 @@
                 >
                   <el-avatar
                     :src="
-                      item.author.avatar
-                        ? item.author.avatar
-                        : 'http://localhost:3000/assets/img/defaultAvatar.png'
+                      item.author.avatar ? item.author.avatar : defaultAvatar
                     "
                     size="small"
                   ></el-avatar>
@@ -46,9 +44,9 @@
             </li>
           </ul>
         </div>
-        <div class="hot-article">
+        <div class="hot-article" v-loading="hotArticleLoading">
           <div class="side-bar-title">
-            <i class="iconfont icon-praise"></i>
+            <i class="iconfont icon-remen"></i>
             <span>热门文章</span>
           </div>
           <ul v-if="hotArticles && hotArticles.length > 0">
@@ -83,45 +81,36 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
   inject: ['sideScroll'],
   name: 'MainAndSidebar',
   data () {
     return {
+      lastCommentLoading: true,
+      hotArticleLoading: true,
       latestedComment: '',
       hotArticles: ''
     }
   },
-  methods: {
+  computed: {
+    ...mapState(['defaultAvatar'])
   },
   created () {
     this.axios.get('api/comments/find/lasted').then(res => {
       this.latestedComment = res.data
+      this.lastCommentLoading = false
     }).catch((err) => {
       this.$message.error('获取最新评论失败! 请刷新后重试, 或联系站长')
       return err
     })
     this.axios.get('api/posts/recommend').then(res => {
       this.hotArticles = res.data
+      this.hotArticleLoading = false
     }).catch((err) => {
       this.$message.error('获取热门文章失败! 请刷新后重试, 或联系站长')
       return err
     })
-  },
-  mounted () {
-    // // this.sideScroll()
-    // this.$nextTick(() => {
-    //   // this.sideScroll()
-    //   const sideBar = document.getElementById('sideBar')
-    //   const mainAndSidebar = document.getElementById('mainAndSidebar') // 父盒子
-    //   const mainAndSidebarHeigth = mainAndSidebar.offsetHeight // 父盒子高度
-    //   const sidBarHeigth = sideBar.offsetHeight // 子盒子的高度
-    //   console.log(mainAndSidebarHeigth)
-    //   console.log(sidBarHeigth)
-    //   if (mainAndSidebarHeigth < sidBarHeigth) {
-    //     mainAndSidebar.style.height = sidBarHeigth + 'px'
-    //   }
-    // })
   }
 }
 </script>
@@ -247,9 +236,6 @@ export default {
     margin-left: 10px;
     position: relative;
     // float: right;
-    .side-bar {
-      // position: absolute;
-    }
     .side-bar-title {
       text-align: left;
       border-bottom: 1px solid #f5f5f5;
@@ -265,6 +251,7 @@ export default {
     .hot-article {
       background-color: #fff;
       border-radius: 8px;
+      min-height: 200px;
       padding: 10px;
       margin-top: 10 / 40rem;
       li {
@@ -292,6 +279,7 @@ export default {
       background-color: #fff;
       border-radius: 8px;
       padding: 10px 0 10px 10px;
+      min-height: 200px;
       li {
         border-bottom: 1px solid #f5f5f5;
         padding: 5px;

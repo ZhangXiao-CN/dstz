@@ -4,12 +4,12 @@
       <div class="header-top-wrap">
         <div class="top-left">
           <div class="logo">
-            <a href="javascript:;" @click="reloadSelf">
+            <a href="#/home" @click="reloadSelf">
               <img class="logon-img" src="../../assets/images/logo.png" />
             </a>
           </div>
           <div class="samll-logo">
-            <a href="javascript:;" @click="reloadSelf">前端社</a>
+            <a href="#/home" @click="reloadSelf">前端社</a>
           </div>
           <div class="header-link">
             <div>
@@ -49,20 +49,18 @@
             <i class="iconfont icon-user"></i>
           </div>
           <div class="user-btn" v-if="isLogin">
-            <button class="add-btn" @click="goWrite">
+            <router-link class="add-btn" :to="{ name: 'write' }">
               <i class="iconfont icon-addition"></i>
-            </button>
-            <button class="news-btn">
-              <i class="iconfont icon-remind"></i>
-            </button>
+            </router-link>
+            <router-link class="news-btn" :to="{ name: 'message' }">
+              <i class="iconfont icon-remind message-sate">
+                <i v-show="messageState" class="iconfont icon-xinxiaoxi"></i>
+              </i>
+            </router-link>
           </div>
           <div class="user-info" @click="popUpuserToolBox" v-if="isLogin">
             <el-avatar
-              :src="
-                userInfo.avatar
-                  ? userInfo.avatar
-                  : 'http://localhost:3000/assets/img/defaultAvatar.png'
-              "
+              :src="userInfo.avatar ? userInfo.avatar : defaultAvatar"
               :key="userInfo.avatar"
               size="small"
               class="user-avatar"
@@ -78,9 +76,7 @@
                       <div>
                         <el-avatar
                           :src="
-                            userInfo.avatar
-                              ? userInfo.avatar
-                              : 'http://localhost:3000/assets/img/defaultAvatar.png'
+                            userInfo.avatar ? userInfo.avatar : defaultAvatar
                           "
                           :key="userInfo.avatar"
                           size="medium"
@@ -104,9 +100,14 @@
                     </router-link>
                   </li>
                   <li>
-                    <router-link to="write">
+                    <router-link to="message">
                       <div>
-                        <i class="iconfont icon-remind"></i>
+                        <i class="iconfont icon-remind message-sate">
+                          <i
+                            v-show="messageState"
+                            class="iconfont icon-xinxiaoxi"
+                          ></i>
+                        </i>
                       </div>
                       <p>
                         <span>系统通知</span>
@@ -154,7 +155,8 @@ export default {
     return {
       searchText: '',
       userToolBox: false,
-      dropDow: ''
+      dropDow: '',
+      messageState: false
     }
   },
   methods: {
@@ -167,8 +169,7 @@ export default {
         } else {
           this.$router.go(0)
         }
-      } else {
-        this.$router.push({ name: 'home' })
+        return false
       }
     },
     popUpLoginBox (bool) {
@@ -189,9 +190,6 @@ export default {
         this.$message.error('退出失败')
       }
     },
-    goWrite () {
-      this.$router.push({ name: 'write' })
-    },
     async searchArticle () {
       this.$store.commit('changeIsSearch', true)
       try {
@@ -204,7 +202,7 @@ export default {
         this.$store.commit('changeCurrentCategory', '')
         this.$store.commit('changeCurrentCategoryChilren', '')
         this.$store.commit('changeArticleSearch', this.searchText)
-        this.$store.commit('changeCurrentCategoryTitle', '<i class="iconfont icon-sousuo"></i>' + this.searchText)
+        this.$store.commit('changeCurrentCategoryTitle', '<i class="iconfont icon-search"></i>' + this.searchText)
         this.$store.commit('changeArticleList', res)
         this.$store.commit('changeBackShow', true)
         this.$store.commit('changeArticleListLoading', false)
@@ -232,7 +230,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['isLogin', 'userInfo', 'articleLimit', 'isSearch'])
+    ...mapState(['isLogin', 'userInfo', 'articleLimit', 'isSearch', 'defaultAvatar'])
   },
   watch: {
     isSearch () {
@@ -280,6 +278,19 @@ export default {
           })
       }
     }
+    // 获取获取消息状态
+    if (!this.isLogin) return
+    this.axios.get('api/messages/notice/state')
+      .then(res => {
+        console.log(res.data)
+        if (res.data) {
+          this.messageState = true
+        }
+      })
+      .catch((err) => {
+        this.$message.error('获取消息状态失败')
+        return err
+      })
   }
 }
 </script>>
@@ -297,6 +308,18 @@ export default {
 .header-wrap {
   max-width: 1440px;
   margin: 0 auto;
+}
+
+.message-sate {
+  position: relative;
+  .icon-xinxiaoxi {
+    color: #d81e06;
+    position: absolute;
+    top: -40%;
+    right: -40%;
+    // transform: translateX(-50%);
+    // transform: translateY(-50%);
+  }
 }
 
 .header-top-wrap {
@@ -378,6 +401,13 @@ export default {
   .iconfont {
     font-size: 22px;
     cursor: pointer;
+  }
+  a {
+    margin: 0 5px;
+  }
+  a:active {
+    position: relative;
+    top: 1px;
   }
 }
 

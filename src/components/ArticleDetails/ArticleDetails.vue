@@ -1,6 +1,6 @@
 <template>
   <div id="articleDetails">
-    <div class="article-details-wrap">
+    <div class="article-details-wrap" id="articleDetailsWrap">
       <div class="thumbnail-img">
         <img v-if="article.thumbnail" v-lazy="article.thumbnail" />
       </div>
@@ -8,7 +8,7 @@
         <div class="articlecategory">
           <i class="iconfont icon-fenlei"></i>
           <span to="category">{{ article | filterCategory }}</span>
-          <i class="iconfont icon-browse_fill viewicon"></i>
+          <i class="iconfont icon-browse-fill viewicon"></i>
           <span class="viewCount">{{
             article.meta && article.meta.views
           }}</span>
@@ -29,7 +29,7 @@
               :src="
                 article.author && article.author.avatar
                   ? article.author && article.author.avatar
-                  : 'http://localhost:3000/assets/img/defaultAvatar.png'
+                  : defaultAvatar
               "
               size="medium"
             ></el-avatar>
@@ -73,11 +73,11 @@
       <div class="like">
         <div :class="{ 'is-favorites ': articFavorites }">
           <div v-if="articFavorites" @click="favorites('cancelFavorites')">
-            <i class="iconfont icon-collection_fill"></i>
+            <i class="iconfont icon-icon_collection_fill"></i>
             <span>已收藏</span>
           </div>
           <div v-else @click="favorites('favorites')">
-            <i class="iconfont icon-collection_fill"></i>
+            <i class="iconfont icon-icon_collection_fill"></i>
             <span>收藏</span>
           </div>
         </div>
@@ -116,11 +116,7 @@
         >
           <el-avatar
             shape="square"
-            :src="
-              item.author.avatar
-                ? item.author.avatar
-                : 'http://localhost:3000/assets/img/defaultAvatar.png'
-            "
+            :src="item.author.avatar ? item.author.avatar : defaultAvatar"
             size="medium"
           ></el-avatar>
           <div class="comment-info">
@@ -159,7 +155,6 @@
                   class="reply-btn"
                   v-if="reply !== item._id"
                 >
-                  <i class="iconfont icon-interactive_fill"></i>
                   <span>回复</span>
                 </button>
                 <button
@@ -167,7 +162,6 @@
                   class="reply-btn"
                   v-if="reply === item._id"
                 >
-                  <i class="iconfont icon-interactive_fill"></i>
                   <span>取消回复</span>
                 </button>
               </div>
@@ -186,7 +180,7 @@
                   :src="
                     childItem.from_uid.avatar
                       ? childItem.from_uid.avatar
-                      : 'http://localhost:3000/assets/img/defaultAvatar.png'
+                      : defaultAvatar
                   "
                   size="medium"
                 ></el-avatar>
@@ -242,7 +236,8 @@
                           replyFabulous(
                             'cancelReplyFabulous',
                             item._id,
-                            childItem._id
+                            childItem._id,
+                            childItem.content
                           )
                         "
                       >
@@ -255,7 +250,8 @@
                           replyFabulous(
                             'replyFabulous',
                             item._id,
-                            childItem._id
+                            childItem._id,
+                            childItem.content
                           )
                         "
                       >
@@ -267,7 +263,6 @@
                         class="reply-btn"
                         v-if="reply !== childItem._id"
                       >
-                        <i class="iconfont icon-interactive_fill"></i>
                         <span>回复</span>
                       </button>
                       <button
@@ -275,7 +270,6 @@
                         class="reply-btn"
                         v-if="reply === childItem._id"
                       >
-                        <i class="iconfont icon-interactive_fill"></i>
                         <span>取消回复</span>
                       </button>
                     </div>
@@ -287,9 +281,7 @@
                           shape="square"
                           :size="35"
                           :src="
-                            userInfo.avatar
-                              ? userInfo.avatar
-                              : 'http://localhost:3000/assets/img/defaultAvatar.png'
+                            userInfo.avatar ? userInfo.avatar : defaultAvatar
                           "
                           v-cloak
                         ></el-avatar>
@@ -307,7 +299,12 @@
                         :size="'mini'"
                         reply
                         @click="
-                          createReply($event, item._id, childItem.from_uid._id)
+                          createReply(
+                            $event,
+                            item._id,
+                            childItem.from_uid._id,
+                            childItem.content
+                          )
                         "
                         :loading="loading === 1"
                         >提交</el-button
@@ -323,11 +320,7 @@
                   <el-avatar
                     shape="square"
                     :size="35"
-                    :src="
-                      userInfo.avatar
-                        ? userInfo.avatar
-                        : 'http://localhost:3000/assets/img/defaultAvatar.png'
-                    "
+                    :src="userInfo.avatar ? userInfo.avatar : defaultAvatar"
                     v-cloak
                   ></el-avatar>
                 </div>
@@ -368,11 +361,7 @@
           <el-avatar
             shape="square"
             :size="35"
-            :src="
-              userInfo.avatar
-                ? userInfo.avatar
-                : 'http://localhost:3000/assets/img/defaultAvatar.png'
-            "
+            :src="userInfo.avatar ? userInfo.avatar : defaultAvatar"
             v-cloak
           ></el-avatar>
         </div>
@@ -416,7 +405,7 @@ export default {
   },
   components: { Emoji },
   computed: {
-    ...mapState(['isLogin', 'userInfo'])
+    ...mapState(['isLogin', 'userInfo', 'defaultAvatar'])
   },
   methods: {
     getComments (comment) {
@@ -442,6 +431,17 @@ export default {
       try {
         const { data: res } = await this.axios.put('api/users/' + path + '/' + this.article.author._id)
         this.isAttention = res.isAttention
+        let messageText = '关注了你'
+        if (path === 'cancelAttention') {
+          messageText = '对你取消了关注'
+        }
+        await this.postNotice({
+          state: 0,
+          fromUser: this.userInfo._id,
+          toUser: this.article.author._id,
+          massageType: 4,
+          messageText: messageText
+        })
         this.loading = ''
       } catch (err) {
         this.loading = ''
@@ -482,6 +482,16 @@ export default {
           this.commentList.records.push(res.com)
         }
         this.article.meta = res.post.meta
+        console.log(res)
+        await this.postNotice({
+          state: 0,
+          fromUser: this.userInfo._id,
+          toUser: this.article.author._id,
+          massageType: 1,
+          messageText: '评论了你的文章',
+          fromArticle: this.article._id,
+          fromComment: res.com._id
+        })
         e.target.innerText = '提交'
         this.loading = ''
       } catch (err) {
@@ -491,7 +501,7 @@ export default {
       }
     },
     // 回复
-    async createReply (e, commentID, authorId) {
+    async createReply (e, commentID, authorId, replyContent) {
       this.loading = 1
       e.target.innerText = ''
       if (!this.isLoginAndEject('登录后才能回复哦!')) {
@@ -516,6 +526,21 @@ export default {
           to_uid: authorId,
           content: this.myComment,
           postId: this.article._id
+        })
+        let replyText = ''
+        if (replyContent) {
+          replyText = replyContent
+        }
+        await this.postNotice({
+          state: 1,
+          fromUser: this.userInfo._id,
+          toUser: this.article.author._id,
+          massageType: 2,
+          messageText: '回复了你的评论',
+          fromArticle: this.article._id,
+          fromComment: res.com._id,
+          replyText: replyText,
+          toReplyText: this.myComment
         })
         this.loading = ''
         const textarea = document.getElementById('textarea')
@@ -548,6 +573,18 @@ export default {
         const { data: res } = await this.axios.post('api/posts/' + path + '/' + this.$route.params.id)
         this.articleLike = res.islike
         this.article.meta.likes = res.post.meta.likes
+        let messageText = '赞了你的文章'
+        if (path === 'cancelFabulous') {
+          messageText = '对你的文章取消了点赞'
+        }
+        await this.postNotice({
+          state: 0,
+          fromUser: this.userInfo._id,
+          toUser: this.article.author._id,
+          massageType: 0,
+          messageText: messageText,
+          fromArticle: this.article._id
+        })
         this.likeFlag = true
       } catch (err) {
         this.likeFlag = true
@@ -564,8 +601,21 @@ export default {
         }
         const { data: res } = await this.axios.post('api/posts/' + path + '/' + this.$route.params.id)
         this.articFavorites = res.isFavorites
+        let messageText = '收藏了你的文章'
+        if (path === 'cancelFavorites') {
+          messageText = '对你的文章取消了收藏'
+        }
+        await this.postNotice({
+          state: 0,
+          fromUser: this.userInfo._id,
+          toUser: this.article.author._id,
+          massageType: 3,
+          messageText: messageText,
+          fromArticle: this.article._id
+        })
         this.favoritesFlag = true
       } catch (err) {
+        console.log(err)
         this.$message.error('操作失败了!--! 请刷新后重试, 或联系站长')
         this.favoritesFlag = true
       }
@@ -577,6 +627,7 @@ export default {
         const { data: res } = await this.axios.get('api/comments/' + this.$route.params.id + '?page=' + e)
         this.commentList = res.records.length > 0 ? res : ''
         this.commentLoading = false
+        this.scrollComment()
       } catch (err) {
         this.$message.error('获取评论列表失败! 请刷新后重试, 或联系站长')
         this.commentLoading = false
@@ -613,13 +664,26 @@ export default {
             break
           }
         }
+        let messageText = '赞了你的评论'
+        if (path === 'cancelFabulous') {
+          messageText = '对你的评论取消了点赞'
+        }
+        await this.postNotice({
+          state: 0,
+          fromUser: this.userInfo._id,
+          toUser: this.article.author._id,
+          massageType: 0,
+          messageText: messageText,
+          fromArticle: this.article._id,
+          fromComment: commentId
+        })
       } catch (err) {
         this.$message.error('操作失败了!--! 请刷新后重试, 或联系站长')
         this.likeFlag = true
       }
     },
     // 回复点赞
-    async replyFabulous (path, commentId, replyId) {
+    async replyFabulous (path, commentId, replyId, replyContent) {
       if (!this.likeFlag) return
       this.likeFlag = false
       try {
@@ -641,6 +705,20 @@ export default {
             break
           }
         }
+        let messageText = '赞了你的回复评论'
+        if (path === 'cancelReplyFabulous') {
+          messageText = '对你的回复评论取消了点赞'
+        }
+        await this.postNotice({
+          state: 0,
+          fromUser: this.userInfo._id,
+          toUser: this.article.author._id,
+          massageType: 0,
+          messageText: messageText,
+          fromArticle: this.article._id,
+          fromComment: commentId,
+          fromReplyText: replyContent
+        })
       } catch (err) {
         this.$message.error('操作失败!--! 请刷新后重试, 或联系站长')
         this.likeFlag = true
@@ -649,6 +727,13 @@ export default {
     // 替换文章中的src属性为data-src 实现懒加载
     replaceAllImg (html) {
       return html.replace(/<img src="/g, '<img data-src="')
+    },
+    // 滚动到评论区
+    scrollComment () {
+      this.$nextTick(() => {
+        const moveY = document.getElementById('articleDetailsWrap').clientHeight
+        window.scrollTo(0, moveY + 10)
+      })
     }
   },
   created () {
@@ -817,6 +902,9 @@ export default {
       white-space: normal;
       .el-tag {
         margin: 5px;
+      }
+      i {
+        font-size: 13px;
       }
     }
     .tags-wrap:active {

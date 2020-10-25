@@ -20,6 +20,8 @@ import VueAwesomeSwiper from 'vue-awesome-swiper'
 import NProgress from 'nprogress'
 // import 'nprogress/nprogress.css'
 import VueLazyload from 'vue-lazyload'
+// 引入公共方法
+import { postNotice } from './utils/util'
 
 // 引入防xss攻击库
 import xss from 'xss'
@@ -50,6 +52,8 @@ xss.whiteList.em = ['style', 'class']
 xss.whiteList.a = ['style', 'class', 'id', 'target', 'href', 'title']
 xss.stripIgnoreTag = true
 Vue.prototype.$xss = xss
+
+Vue.prototype.postNotice = postNotice
 
 Vue.config.productionTip = false
 // 定义axios默认地址

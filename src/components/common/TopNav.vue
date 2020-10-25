@@ -5,7 +5,7 @@
         <ul class="category-list">
           <li class="category-item">
             <a
-              href="javascript:;"
+              href="#/home"
               class="category-link"
               :class="{ currentIndex: currentIndex == 100 }"
               @click="goHome"
@@ -54,16 +54,16 @@
         </ul>
       </nav>
       <div class="right-btn">
-        <button @click="goWrite">
+        <router-link :to="{ name: 'write' }">
           <i class="iconfont icon-mianxingyumaobi"></i>
           <span>写文章</span>
-        </button>
+        </router-link>
       </div>
     </div>
     <div class="small-category-btn" @click="SidebarBarNavShow(true)">
-      <button @click="goWrite">
+      <router-link :to="{ name: 'write' }">
         <i class="iconfont icon-mianxingyumaobi"></i>
-      </button>
+      </router-link>
       <i class="iconfont icon-other"></i>
     </div>
     <transition name="slide">
@@ -73,9 +73,7 @@
         </div>
         <ul class="sidebar-bar-list">
           <li class="nav-item">
-            <a href="javascript:;" class="category-link" @click="goHome"
-              >首页</a
-            >
+            <a href="#/home" class="category-link" @click="goHome">首页</a>
           </li>
           <li
             class="category-item"
@@ -142,9 +140,6 @@ export default {
     }
   },
   methods: {
-    goWrite () {
-      this.$router.push({ name: 'write' })
-    },
     openChildNav (e) {
       const ul = e.target.nextElementSibling
       const display = ul.style.display
@@ -212,7 +207,7 @@ export default {
 }
 .small-category-btn {
   display: none;
-  button {
+  a {
     padding: 2px 10px;
     margin-right: 10px;
     font-size: 12px;
@@ -293,7 +288,8 @@ export default {
     }
   }
   .right-btn {
-    button {
+    a {
+      display: block;
       padding: 2px 10px;
       margin-right: 5px;
       font-size: 12px;
@@ -304,6 +300,10 @@ export default {
       i {
         font-size: 12px;
       }
+    }
+    a:active {
+      position: relative;
+      top: 1px;
     }
   }
 }

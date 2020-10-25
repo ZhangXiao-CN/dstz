@@ -5,23 +5,24 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-    isLogin: false,
-    loginBox: false,
-    regShow: false,
-    userInfo: {},
-    categoryNav: [],
-    categories: [],
-    articleList: [],
-    currentCategoryTitle: '<i class="iconfont icon-zuixin"></i>最新文章',
-    currentCategory: '',
-    currentCategoryChilren: '',
-    articleMroe: true,
-    articleListLoading: false,
-    articleSearch: '',
-    articleLimit: 10,
-    backShow: false,
-    isSearch: false,
-    headerIsOver: false
+    isLogin: false, // 登陆状态
+    loginBox: false, // 登陆模块显示
+    regShow: false, // 注册模块显示
+    userInfo: {}, // 登陆用户
+    categoryNav: [], // 分类导航
+    categories: [], // 分类列表
+    articleList: [], // 最新文章列表
+    currentCategoryTitle: '<i class="iconfont icon-zuixin"></i>最新文章', // 主页文章列表标题
+    currentCategory: '', // 当前一级分类
+    currentCategoryChilren: '', // 当前二级分类
+    articleMroe: true, // 加载更多显示
+    articleListLoading: true, // 文章加载loading
+    articleSearch: '', // 文章搜索
+    articleLimit: 10, // 文章请求数量
+    backShow: false, // 返回模块显示
+    isSearch: false, // 是否是搜索状态
+    headerIsOver: false, // header模块是否加载完毕
+    defaultAvatar: 'http://localhost:3000/assets/img/defaultAvatar.png'
   },
   mutations: {
     changeIsLogin (state, bool) {

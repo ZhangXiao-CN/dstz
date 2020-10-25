@@ -54,11 +54,7 @@
           <el-avatar
             shape="square"
             :size="120"
-            :src="
-              userAvatar
-                ? userAvatar
-                : 'http://localhost:3000/assets/img/defaultAvatar.png'
-            "
+            :src="userAvatar ? userAvatar : defaultAvatar"
             v-cloak
           ></el-avatar>
           <label v-if="userSelf">
@@ -104,7 +100,7 @@
               :class="{ 'current-color': leftBarIndex === 0 }"
             >
               <div class="btn">
-                <i class="iconfont icon-user"></i>
+                <i class="iconfont icon-User"></i>
                 <span>概览</span>
               </div>
               <i class="iconfont icon-enter"></i>
@@ -130,7 +126,7 @@
               :class="{ 'current-color': leftBarIndex === 2 }"
             >
               <div class="btn">
-                <i class="iconfont icon-select"></i>
+                <i class="iconfont icon-shoucang"></i>
                 <span>收藏</span>
               </div>
               <i class="iconfont icon-enter"></i>
@@ -143,7 +139,7 @@
               :class="{ 'current-color': leftBarIndex === 3 }"
             >
               <div class="btn">
-                <i class="iconfont icon-yanjing"></i>
+                <i class="iconfont icon-guanzhu"></i>
                 <span>关注</span>
               </div>
               <i class="iconfont icon-enter"></i>
@@ -156,7 +152,7 @@
               :class="{ 'current-color': leftBarIndex === 4 }"
             >
               <div class="btn">
-                <i class="iconfont icon-like"></i>
+                <i class="iconfont icon-fensi"></i>
                 <span>粉丝</span>
               </div>
               <i class="iconfont icon-enter"></i>
@@ -169,7 +165,7 @@
               :class="{ 'current-color': leftBarIndex === 5 }"
             >
               <div class="btn">
-                <i class="iconfont icon-setup"></i>
+                <i class="iconfont icon-shezhi"></i>
                 <span>设置</span>
               </div>
               <i class="iconfont icon-enter"></i>
@@ -257,19 +253,16 @@
                     class="count"
                     v-if="publishCurrent === 0"
                   >
-                    <div data-v-5cc3ab68 class="comment-count">
-                      <i
-                        data-v-5cc3ab68
-                        class="iconfont icon-interactive_fill"
-                      ></i>
-                      <span data-v-5cc3ab68>{{
-                        item.meta && item.meta.comments
-                      }}</span>
-                    </div>
                     <div data-v-5cc3ab68 class="views-count">
-                      <i data-v-5cc3ab68 class="iconfont icon-browse_fill"></i>
+                      <i data-v-5cc3ab68 class="iconfont icon-browse-fill"></i>
                       <span data-v-5cc3ab68>{{
                         item.meta && item.meta.views
+                      }}</span>
+                    </div>
+                    <div data-v-5cc3ab68 class="comment-count">
+                      <i data-v-5cc3ab68 class="iconfont icon-pinglun"></i>
+                      <span data-v-5cc3ab68>{{
+                        item.meta && item.meta.comments
                       }}</span>
                     </div>
                     <div data-v-5cc3ab68 class="likes-count">
@@ -370,19 +363,16 @@
                   <p>{{ item.title }}</p>
                 </router-link>
                 <div data-v-5cc3ab68 class="count">
-                  <div data-v-5cc3ab68 class="comment-count">
-                    <i
-                      data-v-5cc3ab68
-                      class="iconfont icon-interactive_fill"
-                    ></i>
-                    <span data-v-5cc3ab68>{{
-                      item.meta && item.meta.comments
-                    }}</span>
-                  </div>
                   <div data-v-5cc3ab68 class="views-count">
-                    <i data-v-5cc3ab68 class="iconfont icon-browse_fill"></i>
+                    <i data-v-5cc3ab68 class="iconfont icon-browse-fill"></i>
                     <span data-v-5cc3ab68>{{
                       item.meta && item.meta.views
+                    }}</span>
+                  </div>
+                  <div data-v-5cc3ab68 class="comment-count">
+                    <i data-v-5cc3ab68 class="iconfont icon-pinglun"></i>
+                    <span data-v-5cc3ab68>{{
+                      item.meta && item.meta.comments
                     }}</span>
                   </div>
                   <div data-v-5cc3ab68 class="likes-count">
@@ -425,11 +415,7 @@
                   <el-avatar
                     shape="square"
                     :size="80"
-                    :src="
-                      item.avatar
-                        ? item.avatar
-                        : 'http://localhost:3000/assets/img/defaultAvatar.png'
-                    "
+                    :src="item.avatar ? item.avatar : defaultAvatar"
                   ></el-avatar>
                 </router-link>
                 <div class="attention-user">
@@ -482,11 +468,7 @@
                 <el-avatar
                   shape="square"
                   :size="80"
-                  :src="
-                    item.avatar
-                      ? item.avatar
-                      : 'http://localhost:3000/assets/img/defaultAvatar.png'
-                  "
+                  :src="item.avatar ? item.avatar : defaultAvatar"
                 ></el-avatar>
               </router-link>
               <div class="fans-user">
@@ -702,7 +684,7 @@ export default {
     }
   },
   computed: {
-    ...mapState(['userInfo', 'isLogin', 'userInfo'])
+    ...mapState(['userInfo', 'isLogin', 'userInfo', 'defaultAvatar'])
   },
   methods: {
     // 关注与取消
@@ -718,6 +700,17 @@ export default {
         const { data: res } = await this.axios.put('api/users/' + path + '/' + this.author._id)
         this.isAttention = res.isAttention
         this.isAttentionLoading = false
+        let messageText = '关注了你'
+        if (path === 'cancelAttention') {
+          messageText = '对你取消了关注'
+        }
+        await this.postNotice({
+          state: 0,
+          fromUser: this.userInfo._id,
+          toUser: this.author._id,
+          massageType: 4,
+          messageText: messageText
+        })
       } catch (err) {
         this.isAttentionLoading = false
         this.$message.error('操作失败了!--! 请刷新后重试, 或联系站长')
@@ -936,6 +929,13 @@ export default {
           this.attentionsLimit -= 5
           this.checkbox(3)
         }
+        await this.postNotice({
+          state: 0,
+          fromUser: this.userInfo._id,
+          toUser: id,
+          massageType: 4,
+          messageText: '对你取消了关注'
+        })
         this.loading = ''
       } catch (err) {
         this.loading = ''
@@ -943,7 +943,7 @@ export default {
       }
     },
     async changeAvatar (e) {
-      if (this.userAvatar && this.userAvatar !== 'http://localhost:3000/assets/img/defaultAvatar.png') {
+      if (this.userAvatar && this.userAvatar !== this.defaultAvatar) {
         await this.delImg('userAvatar')
       }
       const newAvatar = await this.uploadImg(e)
@@ -1031,7 +1031,7 @@ export default {
       if (this.isLogin && this.userInfo._id === this.$route.params.id) {
         this.userSelf = true
         this.author = this.userInfo
-        this.userAvatar = this.userInfo.avatar ? this.userInfo.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'
+        this.userAvatar = this.userInfo.avatar ? this.userInfo.avatar : this.defaultAvatar
         this.userThumb = this.userInfo.thumb ? this.userInfo.thumb : 'http://localhost:3000/assets/img/defaultthumb.jpg'
         this.userEdit.nickName = this.userInfo.nickName
         this.userEdit.email = this.userInfo.email
@@ -1043,7 +1043,7 @@ export default {
         try {
           const { data: res } = await this.axios.get('api/users/' + this.$route.params.id)
           this.author = res
-          this.userAvatar = res.avatar ? res.avatar : 'http://localhost:3000/assets/img/defaultAvatar.png'
+          this.userAvatar = res.avatar ? res.avatar : this.defaultAvatar
           this.userThumb = res.thumb ? res.thumb : 'http://localhost:3000/assets/img/defaultthumb.jpg'
         } catch (error) {
           this.$message.error('查询用户失败')
@@ -1169,6 +1169,7 @@ export default {
     width: 20%;
     background-color: #fff;
     ul {
+      padding-left: 5px;
       li {
         border-bottom: 1px solid #f3f3f3;
         a {
@@ -1522,6 +1523,7 @@ export default {
       margin-top: 5px;
       border-radius: 8px;
       ul {
+        padding: 0;
         li {
           padding-top: 8px;
         }
