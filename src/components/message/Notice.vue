@@ -14,20 +14,29 @@
               :size="22"
               class="user-avatar"
             ></el-avatar
-            >龙小娇</a
+            >{{ item.fromUser.nickName }}</a
           >
           <span class="messageText">{{ item.messageText }}</span>
           <span> · </span>
           <span>{{ item.createAt | filterDate }}</span>
-          <div class="comment-text" v-if="item.fromComment">
-            <p v-html="$xss(item.fromComment.content)"></p>
+          <i class="iconfont icon-new new-notice" v-if="item.state === 0"></i>
+          <div class="comment-wrap">
+            <div class="comment-text" v-if="item.fromReplyText">
+              <p v-html="$xss(item.fromReplyText)"></p>
+            </div>
+            <div class="comment-text reply-text" v-else-if="item.toReplyText">
+              <p v-html="$xss(item.toReplyText)"></p>
+            </div>
+            <div class="comment-text" v-else-if="item.fromComment">
+              <p v-html="$xss(item.fromComment.content)"></p>
+            </div>
           </div>
           <a
             v-if="item.fromArticle"
             :href="'#/article/' + item.fromArticle._id"
             class="article-title"
             target="_blank"
-            >{{ item.fromArticle.title }}</a
+            ><span>[文章]</span>{{ item.fromArticle.title }}</a
           >
         </li>
         <a
@@ -80,11 +89,13 @@ export default {
   methods: {
     async getmroe () {
       this.moreLoading = true
-      this.messagrMroe = this.messagrMroe + 10
+      this.messageLimit = this.messageLimit + 10
       try {
         const { data } = await this.axios.get('api/messages/notice?limit=' + this.messageLimit)
         if (this.noticeList.length === data.length) {
           this.messagrMroe = false
+        } else {
+          this.noticeList = data
         }
       } catch (err) {
         this.$message.error('获取消息失败')
@@ -141,27 +152,45 @@ export default {
   }
   .article-title {
     display: block;
-    padding-left: 26px;
-    font-style: italic;
+    // font-style: italic;
     font-size: 14px;
     color: #a2e1d4;
+    padding: 3px 0;
+    padding-left: 26px;
+    span {
+      color: #409eff;
+      padding-right: 3px;
+      font-size: 14px;
+    }
   }
   span {
     font-size: 15px;
   }
 }
-.comment-text {
-  text-align: left;
-  position: relative;
-  font-size: 14.5px;
-  padding: 8px 3px;
-  background-color: #f5f5f5;
-  border-radius: 8px;
-  margin: 8 / 40rem;
-  margin-left: 26px;
-  margin-right: 5px;
-  p {
-    padding: 0 5px;
+
+.comment-wrap {
+  display: flex;
+  // flex-direction: column;
+  // justify-content: center;
+  // align-items: flex-start;
+  .comment-text {
+    width: initial;
+    text-align: left;
+    position: relative;
+    font-size: 14.5px;
+    padding: 8px 3px;
+    background-color: #f5f5f5;
+    border-radius: 8px;
+    margin: 8 / 40rem;
+    margin-left: 26px;
+    margin-right: 5px;
+    p {
+      padding: 0 5px;
+      img {
+        width: 20px;
+        height: 20px;
+      }
+    }
   }
 }
 .comment-text::before {
@@ -196,5 +225,8 @@ export default {
 }
 .nomore {
   color: #304430;
+}
+.new-notice {
+  color: #f4606c;
 }
 </style>

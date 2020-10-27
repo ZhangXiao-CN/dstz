@@ -157,13 +157,39 @@
                 >
                   <span>回复</span>
                 </button>
-                <button
+              </div>
+            </div>
+            <div class="reply-wrap" v-if="reply === item._id">
+              <div class="comment-form">
+                <div class="comment-avatar">
+                  <el-avatar
+                    shape="square"
+                    :size="35"
+                    :src="userInfo.avatar ? userInfo.avatar : defaultAvatar"
+                    v-cloak
+                  ></el-avatar>
+                </div>
+                <div class="text">
+                  <Emoji @comments="getComments" :myComment="myComment"></Emoji>
+                </div>
+              </div>
+              <div class="comment-btn">
+                <el-button
+                  type="info"
+                  :size="'mini'"
                   @click="changereply('0')"
-                  class="reply-btn"
+                  class="canceel-reply-btn"
                   v-if="reply === item._id"
                 >
                   <span>取消回复</span>
-                </button>
+                </el-button>
+                <el-button
+                  type="primary"
+                  :size="'mini'"
+                  @click="createReply($event, item._id, item.author._id)"
+                  :loading="loading === 1"
+                  >提交</el-button
+                >
               </div>
             </div>
             <ul
@@ -265,13 +291,6 @@
                       >
                         <span>回复</span>
                       </button>
-                      <button
-                        @click="changereply('0')"
-                        class="reply-btn"
-                        v-if="reply === childItem._id"
-                      >
-                        <span>取消回复</span>
-                      </button>
                     </div>
                   </div>
                   <div class="reply-wrap" v-if="reply === childItem._id">
@@ -295,9 +314,17 @@
                     </div>
                     <div class="comment-btn">
                       <el-button
+                        type="info"
+                        :size="'mini'"
+                        @click="changereply('0')"
+                        class="canceel-reply-btn"
+                        v-if="reply === childItem._id"
+                      >
+                        <span>取消回复</span>
+                      </el-button>
+                      <el-button
                         type="primary"
                         :size="'mini'"
-                        reply
                         @click="
                           createReply(
                             $event,
@@ -314,31 +341,6 @@
                 </div>
               </li>
             </ul>
-            <div class="reply-wrap" v-if="reply === item._id">
-              <div class="comment-form">
-                <div class="comment-avatar">
-                  <el-avatar
-                    shape="square"
-                    :size="35"
-                    :src="userInfo.avatar ? userInfo.avatar : defaultAvatar"
-                    v-cloak
-                  ></el-avatar>
-                </div>
-                <div class="text">
-                  <Emoji @comments="getComments" :myComment="myComment"></Emoji>
-                </div>
-              </div>
-              <div class="comment-btn">
-                <el-button
-                  type="primary"
-                  :size="'mini'"
-                  reply
-                  @click="createReply($event, item._id, item.author._id)"
-                  :loading="loading === 1"
-                  >提交</el-button
-                >
-              </div>
-            </div>
           </div>
         </li>
       </ul>
@@ -501,7 +503,7 @@ export default {
       }
     },
     // 回复
-    async createReply (e, commentID, authorId, replyContent) {
+    async createReply (e, commentID, authorId) {
       this.loading = 1
       e.target.innerText = ''
       if (!this.isLoginAndEject('登录后才能回复哦!')) {
@@ -527,19 +529,16 @@ export default {
           content: this.myComment,
           postId: this.article._id
         })
-        let replyText = ''
-        if (replyContent) {
-          replyText = replyContent
-        }
+        console.log(res)
         await this.postNotice({
-          state: 1,
+          state: 0,
           fromUser: this.userInfo._id,
-          toUser: this.article.author._id,
+          toUser: authorId,
           massageType: 2,
           messageText: '回复了你的评论',
           fromArticle: this.article._id,
-          fromComment: res.com._id,
-          replyText: replyText,
+          fromComment: res.comment._id,
+          // fromReplyText: replyText,
           toReplyText: this.myComment
         })
         this.loading = ''
@@ -547,6 +546,7 @@ export default {
         textarea.innerHTML = ''
         this.myComment = ''
         for (const item of this.commentList.records) {
+          console.log(item)
           if (item._id === res.comment._id) {
             item.replies = res.comment.replies
             break
@@ -559,6 +559,7 @@ export default {
         this.$message.error('提交评论失败! 请刷新后重试, 或联系站长')
         this.loading = ''
         e.target.innerText = '提交'
+        console.log(err)
       }
     },
     // 点赞与取消
@@ -638,10 +639,10 @@ export default {
     changereply (id) {
       this.reply = id
       this.myComment = ''
-      if (this.reply !== '0') {
-        const textarea = document.getElementById('textarea')
-        textarea.focus()
-      }
+      // if (this.reply !== '0') {
+      //   const textarea = document.getElementById('textarea')
+      //   textarea.focus()
+      // }
     },
     // 评论点赞
     async commentFabulous (path, commentId) {
@@ -705,9 +706,9 @@ export default {
             break
           }
         }
-        let messageText = '赞了你的回复评论'
+        let messageText = '赞了你的回复'
         if (path === 'cancelReplyFabulous') {
-          messageText = '对你的回复评论取消了点赞'
+          messageText = '对你的回复取消了点赞'
         }
         await this.postNotice({
           state: 0,
@@ -1023,9 +1024,6 @@ export default {
 @media screen and (max-width: 1024px) {
   .article-comment {
     margin-top: 5px;
-  }
-  .reply-btn {
-    opacity: 1 !important;
   }
 }
 
